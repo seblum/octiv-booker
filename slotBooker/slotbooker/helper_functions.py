@@ -1,6 +1,18 @@
 from datetime import date
 
 
+def _get_xpath_booking_head() -> str:
+    return "/html/body/div/div[5]/div/div"
+
+
+def _get_xpath_login_username_head() -> str:
+    return "/html/body/div/div[3]/div/div/div/div/div/div/form"
+
+
+def _get_xpath_login_password_head() -> str:
+    return "/html/body/div[1]/div[3]/div/div/div/div/div/div/form"
+
+
 def get_day(days_before_bookable: int) -> (str, bool):
     week_days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
     today = date.today().weekday()
