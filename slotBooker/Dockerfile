@@ -14,11 +14,11 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 # set display port to avoid crash
 ENV DISPLAY=:99
 
-RUN mkdir /slotbooker 
+RUN mkdir /slotbooker
 COPY slotbooker slotbooker
 COPY poetry.lock pyproject.toml ./
 
-ENV PYTHONPATH=${PYTHONPATH}:${PWD} 
+ENV PYTHONPATH=${PYTHONPATH}:${PWD}
 
 RUN pip3 install poetry
 RUN poetry config virtualenvs.create false
@@ -27,11 +27,11 @@ RUN poetry install
 ENTRYPOINT [ "poetry", "run", "slotBooker" ]
 
 
-# RUN mkdir /app 
+# RUN mkdir /app
 # COPY /app /app
-# COPY pyproject.toml /app 
+# COPY pyproject.toml /app
 # WORKDIR /app
-# ENV PYTHONPATH=${PYTHONPATH}:${PWD} 
+# ENV PYTHONPATH=${PYTHONPATH}:${PWD}
 # RUN pip3 install poetry
 # RUN poetry config virtualenvs.create false
 # RUN poetry install --no-dev
