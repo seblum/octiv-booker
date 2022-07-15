@@ -36,7 +36,7 @@ def get_day_button(day_to_book : str) -> str:
     return day_button
 
 
-def _get_booking_slot(day_to_book: str, book_action: bool = True) -> str:
+def get_booking_slot(booking_slot: int, book_action: bool) -> str:
     # set paths for weightligting slot, etc
     
     def _get_xpath_book(slot: int) -> str:
@@ -45,44 +45,6 @@ def _get_booking_slot(day_to_book: str, book_action: bool = True) -> str:
     def _get_xpath_cancel(slot: int) -> str:
         return f"/html/body/div/div[5]/div/div[{slot}]/div/div[2]/div[3]/button"
 
-    # box above
-    # /html/body/div/div[5]/div/div[6]/div/div[1]
-    # weightlifting box
-    # /html/body/div/div[5]/div/div[7]/div/div[1]
+    return _get_xpath_book(booking_slot) if book_action else _get_xpath_cancel(booking_slot)
 
-    # for i in all:
-    #     f"/html/body/div/div[5]/div/div[{i}]/div/div[1]/div[2]/p[1]"
-    #     /html/body/div/div[5]/div/div[7]/div/div[1]/div[2]/p[1]
-
-    # WebElement e = driver.findElement(By.xpath("//*[text()='Weightlifting']"));
-
-    # System.out.println("Element with text(): " + e.getText() );
-    
-    # "//*[text() = 'Weightlifting']"
-    # //example[contains(text(), 'Hello')]
-
-    # button_str= "/div[3]/button"
-    # f'/html/body/div/div[5]/div/div[{ where_sth_is_weightliftig  }]/div/div[1]' + button_str
-    
-    class_thu = 3 # weightlifting
-    # /html/body/div/div[5]/div/div[16]/div/div[1]/div[3]/button
-    class_sat = 4 # gynmastics
-    # /html/body/div/div[5]/div/div[7]/div/div[1]/div[3]/button
-    class_sun = 3 # weightlifting
-    # /html/body/div/div[5]/div/div[7]/div/div[1]/div[3]/button
-
-    match day_to_book:
-        case "Monday":
-            return "TBD"
-        case "Tuesday":
-            return "TBD"
-        case "Wednesday":
-            return "TBD"
-        case "Thursday":
-            return _get_xpath_book(class_thu) if book_action else _get_xpath_cancel(class_thu)
-        case "Friday":
-            return "TBD"
-        case "Saturday":
-            return "TBD"
-        case "Sunday":
-            return "TBD"
+  
