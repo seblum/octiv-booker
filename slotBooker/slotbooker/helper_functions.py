@@ -52,9 +52,9 @@ def get_booking_slot(booking_slot: int, book_action: bool) -> str:
     # set paths for weightligting slot, etc
 
     def _get_xpath_book(slot: int) -> str:
-        return f"/html/body/div/div[5]/div/div[{slot}]/div/div[1]/div[3]/button"
+        return f"{_get_xpath_booking_head()}[{slot}]/div/div[1]/div[3]/button"
 
     def _get_xpath_cancel(slot: int) -> str:
-        return f"/html/body/div/div[5]/div/div[{slot}]/div/div[2]/div[3]/button"
+        return f"{_get_xpath_booking_head()}[{slot}]/div/div[2]/div[3]/button"
 
     return _get_xpath_book(booking_slot) if book_action else _get_xpath_cancel(booking_slot)

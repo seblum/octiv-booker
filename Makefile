@@ -85,4 +85,3 @@ bump-minor:
 .PHONY: bump-patch
 bump-patch:
 	$(POETRY_VERSION_CMD) patch
-

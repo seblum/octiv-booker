@@ -3,7 +3,7 @@
 
 docker build -t seblum/slotbooker:v1 .
 
-
+# makefile add install of chromedriver
 
 # Before you start
 ## Add crendentials of ZHS account
