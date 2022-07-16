@@ -15,6 +15,7 @@ from .helper_functions import (
     get_day_button,
 )
 
+import time
 
 def login(driver: object, base_url: str, username: str, password: str) -> None:
     """Log in onto website
@@ -115,7 +116,7 @@ def book_slot(driver: object, class_name: str, booking_action: bool = True) -> N
             # Use execute_script() when another element is covering the element to be clicked
             element = driver.find_element(By.XPATH, xpath_button_book)
             driver.execute_script("arguments[0].click();", element)
-
+            time.sleep(5)
             print(f"! Class booked")
         else:
             print(f"| Cancelling class at {time_slots[-1]}")
@@ -127,10 +128,12 @@ def book_slot(driver: object, class_name: str, booking_action: bool = True) -> N
             driver.execute_script("arguments[0].click();", element)
 
             driver.switch_to.alert.accept()
-            driver.implicitly_wait(10)
+            time.sleep(5)
             print(f"! Class cancelled")
     else:
         print("! No bookable slot found")
+
+    #driver.find_element(By.XPATH, "ss")
 
         # # book max slot: if list contains multiple elements, then last element
         # xpath_button_book = get_booking_slot(booking_slot=max(class_slots), book_action=booking_action)
