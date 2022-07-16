@@ -1,10 +1,6 @@
-# from calendar import weekday
-# from datetime import date
-# from pickle import NONE
-# from xml.etree.ElementPath import xpath_tokenizer
+from xml.dom.minidom import Element
 
-# from selenium import webdriver
-# from selenium.common.exceptions import UnexpectedAlertPresentException
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -29,7 +25,7 @@ def login(driver: object, base_url: str, username: str, password: str) -> None:
         username (str): username for login
         password (str): password for login
     """
-    print(">")
+    print("<>")
     driver.get(base_url)
 
     # username field
@@ -65,12 +61,12 @@ def switch_day(driver: object, days_before_bookable: int, booking_action: bool =
         WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, f"{_get_xpath_booking_head()}[3]/div[9]/div/div/i"))
         ).click()
-        print("|-- switched to next week")
+        print("| switched to next week")
 
     day_button = get_day_button(day)
     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, day_button))).click()
 
-    print(f"  | switch to {day} successful")
+    print(f"| switched to day: {day}")
     return day
 
 
@@ -90,30 +86,79 @@ def book_slot(driver: object, class_name: str, booking_action: bool = True) -> N
     all_slots_bounding_boxes = driver.find_elements(By.XPATH, _get_xpath_booking_head())
 
     # Iterate over all found bounding boxes
-    print(f"  ? possible bookings for '{class_name}'")
-    class_slot = []
-    for i in range(len(all_slots_bounding_boxes)):
-        xpath_test = f"{_get_xpath_booking_head()}[{i}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
+    print(f"? possible classes for '{class_name}'")
+    class_slots, time_slots = [], []
+    for slot_index in range(len(all_slots_bounding_boxes)):
+        slot_index += 1
+        xpath_test = f"{_get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
         try:
-            # If the bounding box is one relevant for booking a class and has the relevant class name
             if driver.find_element(By.XPATH, xpath_test).text == class_name:
                 # get the corresponding time slot and print it
                 xpath_time_slot = (
-                    f"{_get_xpath_booking_head()}[{i}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
+                    f"{_get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
                 )
-                print(f"- time: {driver.find_element(By.XPATH, xpath_time_slot).text} - index: {i}")
+                time_slot = driver.find_element(By.XPATH, xpath_time_slot).text
+                print(f"- time: {time_slot} - index: {slot_index}")
                 # append index of class to list
-                class_slot.append(i)
+                class_slots.append(slot_index)
+                time_slots.append(time_slot)
         except:
             continue
 
     # TODO: build in popup for cancel class
-    if class_slot:
-        # try:
-        # book max slot: if list contains multiple elements, then last element
-        xpath_button_book = get_booking_slot(booking_slot=max(class_slot), book_action=booking_action)
-        WebDriverWait(driver, 40).until(EC.element_to_be_clickable((By.XPATH, xpath_button_book))).click()
-        # except UnexpectedAlertPresentException:
-        #   print("cannot cancel, popup detected")
+    if class_slots:
+        if booking_action:
+            print(f"| Booking class at {time_slots[-1]}")
+
+            # book max slot: if list contains multiple elements, then last element
+            xpath_button_book = get_booking_slot(booking_slot=max(class_slots), book_action=booking_action)
+            # Use execute_script() when another element is covering the element to be clicked
+            element = driver.find_element(By.XPATH, xpath_button_book)
+            driver.execute_script("arguments[0].click();", element)
+
+            print(f"! Class booked")
+        else:
+            print(f"| Cancelling class at {time_slots[-1]}")
+
+            # book max slot: if list contains multiple elements, then last element
+            xpath_button_book = get_booking_slot(booking_slot=max(class_slots), book_action=booking_action)
+            # Use execute_script() when another element is covering the element to be clicked
+            element = driver.find_element(By.XPATH, xpath_button_book)
+            driver.execute_script("arguments[0].click();", element)
+
+            driver.switch_to.alert.accept()
+            driver.implicitly_wait(10)
+            print(f"! Class cancelled")
     else:
-        print("  ! No bookable slot found")
+        print("! No bookable slot found")
+
+        # # book max slot: if list contains multiple elements, then last element
+        # xpath_button_book = get_booking_slot(booking_slot=max(class_slots), book_action=booking_action)
+        # element = driver.find_element(By.XPATH, xpath_button_book)
+        # # Use execute_script() when another element is covering the element to be clicked
+        # driver.execute_script("arguments[0].click();", element)
+        # print(f"  ! Class booked at {time_slots[-1]}") if booking_action else print(f"  ! Class cancelled at {time_slots[-1]}")
+
+        # # element.click()# print(xpath_button_book)
+        # # action = ActionChains(driver)
+        # # print("1")
+        # #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        # #element.click()# print(xpath_button_book)
+        # driver.execute_script("arguments[0].scrollIntoView(true);", WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath_button_book))))
+        # #action.move_to_element(WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, xpath_button_book))))
+        # #print("2")
+        # #action.perform()
+        # #WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, xpath_button_book))).click()
+        # print("1")
+        # # driver.execute_script("arguments[0].scrollIntoView();", WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, xpath_button_book))))
+        # # print("2")
+        # # action.move_to_element(WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath_button_book)))).click().perform()
+        # # print("3")
+        # print(xpath_button_book)
+        # #driver.maximize_window()
+        # print(driver.find_element(By.XPATH, xpath_button_book))
+        # driver.find_element(By.XPATH, xpath_button_book).click()
+        # print("2")
+        # WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath_button_book))).click()#send_keys(Keys.RETURN)
+        # # except UnexpectedAlertPresentException:
+        # print("cannot cancel, popup detected")
