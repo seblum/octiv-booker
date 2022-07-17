@@ -133,35 +133,3 @@ def book_slot(driver: object, class_name: str, booking_action: bool = True) -> N
     else:
         print("! No bookable slot found")
 
-    #driver.find_element(By.XPATH, "ss")
-
-        # # book max slot: if list contains multiple elements, then last element
-        # xpath_button_book = get_booking_slot(booking_slot=max(class_slots), book_action=booking_action)
-        # element = driver.find_element(By.XPATH, xpath_button_book)
-        # # Use execute_script() when another element is covering the element to be clicked
-        # driver.execute_script("arguments[0].click();", element)
-        # print(f"  ! Class booked at {time_slots[-1]}") if booking_action else print(f"  ! Class cancelled at {time_slots[-1]}")
-
-        # # element.click()# print(xpath_button_book)
-        # # action = ActionChains(driver)
-        # # print("1")
-        # #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        # #element.click()# print(xpath_button_book)
-        # driver.execute_script("arguments[0].scrollIntoView(true);", WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath_button_book))))
-        # #action.move_to_element(WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, xpath_button_book))))
-        # #print("2")
-        # #action.perform()
-        # #WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, xpath_button_book))).click()
-        # print("1")
-        # # driver.execute_script("arguments[0].scrollIntoView();", WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, xpath_button_book))))
-        # # print("2")
-        # # action.move_to_element(WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath_button_book)))).click().perform()
-        # # print("3")
-        # print(xpath_button_book)
-        # #driver.maximize_window()
-        # print(driver.find_element(By.XPATH, xpath_button_book))
-        # driver.find_element(By.XPATH, xpath_button_book).click()
-        # print("2")
-        # WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath_button_book))).click()#send_keys(Keys.RETURN)
-        # # except UnexpectedAlertPresentException:
-        # print("cannot cancel, popup detected")
