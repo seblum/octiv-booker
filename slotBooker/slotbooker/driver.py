@@ -1,5 +1,6 @@
 from selenium import webdriver
 
+
 def get_driver(chromedriver: str) -> object:
     """Sets the Google ChromeDriver with headless support enabled
 

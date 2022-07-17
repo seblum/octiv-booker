@@ -1,3 +1,4 @@
+import time
 from xml.dom.minidom import Element
 
 from selenium.webdriver.common.action_chains import ActionChains
@@ -7,15 +8,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from .helper_functions import (
-    _get_xpath_booking_head,
-    _get_xpath_login_password_head,
-    _get_xpath_login_username_head,
     get_booking_slot,
     get_day,
     get_day_button,
+    get_xpath_booking_head,
+    get_xpath_login_password_head,
+    get_xpath_login_username_head,
 )
 
-import time
 
 def login(driver: object, base_url: str, username: str, password: str) -> None:
     """Log in onto website
@@ -30,18 +30,18 @@ def login(driver: object, base_url: str, username: str, password: str) -> None:
     driver.get(base_url)
 
     # username field
-    driver.find_element(By.XPATH, f"{_get_xpath_login_username_head()}/div[1]/input").send_keys(username)
-    driver.find_element(By.XPATH, f"{_get_xpath_login_username_head()}/button").send_keys(Keys.RETURN)
+    driver.find_element(By.XPATH, f"{get_xpath_login_username_head()}/div[1]/input").send_keys(username)
+    driver.find_element(By.XPATH, f"{get_xpath_login_username_head()}/button").send_keys(Keys.RETURN)
     print("| submit user name successful")
 
     # password field
     WebDriverWait(driver, 20).until(
-        EC.element_to_be_clickable((By.XPATH, f"{_get_xpath_login_password_head()}/div[2]/input"))
+        EC.element_to_be_clickable((By.XPATH, f"{get_xpath_login_password_head()}/div[2]/input"))
     ).send_keys(password)
     # checkbox
-    driver.find_element(By.XPATH, f"{_get_xpath_login_password_head()}/div[3]/div/div/div[1]/div/i").click()
+    driver.find_element(By.XPATH, f"{get_xpath_login_password_head()}/div[3]/div/div/div[1]/div/i").click()
     # submit
-    driver.find_element(By.XPATH, f"{_get_xpath_login_password_head()}/button").send_keys(Keys.RETURN)
+    driver.find_element(By.XPATH, f"{get_xpath_login_password_head()}/button").send_keys(Keys.RETURN)
     print("| login successful")
 
 
@@ -60,7 +60,7 @@ def switch_day(driver: object, days_before_bookable: int, booking_action: bool =
 
     if next_week:
         WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, f"{_get_xpath_booking_head()}[3]/div[9]/div/div/i"))
+            EC.element_to_be_clickable((By.XPATH, f"{get_xpath_booking_head()}[3]/div[9]/div/div/i"))
         ).click()
         print("| switched to next week")
 
@@ -72,7 +72,8 @@ def switch_day(driver: object, days_before_bookable: int, booking_action: bool =
 
 
 def book_slot(driver: object, class_name: str, booking_action: bool = True) -> None:
-    """Book the slot of the class
+    """Book/Cancel the slot of the class. The function gets all possible booking slots and
+        selects those who match the class_name. If there are multiple options, it selects the latest one
 
     Args:
         driver (object): Webdriver, currently Chromium
@@ -83,20 +84,20 @@ def book_slot(driver: object, class_name: str, booking_action: bool = True) -> N
     # whether there has been a booking or not. 1 if not yet booked, 2 if already has been booked
     bounding_box_number_by_action = 1 if booking_action else 2
 
-    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, _get_xpath_booking_head())))
-    all_slots_bounding_boxes = driver.find_elements(By.XPATH, _get_xpath_booking_head())
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, get_xpath_booking_head())))
+    all_slots_bounding_boxes = driver.find_elements(By.XPATH, get_xpath_booking_head())
 
     # Iterate over all found bounding boxes
     print(f"? possible classes for '{class_name}'")
     class_slots, time_slots = [], []
     for slot_index in range(len(all_slots_bounding_boxes)):
         slot_index += 1
-        xpath_test = f"{_get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
+        xpath_test = f"{get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
         try:
             if driver.find_element(By.XPATH, xpath_test).text == class_name:
                 # get the corresponding time slot and print it
                 xpath_time_slot = (
-                    f"{_get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
+                    f"{get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
                 )
                 time_slot = driver.find_element(By.XPATH, xpath_time_slot).text
                 print(f"- time: {time_slot} - index: {slot_index}")
@@ -106,30 +107,24 @@ def book_slot(driver: object, class_name: str, booking_action: bool = True) -> N
         except:
             continue
 
-    # TODO: build in popup for cancel class
+    def _click_book_button(class_slots: list, booking_action: bool) -> None:
+        # book max slot: if list contains multiple elements, then last element
+        xpath_button_book = get_booking_slot(booking_slot=max(class_slots), book_action=booking_action)
+        # Use execute_script() when another element is covering the element to be clicked
+        element = driver.find_element(By.XPATH, xpath_button_book)
+        driver.execute_script("arguments[0].click();", element)
+
     if class_slots:
         if booking_action:
             print(f"| Booking class at {time_slots[-1]}")
-
-            # book max slot: if list contains multiple elements, then last element
-            xpath_button_book = get_booking_slot(booking_slot=max(class_slots), book_action=booking_action)
-            # Use execute_script() when another element is covering the element to be clicked
-            element = driver.find_element(By.XPATH, xpath_button_book)
-            driver.execute_script("arguments[0].click();", element)
+            _click_book_button(class_slots, booking_action)
             time.sleep(5)
             print(f"! Class booked")
         else:
             print(f"| Cancelling class at {time_slots[-1]}")
-
-            # book max slot: if list contains multiple elements, then last element
-            xpath_button_book = get_booking_slot(booking_slot=max(class_slots), book_action=booking_action)
-            # Use execute_script() when another element is covering the element to be clicked
-            element = driver.find_element(By.XPATH, xpath_button_book)
-            driver.execute_script("arguments[0].click();", element)
-
+            _click_book_button(class_slots, booking_action)
             driver.switch_to.alert.accept()
             time.sleep(5)
             print(f"! Class cancelled")
     else:
         print("! No bookable slot found")
-

@@ -1,7 +1,7 @@
 from datetime import date
 
 
-def _get_xpath_booking_head() -> str:
+def get_xpath_booking_head() -> str:
     """Head of the XPath of the booking table page after log in
 
     Returns:
@@ -10,7 +10,7 @@ def _get_xpath_booking_head() -> str:
     return "/html/body/div/div[5]/div/div"
 
 
-def _get_xpath_login_username_head() -> str:
+def get_xpath_login_username_head() -> str:
     """Head of XPath of the login page where the username is set
 
     Returns:
@@ -19,7 +19,7 @@ def _get_xpath_login_username_head() -> str:
     return "/html/body/div/div[3]/div/div/div/div/div/div/form"
 
 
-def _get_xpath_login_password_head() -> str:
+def get_xpath_login_password_head() -> str:
     """Head of XPath of the login page where the password is set
         and the terms and agreements have to be checked.
 
@@ -94,9 +94,9 @@ def get_booking_slot(booking_slot: int, book_action: bool) -> str:
     """
 
     def _get_xpath_book(slot: int) -> str:
-        return f"{_get_xpath_booking_head()}[{slot}]/div/div[1]/div[3]/button"
+        return f"{get_xpath_booking_head()}[{slot}]/div/div[1]/div[3]/button"
 
     def _get_xpath_cancel(slot: int) -> str:
-        return f"{_get_xpath_booking_head()}[{slot}]/div/div[2]/div[3]/button"
+        return f"{get_xpath_booking_head()}[{slot}]/div/div[2]/div[3]/button"
 
     return _get_xpath_book(booking_slot) if book_action else _get_xpath_cancel(booking_slot)

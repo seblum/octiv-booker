@@ -31,5 +31,3 @@ RUN poetry install
 # RUN poetry install --no-dev
 
 ENTRYPOINT [ "poetry", "run", "slotBooker" ]
-
-
