@@ -3,4 +3,3 @@ locals {
     ecr_repository_name = "octiv-booker"
     ecr_image_tag       = "latest"
 }
-

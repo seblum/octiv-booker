@@ -10,7 +10,7 @@ resource docker_registry_image docker_ecr_image {
     build {
         context = "../slotBooker"
         dockerfile = "Dockerfile"
-    }  
+    }
 }
 
 
@@ -69,4 +69,51 @@ resource aws_iam_policy iam_policy_for_lambda {
     ]
 }
  EOF
+}
+
+
+# module "eventbridge" {
+#   source = "terraform-aws-modules/eventbridge/aws"
+
+#   create_bus = false
+
+#   rules = {
+#     crons = {
+#       description         = "Trigger for a Lambda"
+#       schedule_expression = "rate(5 minutes)"
+#     }
+#   }
+
+#   targets = {
+#     crons = [
+#       {
+#         name  = "lambda-loves-cron"
+#         arn   = "${aws_lambda_function.terraform_lambda_func.arn}"
+#         input = jsonencode({"job": "cron-by-rate"})
+#       }
+#     ]
+#   }
+# }
+
+
+resource "aws_cloudwatch_event_rule" "octiv_scheduler" {
+    name = "octiv_scheduler"
+    description = "Fires Saturday, Monday, and Tuesday at 8pm five minutes"
+    schedule_expression = "cron(0 20 ? * SAT,MON,TUE *)" #"rate(5 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "check_octiv_scheduler" {
+    rule = aws_cloudwatch_event_rule.octiv_scheduler.name
+    target_id = "terraform_lambda_func"
+    arn = aws_lambda_function.terraform_lambda_func.arn
+}
+
+
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_octiv" {
+    statement_id = "AllowExecutionFromCloudWatch"
+    action = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.terraform_lambda_func.function_name
+    principal = "events.amazonaws.com"
+    source_arn = aws_cloudwatch_event_rule.octiv_scheduler.arn
 }
