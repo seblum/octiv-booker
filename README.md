@@ -16,4 +16,15 @@ chmod 400 octivbooker.pem
 
 ssh-keygen -y -f octivbooker.pem > octivbooker-public.pem
 
-chmod 400 octivbooker-public.pem 
+chmod 400 octivbooker-public.pem
+
+
+# TODO
+
+[] create envs for octiv passwords
+[] move terraform to github actions
+[] add terraform cloud to save statefile
+[] write proper documentation
+
+
+
