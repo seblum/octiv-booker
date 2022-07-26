@@ -1,7 +1,6 @@
 import os
 
 import yaml
-
 from driver import close_driver, get_driver
 from ui_interaction import book_slot, login, switch_day
 
@@ -14,19 +13,28 @@ def main():
     """Main of Slotbooker. Gets driver, logs into website, selects
     the day wanted, and books slot. Closes driver afterwards
     """
-    driver = get_driver(chromedriver=config.get("chromedriver"))
+    # get env variables
+    USER = os.environ.get("OCTIV_USERNAME")
+    PASSWORD = os.environ.get("OCTIV_PASSWORD")
 
-    login(driver, base_url=config.get("base_url"), username=config.get("email"), password=config.get("password"))
+    # check whether env variables are set or None
+    if USER is None or PASSWORD is None:
+        print("USERNAME and PASSWORD not set")
+        print("Please run 'source set-credentials.sh' to set env variables")
+    else:
+        driver = get_driver(chromedriver=config.get("chromedriver"))
 
-    day = switch_day(driver, days_before_bookable=config.get("days_before_bookable"))
+        login(driver, base_url=config.get("base_url"), username=USER, password=PASSWORD)
 
-    book_slot(
-        driver,
-        class_name=config.get("class").get(day),  # depending on day, select class
-        booking_action=config.get("book_class"),
-    )
+        day = switch_day(driver, days_before_bookable=config.get("days_before_bookable"))
 
-    close_driver(driver)
+        book_slot(
+            driver,
+            class_name=config.get("class").get(day),  # depending on day, select class
+            booking_action=config.get("book_class"),
+        )
+
+        close_driver(driver)
 
 
 if __name__ == "__main__":
