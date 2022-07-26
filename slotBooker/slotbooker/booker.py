@@ -2,8 +2,8 @@ import os
 
 import yaml
 
-from .driver import close_driver, get_driver
-from .ui_interaction import book_slot, login, switch_day
+from driver import close_driver, get_driver
+from ui_interaction import book_slot, login, switch_day
 
 # Load config yaml
 config_path = os.path.join(os.path.dirname(__file__), "config.yaml")

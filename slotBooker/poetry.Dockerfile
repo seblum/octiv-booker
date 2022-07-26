@@ -6,7 +6,6 @@ RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable 
 RUN apt-get -y update
 RUN apt-get install -y google-chrome-stable
 
-
 # install chromedriver
 RUN apt-get install -yqq unzip
 RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
@@ -16,29 +15,19 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 ENV DISPLAY=:99
 
 RUN mkdir /app
-COPY slotbooker/* /app/
-#COPY poetry.lock pyproject.toml ./
-
-COPY ./requirements.txt /app/requirements.txt
+COPY . /app
 
 WORKDIR /app
 
-RUN chmod 644 $(find /app/. -type f)
-RUN chmod 755 $(find /app/. -type d)
+# make files executable
+RUN chmod 644 $(find . -type f)
+RUN chmod 755 $(find . -type d)
 
-#ENV PYTHONPATH=${PYTHONPATH}:${PWD}
+ENV PYTHONPATH=${PYTHONPATH}:${PWD}
 
-RUN python -m venv /opt/venv
-# Enable venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-RUN pip3 install -Ur requirements.txt
-
-RUN pip3 install webdriver-manager
-
-#RUN pip3 install poetry
-#RUN poetry config virtualenvs.create false
-#RUN poetry install
+RUN pip3 install poetry
+RUN poetry config virtualenvs.create false
 # RUN poetry install --no-dev
+RUN poetry install
 
-ENTRYPOINT [ "python", "booker.py" ]
+ENTRYPOINT [ "poetry", "run", "slotBooker" ]

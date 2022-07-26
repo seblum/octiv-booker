@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from .helper_functions import (
+from helper_functions import (
     get_booking_slot,
     get_day,
     get_day_button,
