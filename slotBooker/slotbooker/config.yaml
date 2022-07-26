@@ -1,0 +1,14 @@
+chromedriver: '/usr/local/bin/chromedriver'
+base_url: 'https://app.octivfitness.com/login'
+
+days_before_bookable: 4
+book_class: True
+
+class:
+  Monday: "None"
+  Tuesday: "None"
+  Wednesday: "None"
+  Thursday: "Weightlifting"
+  Friday: "None"
+  Saturday: "Gynmastics"
+  Sunday: "Weightlifting"
