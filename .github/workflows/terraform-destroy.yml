@@ -28,10 +28,6 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: terraform init -input=false
 
-    - name: Terraform validation
-      working-directory: ./infrastructure/aws_EC2
-      run: terraform validate
-
     - name: Terraform destroy
       working-directory: ./infrastructure/aws_EC2
       env:
