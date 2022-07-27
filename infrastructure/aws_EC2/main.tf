@@ -1,3 +1,15 @@
+
+# Call the seed_module to build our ADO seed info
+module "bootstrap" {
+  source                      = "./modules/bootstrap"
+  name_of_s3_bucket           = local.name_of_s3_bucket
+  dynamo_db_table_name        = "aws-locks"
+}
+
+
+# /* Commented out until after bootstrap
+
+
 # create ECR repo
 resource aws_ecr_repository ecr_repo {
     name = local.ecr_repository_name
@@ -25,7 +37,10 @@ resource docker_registry_image docker_ecr_image {
 
 resource "aws_key_pair" "octivbooker-key"{
     key_name = "octivbooker-public"
-    public_key = "${file("../../octivbooker-public.pem")}"
+    # used for terraform cloud
+    public_key = var.public_pem_key
+    # # used for local
+    # public_key = "${file("../../octivbooker-public.pem")}"
 }
 
 resource "aws_iam_role" "ec2_role_hello_world" {
@@ -160,3 +175,5 @@ resource "aws_security_group" "main" {
         }
     ]
 }
+
+#*/
