@@ -1,5 +1,5 @@
 output "ec2_global_ips" {
-  value = ["${aws_instance.web.*.public_ip}"]
+  value = ["${aws_instance.octivbooker-ec2.*.public_ip}"]
 }
 
 # ssh -i "octivebooker.pem"       ec2-user@ec3-70-23-178.eu-central-1.compute.amazonaws.com
