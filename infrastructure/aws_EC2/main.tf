@@ -26,7 +26,6 @@ resource docker_registry_image docker_ecr_image {
           OCTIV_USERNAME=var.octiv_username
           OCTIV_PASSWORD=var.octiv_password
           }
-        #build_args = OCTIV_PASSWORD=??? 
     }
 
     depends_on = [var.octiv_username, var.octiv_password]
