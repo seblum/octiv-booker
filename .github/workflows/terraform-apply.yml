@@ -25,17 +25,20 @@ jobs:
 
     - name: Verify Terraform version
       run: terraform --version
-
+      
     - name: Terraform init
+      working-directory: ./infrastructure/aws_EC2
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: terraform init -input=false
 
     - name: Terraform validation
+      working-directory: ./infrastructure/aws_EC2
       run: terraform validate
 
     - name: Terraform apply
+      working-directory: ./infrastructure/aws_EC2
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
