@@ -47,4 +47,5 @@ jobs:
       run:  |
         terraform apply -auto-approve -input=false \
           -var "octiv_username=${{ secrets.octiv_username }}" \
-          -var "octiv_password=${{ secrets.octiv_password }}" 
+          -var "octiv_password=${{ secrets.octiv_password }}" \
+          -var "public_pem_key=${{ secrets.public_pem_key }}"
