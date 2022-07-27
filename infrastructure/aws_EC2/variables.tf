@@ -23,13 +23,13 @@ variable "octiv_password" {
   type = string
   description = "Octiv password to store as env in docker image"
   # read from env config, or github actions
-  default = "value"
+  # default = "value"
 }
 variable "octiv_username" {
   type = string
   description = "Octiv password to store as env in docker image"
   # read from env config, or github actions
-  default = "value2"
+  # default = "value2"
 }
 
 variable "public_pem_key" {
