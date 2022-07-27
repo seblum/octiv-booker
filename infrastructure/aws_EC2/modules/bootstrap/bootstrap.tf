@@ -17,7 +17,7 @@ resource "aws_s3_bucket" "state_bucket" {
 
   # Prevents Terraform from destroying or replacing this object - a great safety mechanism
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   # Tells AWS to keep a version history of the state file
