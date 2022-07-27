@@ -12,6 +12,6 @@ data "template_file" "init" {
   vars = {
       ecr_url = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
       region  = "${var.region}"
-      awsid   = "${data.aws_caller_identity.current.account_id}"  
+      awsid   = "${data.aws_caller_identity.current.account_id}"
       }
 }

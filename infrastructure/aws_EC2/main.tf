@@ -9,8 +9,16 @@ resource docker_registry_image docker_ecr_image {
 
     build {
         context = "../../slotBooker"
-        dockerfile = "Dockerfile"
+        dockerfile = "poetry.Dockerfile"
+        build_args = {
+          OCTIV_USERNAME=var.octiv_username
+          OCTIV_PASSWORD=var.octiv_password
+          }
+        #build_args = OCTIV_PASSWORD=??? 
     }
+
+    depends_on = [var.octiv_username, var.octiv_password]
+
 }
 
 
@@ -94,7 +102,7 @@ resource "aws_instance" "web" {
     }
 
     user_data = data.template_file.init.rendered
-    
+
 
     # depends_on = [
     #     module.ec2_sg,
@@ -104,7 +112,7 @@ resource "aws_instance" "web" {
     #subnet_id = "${aws_subnet.subnet-uno.id}"
     # security_groups             = ["${aws_security_group.toydeploy-sg.id}"]
     # subnet_id                   = aws_subnet.toydeploy-subnet.id
- 
+
     iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
     tags = {
@@ -152,5 +160,3 @@ resource "aws_security_group" "main" {
         }
     ]
 }
-
-

@@ -1,8 +1,8 @@
 import os
 
 import yaml
-from driver import close_driver, get_driver
-from ui_interaction import book_slot, login, switch_day
+from .driver import close_driver, get_driver
+from .ui_interaction import book_slot, login, switch_day
 
 # Load config yaml
 config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
@@ -16,12 +16,14 @@ def main():
     # get env variables
     USER = os.environ.get("OCTIV_USERNAME")
     PASSWORD = os.environ.get("OCTIV_PASSWORD")
-
     # check whether env variables are set or None
     if USER is None or PASSWORD is None:
         print("USERNAME and PASSWORD not set")
         print("Please run 'source set-credentials.sh' to set env variables")
     else:
+        print("USERNAME and PASSWORD prevalent")
+        print(f"USER: {USER}")
+
         driver = get_driver(chromedriver=config.get("chromedriver"))
 
         login(driver, base_url=config.get("base_url"), username=USER, password=PASSWORD)

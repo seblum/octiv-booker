@@ -14,14 +14,25 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 # set display port to avoid crash
 ENV DISPLAY=:99
 
+# arg directivy to pass at build-time
+ARG OCTIV_USERNAME=${OCTIV_USERNAME:-""}
+# set environment variables
+ENV OCTIV_USERNAME=${OCTIV_USERNAME}
+
+ARG OCTIV_PASSWORD=${OCTIV_PASSWORD:-""}
+ENV OCTIV_PASSWORD=${OCTIV_PASSWORD}
+
+CMD echo "USERNAME is ${OCTIV_USERNAME}"
+
+
 RUN mkdir /app
 COPY . /app
 
 WORKDIR /app
 
 # make files executable
-RUN chmod 644 $(find . -type f)
-RUN chmod 755 $(find . -type d)
+#RUN chmod 644 $(find . -type f)
+#RUN chmod 755 $(find . -type d)
 
 ENV PYTHONPATH=${PYTHONPATH}:${PWD}
 

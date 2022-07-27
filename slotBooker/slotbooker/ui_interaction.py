@@ -1,7 +1,7 @@
 import time
 from xml.dom.minidom import Element
 
-from helper_functions import (
+from .helper_functions import (
     get_booking_slot,
     get_day,
     get_day_button,
