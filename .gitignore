@@ -171,4 +171,5 @@ cython_debug/
 terraform.tfstate
 terraform.tfstate.backup
 
-providers.tf
+#providers.tf
+.DS_Store

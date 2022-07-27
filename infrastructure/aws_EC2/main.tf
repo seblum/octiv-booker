@@ -24,8 +24,8 @@ resource aws_ecr_repository ecr_repo {
 
 ## Build docker images and push to ECR
 resource docker_registry_image docker_ecr_image {
-    name = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
-
+    #name = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
+    name = "${ecr_repository_name}:${ecr_image_tag}"
     build {
         context = "../../slotBooker"
         dockerfile = "poetry.Dockerfile"
@@ -38,7 +38,6 @@ resource docker_registry_image docker_ecr_image {
     depends_on = [var.octiv_username, var.octiv_password]
 
 }
-
 
 resource "aws_key_pair" "octivbooker-key"{
     key_name = "octivbooker-public"
@@ -56,16 +55,12 @@ resource "aws_instance" "octivbooker-ec2" {
 
     user_data = data.template_file.init.rendered
 
-    # depends_on = [
-    #     module.ec2_sg,
-    #     module.dev_ssh_sg
-    # ]
-    vpc_security_group_ids      = [aws_security_group.main.id]
+    vpc_security_group_ids      = [module.network.aws_security_group]
     # subnet_id                   = "${aws_subnet.subnet-uno.id}"
     # security_groups             = ["${aws_security_group.toydeploy-sg.id}"]
     # subnet_id                   = aws_subnet.toydeploy-subnet.id
 
-    iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+    iam_instance_profile = module.iam.aws_iam_instance_profile
 
     tags = {
         project = "octive-booker"

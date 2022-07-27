@@ -12,7 +12,7 @@ terraform {
     bucket         = "octivebookerterraform"
     key            = "terraform.tfstate"
     region         = "eu-central-1"
-    dynamodb_table = "aws-locks"
+    #dynamodb_table = "aws-locks"
     encrypt        = true
   }
 
