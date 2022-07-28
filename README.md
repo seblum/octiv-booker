@@ -1,7 +1,6 @@
 # Octiv SlotBooker
 
-![Octive Overview](https://raw.githubusercontent.com/seblum/octiv_booker/master/overview.png)
-octiv_overview.png
+![Octive Overview](https://github.com/seblum/octiv_booker/blob163984791abc0a553de5e33fb548adf6aa07da9c/octiv_overview.png)
 ## Structure
 
 ```
