@@ -1,6 +1,6 @@
 
-resource "aws_iam_role" "ec2_role_hello_world" {
-  name = "ec2_role_hello_world"
+resource "aws_iam_role" "ec2_role_octiv_booker" {
+  name = "ec2_role_octiv_booker"
 
   assume_role_policy = <<EOF
 {
@@ -25,13 +25,13 @@ EOF
 
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "ec2_profile_hello_world"
-  role = aws_iam_role.ec2_role_hello_world.name
+  role = aws_iam_role.ec2_role_octiv_booker.name
 }
 
 
 resource "aws_iam_role_policy" "ec2_policy" {
   name = "ec2_policy"
-  role = aws_iam_role.ec2_role_hello_world.id
+  role = aws_iam_role.ec2_role_octiv_booker.id
 
   policy = <<EOF
 {
