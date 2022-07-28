@@ -28,7 +28,7 @@ resource aws_ecr_repository ecr_repo {
 ## Build docker images and push to ECR
 resource docker_registry_image docker_ecr_image {
     #name = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
-    name = "${locals.ecr_repository_name}:${locals.ecr_image_tag}"
+    name = "${local.ecr_repository_name}:${local.ecr_image_tag}"
     build {
         context = "../../slotBooker"
         dockerfile = "poetry.Dockerfile"

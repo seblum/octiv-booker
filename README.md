@@ -1,6 +1,6 @@
 # Octiv SlotBooker
 
-![Octive Overview](ovtic.overview.png)
+![Octive Overview](https://raw.githubusercontent.com/seblum/octiv_booker/master/overview.png)
 
 
 ## Structure
