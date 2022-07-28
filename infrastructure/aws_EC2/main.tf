@@ -7,9 +7,9 @@
 # }
 
 
-# module "network" {
-#   source = "./modules/network"
-# }
+module "network" {
+  source = "./modules/network"
+}
 
 module "iam" {
   source = "./modules/iam"
@@ -27,8 +27,8 @@ resource "aws_ecr_repository" "ecr_repo" {
 
 ## Build docker images and push to ECR
 resource "docker_registry_image" "docker_ecr_image" {
-  #name = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
-  name = "${local.ecr_repository_name}:${local.ecr_image_tag}"
+  name = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
+  #name = "${local.ecr_repository_name}:${local.ecr_image_tag}"
   build {
     context    = "../../slotBooker"
     dockerfile = "poetry.Dockerfile"
@@ -52,8 +52,8 @@ resource "aws_instance" "octivbooker-ec2" {
   instance_type           = "t3.micro"
   iam_instance_profile    = module.iam.aws_iam_instance_profile
   user_data               = data.template_file.init.rendered
-  #vpc_security_group_ids  = [module.network.aws_security_group]
-  #subnet_id               = module.network.aws_subnet
+  vpc_security_group_ids  = [module.network.aws_security_group]
+  subnet_id               = module.network.aws_subnet
   key_name                = aws_key_pair.octivbooker-key.key_name
   monitoring              = true
   disable_api_termination = false

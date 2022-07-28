@@ -7,7 +7,6 @@ terraform {
     }
   }
 
-  # Commented out until after bootstrap
   backend "s3" {
     bucket = "octivebookerterraform"
     key    = "terraform.tfstate"
