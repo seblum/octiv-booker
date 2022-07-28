@@ -37,9 +37,6 @@ resource "docker_registry_image" "docker_ecr_image" {
     }
   }
   depends_on = [var.octiv_username, var.octiv_password]
-  tags = {
-    project = "octive-booker"
-  }
 }
 
 resource "aws_key_pair" "octivbooker-key" {
