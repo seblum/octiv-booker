@@ -1,7 +1,7 @@
 chromedriver: '/usr/local/bin/chromedriver'
 base_url: 'https://app.octivfitness.com/login'
 
-days_before_bookable: 4
+days_before_bookable: 5
 book_class: True
 
 class:

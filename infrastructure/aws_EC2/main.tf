@@ -24,6 +24,7 @@ resource "aws_ecr_repository" "ecr_repo" {
   }
 }
 
+
 ## Build docker images and push to ECR
 resource "docker_registry_image" "docker_ecr_image" {
   #name = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
@@ -39,12 +40,10 @@ resource "docker_registry_image" "docker_ecr_image" {
   depends_on = [var.octiv_username, var.octiv_password]
 }
 
+
 resource "aws_key_pair" "octivbooker-key" {
   key_name   = "octivbooker-public"
   public_key = var.public_pem_key
-  # tags = {
-  #     project = "octive-booker"
-  # }
 }
 
 

@@ -65,6 +65,10 @@ ssh-keygen -y -f octivbooker.pem > octivbooker-public.pem
 chmod 400 octivbooker-public.pem
 ```
 
+```
+
+ssh -i "octivbooker-public.pem" ec2-user@ec2-3-66-213-246.eu-central-1.compute.amazonaws.com
+````
 
 ## run locally
 
@@ -96,15 +100,15 @@ seblum/slotbooker:v1
 
 ## TODO
 
-- [ ] pull docker image on ec2 and make it run on cronjobs
 - [x] create envs for octiv passwords
 - [x] create docker envs for octiv passwords
 - [x] pass envs from tf to docker envs for octiv passwords
 - [x] move terraform to github actions
 - [x] terraform statefile save on aws
 - [x] resolve issue with statefile s3 bucket on deletion
-- [ ] write proper documentation
 - [x] enable full network on terraform
 - [x] put tags in infrastructure
 - [x] own network for ec2
-- [ ]
+- [ ] pull docker image on ec2 and make it run on cronjobs
+- [ ] write proper documentation
+- [ ] refactor AWS_Lambda for github actions
