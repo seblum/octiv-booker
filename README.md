@@ -98,6 +98,12 @@ docker run \
 seblum/slotbooker:v1
 ```
 
+## Known issues
+
+- `bash Error: Error pushing docker image: Error response from daemon: Bad parameters and missing X-Registry-Auth: EOF` This Error can occur during terraform apply in Github Actions during building of the Docker image.. It works running terraform apply locally though.
+
+
+
 ## TODO
 
 - [x] create envs for octiv passwords
