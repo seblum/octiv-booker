@@ -1,5 +1,5 @@
 
-# Call the seed_module to build our ADO seed info
+# Initially used to setup S3 and DynamoDB as backend.
 # module "bootstrap" {
 #   source                      = "./modules/bootstrap"
 #   name_of_s3_bucket           = local.name_of_s3_bucket

@@ -170,6 +170,7 @@ cython_debug/
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
+registry.terraform.io
 
 #providers.tf
 .DS_Store
