@@ -1,12 +1,11 @@
 
 # Call the seed_module to build our ADO seed info
-module "bootstrap" {
-  source                      = "./modules/bootstrap"
-  name_of_s3_bucket           = local.name_of_s3_bucket
-  dynamo_db_table_name        = "aws-locks"
-}
+# module "bootstrap" {
+#   source                      = "./modules/bootstrap"
+#   name_of_s3_bucket           = local.name_of_s3_bucket
+#   dynamo_db_table_name        = "aws-locks"
+# }
 
-# /* Commented out until after bootstrap
 
 module "network" {
   source                      = "./modules/network"
@@ -20,12 +19,16 @@ module "iam" {
 # create ECR repo
 resource aws_ecr_repository ecr_repo {
     name = local.ecr_repository_name
+
+    tags = {
+        project = "octive-booker"
+    }
 }
 
 ## Build docker images and push to ECR
 resource docker_registry_image docker_ecr_image {
-    name = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
-    #name = "${locals.ecr_repository_name}:${locals.ecr_image_tag}"
+    #name = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
+    name = "${locals.ecr_repository_name}:${locals.ecr_image_tag}"
     build {
         context = "../../slotBooker"
         dockerfile = "poetry.Dockerfile"
@@ -37,11 +40,16 @@ resource docker_registry_image docker_ecr_image {
 
     depends_on = [var.octiv_username, var.octiv_password]
 
+
+
 }
 
 resource "aws_key_pair" "octivbooker-key"{
     key_name = "octivbooker-public"
     public_key = var.public_pem_key
+    tags = {
+        project = "octive-booker"
+    }
 }
 
 
@@ -56,9 +64,8 @@ resource "aws_instance" "octivbooker-ec2" {
     user_data = data.template_file.init.rendered
 
     vpc_security_group_ids      = [module.network.aws_security_group]
-    # subnet_id                   = "${aws_subnet.subnet-uno.id}"
-    # security_groups             = ["${aws_security_group.toydeploy-sg.id}"]
-    # subnet_id                   = aws_subnet.toydeploy-subnet.id
+    subnet_id                   = module.network.aws_subnet
+
 
     iam_instance_profile = module.iam.aws_iam_instance_profile
 
@@ -72,6 +79,4 @@ resource "aws_instance" "octivbooker-ec2" {
     ebs_optimized           = true
 }
 
-
-#*/
 

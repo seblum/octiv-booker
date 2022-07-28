@@ -1,27 +1,48 @@
+# Octiv SlotBooker
 
-# Structure
+![Octive Overview](ovtic.overview.png)
 
-|
-|--
-# build the image
 
-docker build -t seblum/slotbooker:v1 .
+## Structure
 
-docker build \
---build-arg OCTIV_USERNAME=??? \
---build-arg OCTIV_PASSWORD=??? \
--t seblum/slotbooker:v1 \
---no-cache .
+```
+OCTIV_BOOKER
+│   README.md
+│   Makefile    
+│   .pre-commit-config.yaml    
+│
+└───slotBooker
+│   │   Dockerfile
+│   │   poetry.Dockerfile
+│   │   ...
+│   │
+│   └───slotbooker
+│       │   booker.py
+│       │   config.yaml
+│       │   ...
+│   
+└───infrastructure
+    └───aws_EC2
+    │   │ main.tf
+    │   │ ...
+    │
+    └───aws_lambda
+    │   │ main.tf
+        │ ...
+```
 
-or
+### slotBooker
 
-docker run \
--e OCTIV_USERNAME \ 
--e OCTIV_PASSWORD \
-seblum/slotbooker:v1
 
-# create key pair
+### infrastructure
 
+
+
+## Usage
+
+### create key pair
+
+```
 aws ec2 create-key-pair \
     --key-name octivbooker \
     --key-type rsa \
@@ -34,24 +55,44 @@ chmod 400 octivbooker.pem
 ssh-keygen -y -f octivbooker.pem > octivbooker-public.pem
 
 chmod 400 octivbooker-public.pem
+```
 
-# terraform
 
-1. set your terraform backend
-2. login to cloud
-3. does not work with docker...
-# TODO
+## run locally
+
+To run locally, one has to specify and ingest some variables which is otherwise handled by github actions.
+### build the image
+
+```bash
+docker build -t seblum/slotbooker:v1 .
+
+docker build \
+--build-arg OCTIV_USERNAME=??? \
+--build-arg OCTIV_PASSWORD=??? \
+-t seblum/slotbooker:v1 \
+--no-cache .
+
+docker run \
+-e OCTIV_USERNAME \ 
+-e OCTIV_PASSWORD \
+seblum/slotbooker:v1
+```
+
+## TODO
 
 - [ ] pull docker image on ec2 and make it run on cronjobs
 - [x] create envs for octiv passwords
 - [x] create docker envs for octiv passwords
 - [x] pass envs from tf to docker envs for octiv passwords
-- [ ] move terraform to github actions
-- [ ] terraform statefile save on aws
-- [-] add terraform cloud to save statefile
+- [x] move terraform to github actions
+- [x] terraform statefile save on aws
+- [ ] resolve issue with statefile s3 bucket on deletion
 - [ ] write proper documentation
+- [ ] enable full network on terraform
 - [ ] put tags in infrastructure
-# env variables
+- [ ] own network for ec2
+- [ ] 
+## env variables
 
 run shell script using source set-credentials to set environment variables.
 

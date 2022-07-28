@@ -18,7 +18,7 @@ resource "aws_iam_role" "ec2_role_hello_world" {
 EOF
 
   tags = {
-    project = "hello-world"
+      project = "octive-booker"
   }
 }
 
@@ -26,6 +26,7 @@ EOF
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "ec2_profile_hello_world"
   role = aws_iam_role.ec2_role_hello_world.name
+
 }
 
 
