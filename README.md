@@ -2,7 +2,7 @@
 
 ![Octive Overview](https://github.com/seblum/octiv_booker/blob/d434b11827b830aa7dd0e0614558034dbaabe66f/octiv_overview.png)
 
-Octiv Slotbooker is, as the name says, used to book a slot/class for the fitness app Octiv. I developed it mainly for personal reasons so I can automate the weekly booking of classes. 
+Octiv Slotbooker is, as the name says, used to book a slot/class for the fitness app Octiv. I developed it mainly for personal reasons so I can automate the weekly booking of classes. The functionality is based on selenium. 
 
 ## Structure 
 
@@ -42,7 +42,7 @@ OCTIV_BOOKER
 
 One has to create an S3 Bucket named `octivbookerterraform` previous to run terraform and be able to apply terraform. This is a prerequisite for the backend to store the tf.statefile on AWS. Of course, the bucket can be named otherwise, one has to adjust the backend.tf as well though.
 
-To run locally, one needs to have the AWS CLI, Terraform, and Docker installed and proberly configured.
+To run locally, one needs to have the AWS CLI, Terraform, and Docker installed and proberly configured. To run the app without docker, one also needs to install chromedriver for selenium.
 
 ## Usage
 
