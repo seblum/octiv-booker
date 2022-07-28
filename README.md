@@ -110,5 +110,6 @@ seblum/slotbooker:v1
 - [x] put tags in infrastructure
 - [x] own network for ec2
 - [ ] pull docker image on ec2 and make it run on cronjobs
+- [ ] resolve docker ecr issues
 - [ ] write proper documentation
 - [ ] refactor AWS_Lambda for github actions
