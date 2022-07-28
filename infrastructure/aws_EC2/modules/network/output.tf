@@ -4,6 +4,6 @@ output "aws_security_group" {
 }
 
 output "aws_subnet" {
-  value       =     aws_subnet.octivbooker-subnet.id
+  value       = aws_subnet.octivbooker-subnet.id
   description = "AWS subnet of the given vpc network"
 }

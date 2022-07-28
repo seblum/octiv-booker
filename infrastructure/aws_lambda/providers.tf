@@ -1,6 +1,6 @@
 provider "aws" {
-  region = var.region
-  profile  = "seblum"
+  region  = var.region
+  profile = "seblum"
 }
 
 provider "docker" {

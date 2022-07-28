@@ -1,6 +1,12 @@
 import time
 from xml.dom.minidom import Element
 
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 from .helper_functions import (
     get_booking_slot,
     get_day,
@@ -9,11 +15,6 @@ from .helper_functions import (
     get_xpath_login_password_head,
     get_xpath_login_username_head,
 )
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 
 def login(driver: object, base_url: str, username: str, password: str) -> None:

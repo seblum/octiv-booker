@@ -18,7 +18,7 @@ resource "aws_iam_role" "ec2_role_hello_world" {
 EOF
 
   tags = {
-      project = "octive-booker"
+    project = "octive-booker"
   }
 }
 

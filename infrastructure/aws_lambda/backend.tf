@@ -6,12 +6,12 @@ terraform {
     }
   }
 
-#   backend "remote" {
-#     hostname     = "app.terraform.io"
-#     organization = "nan"
+  #   backend "remote" {
+  #     hostname     = "app.terraform.io"
+  #     organization = "nan"
 
-#     workspaces {
-#       prefix = "event-driven-system-infrastructure-"
-#     }
-#   }
+  #     workspaces {
+  #       prefix = "event-driven-system-infrastructure-"
+  #     }
+  #   }
 }

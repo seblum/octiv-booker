@@ -25,7 +25,7 @@ jobs:
 
     - name: Verify Terraform version
       run: terraform --version
-      
+
     - name: Terraform init
       working-directory: ./infrastructure/aws_EC2
       env:

@@ -6,8 +6,8 @@
 ```
 OCTIV_BOOKER
 │   README.md
-│   Makefile    
-│   .pre-commit-config.yaml    
+│   Makefile
+│   .pre-commit-config.yaml
 │
 └───slotBooker
 │   │   Dockerfile
@@ -18,7 +18,7 @@ OCTIV_BOOKER
 │       │   booker.py
 │       │   config.yaml
 │       │   ...
-│   
+│
 └───infrastructure
     └───aws_EC2
     │   │ main.tf
@@ -87,7 +87,7 @@ docker build \
 --no-cache .
 
 docker run \
--e OCTIV_USERNAME \ 
+-e OCTIV_USERNAME \
 -e OCTIV_PASSWORD \
 seblum/slotbooker:v1
 ```
@@ -105,4 +105,4 @@ seblum/slotbooker:v1
 - [x] enable full network on terraform
 - [x] put tags in infrastructure
 - [x] own network for ec2
-- [ ] 
+- [ ]

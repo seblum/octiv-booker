@@ -9,11 +9,11 @@ terraform {
 
   # Commented out until after bootstrap
   backend "s3" {
-    bucket         = "octivebookerterraform"
-    key            = "terraform.tfstate"
-    region         = "eu-central-1"
+    bucket = "octivebookerterraform"
+    key    = "terraform.tfstate"
+    region = "eu-central-1"
     #dynamodb_table = "aws-locks"
-    encrypt        = true
+    encrypt = true
   }
 
 }

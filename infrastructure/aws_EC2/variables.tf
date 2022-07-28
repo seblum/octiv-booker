@@ -1,7 +1,7 @@
 variable "region" {
   description = "AWS region to create resources in"
-  type  = string
-  default = "eu-central-1"
+  type        = string
+  default     = "eu-central-1"
 }
 
 
@@ -9,7 +9,7 @@ variable "region" {
 # variable "ami_id" {}
 # variable "ami_key_pair_name" {}
 
-# # access keys for terraform cloud 
+# # access keys for terraform cloud
 # variable "aws_access_key_id" {
 # type = string
 
@@ -20,19 +20,19 @@ variable "region" {
 # }
 
 variable "octiv_password" {
-  type = string
+  type        = string
   description = "Octiv password to store as env in docker image"
   # read from env config, or github actions
   # default = "value"
 }
 variable "octiv_username" {
-  type = string
+  type        = string
   description = "Octiv password to store as env in docker image"
   # read from env config, or github actions
   # default = "value2"
 }
 
 variable "public_pem_key" {
-  type = string
+  type        = string
   description = "public pem key for ec2 instance"
 }

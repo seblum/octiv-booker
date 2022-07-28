@@ -1,6 +1,7 @@
 import os
 
 import yaml
+
 from .driver import close_driver, get_driver
 from .ui_interaction import book_slot, login, switch_day
 
