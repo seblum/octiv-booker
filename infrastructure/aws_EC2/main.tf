@@ -37,19 +37,15 @@ resource docker_registry_image docker_ecr_image {
           OCTIV_PASSWORD=var.octiv_password
           }
     }
-
     depends_on = [var.octiv_username, var.octiv_password]
-
-
-
 }
 
 resource "aws_key_pair" "octivbooker-key"{
     key_name = "octivbooker-public"
     public_key = var.public_pem_key
-    tags = {
-        project = "octive-booker"
-    }
+    # tags = {
+    #     project = "octive-booker"
+    # }
 }
 
 

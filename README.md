@@ -1,8 +1,7 @@
 # Octiv SlotBooker
 
 ![Octive Overview](https://raw.githubusercontent.com/seblum/octiv_booker/master/overview.png)
-
-
+octiv_overview.png
 ## Structure
 
 ```
@@ -27,7 +26,7 @@ OCTIV_BOOKER
     │   │ ...
     │
     └───aws_lambda
-    │   │ main.tf
+        │ main.tf
         │ ...
 ```
 
@@ -39,10 +38,15 @@ OCTIV_BOOKER
 
 
 ## Usage
+## Prerequesits
 
+### Create Bucket for tf.state
+
+create bucket octivbookerterraform to store state file.
 ### create key pair
 
 ```
+# create a private key pair to ssh into ec2
 aws ec2 create-key-pair \
     --key-name octivbooker \
     --key-type rsa \
@@ -50,10 +54,13 @@ aws ec2 create-key-pair \
     --query "KeyMaterial" \
     --output text > octivbooker.pem
 
+# make it executable for local development
 chmod 400 octivbooker.pem
 
+# create a public key based on the private one
 ssh-keygen -y -f octivbooker.pem > octivbooker-public.pem
 
+# make it executable for local development
 chmod 400 octivbooker-public.pem
 ```
 
@@ -61,6 +68,14 @@ chmod 400 octivbooker-public.pem
 ## run locally
 
 To run locally, one has to specify and ingest some variables which is otherwise handled by github actions.
+
+You need to have AWS CLI, Terraform, and Docker installed and proberly configured
+### Set environment variables
+
+run shell script using source set-credentials to set environment variables.
+
+printenv
+
 ### build the image
 
 ```bash
@@ -86,14 +101,9 @@ seblum/slotbooker:v1
 - [x] pass envs from tf to docker envs for octiv passwords
 - [x] move terraform to github actions
 - [x] terraform statefile save on aws
-- [ ] resolve issue with statefile s3 bucket on deletion
+- [x] resolve issue with statefile s3 bucket on deletion
 - [ ] write proper documentation
-- [ ] enable full network on terraform
-- [ ] put tags in infrastructure
-- [ ] own network for ec2
+- [x] enable full network on terraform
+- [x] put tags in infrastructure
+- [x] own network for ec2
 - [ ] 
-## env variables
-
-run shell script using source set-credentials to set environment variables.
-
-printenv
