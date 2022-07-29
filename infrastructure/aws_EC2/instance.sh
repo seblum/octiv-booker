@@ -30,7 +30,7 @@ sudo touch /etc/cron.d/slotbooker-cronjobs
 echo "
 # This file contains cron jobs that runs every day at 18 o'clock.
 # run saturday to book for thursday
-0 20 * * 4 root sudo docker run -v /home/ec2-user/tmp:/app/tmp/ 855372857567.dkr.ecr.eu-central-1.amazonaws.com/octiv-booker
+0 20 * * 6 root sudo docker run -v /home/ec2-user/tmp:/app/tmp/ 855372857567.dkr.ecr.eu-central-1.amazonaws.com/octiv-booker
 
 # run monday and tuesday to book for weekend
 0 12 * * 1,2 root sudo docker run -v /home/ec2-user/tmp:/app/tmp/ 855372857567.dkr.ecr.eu-central-1.amazonaws.com/octiv-booker
