@@ -58,6 +58,7 @@ aws ec2 create-key-pair \
     --key-type rsa \
     --key-format pem \
     --query "KeyMaterial" \
+    --region eu-central-1 \
     --output text > octivbooker.pem
 
 # make it executable for local development
