@@ -8,6 +8,8 @@ sudo yum upgrade -y
 echo "Installing docker"
 sudo amazon-linux-extras install docker -y
 sudo service docker start
+# systemctl enable docker
+# systemctl start docker
 
 #sudo usermod -a -G docker ec2-user
 #sudo curl -L https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
@@ -21,8 +23,6 @@ aws ecr get-login-password --region "${region}" | docker login --username AWS --
 docker pull "${ecr_url}"
 sleep 5
 
-# systemctl enable docker
-# systemctl start docker
 # create cronjobs
 # sudo crontab -l > cron_bkp
 #sudo echo "0 10 * * * docker run octiv-booker:latest" >> cron_bkp
