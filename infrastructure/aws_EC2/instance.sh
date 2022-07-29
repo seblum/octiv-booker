@@ -42,9 +42,7 @@ echo "
 # Give execution rights on the cron job
 sudo chmod 0644 /etc/cron.d/slotbooker-cronjobs
 
+echo "SET TIMEZONE"
+sudo timedatectl set-timezone Europe/Berlin
+#echo "Europe/Berlin" | sudo tee /etc/timezone
 
-# create cronjobs
-# sudo crontab -l > cron_bkp
-#sudo echo "0 10 * * * docker run octiv-booker:latest" >> cron_bkp
-#sudo crontab cron_bkp
-#sudo rm cron_bkp
