@@ -16,11 +16,13 @@ sudo chmod +x /usr/local/bin/docker-compose
 echo "Log into private ecr"
 # TODO: install credentials store
 aws ecr get-login-password --region "${region}" | docker login --username AWS --password-stdin "${awsid}".dkr.ecr."${region}".amazonaws.com
-sleep 5
+
 #sudo docker start
 docker pull "${ecr_url}"
 sleep 5
 
+# systemctl enable docker
+# systemctl start docker
 # create cronjobs
 # sudo crontab -l > cron_bkp
 #sudo echo "0 10 * * * docker run octiv-booker:latest" >> cron_bkp
