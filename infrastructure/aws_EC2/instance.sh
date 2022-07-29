@@ -36,7 +36,7 @@ echo "
 0 12 * * 1,2 sudo docker run -v /home/ec2-user/tmp:/app/tmp/ 855372857567.dkr.ecr.eu-central-1.amazonaws.com/octiv-booker
 
 # test to run it every 3 minutes
-*/3 * * * * sudo docker run -v /home/ec2-user/tmp:/app/tmp/ 855372857567.dkr.ecr.eu-central-1.amazonaws.com/octiv-booker
+# /3 * * * * sudo docker run -v /home/ec2-user/tmp:/app/tmp/ 855372857567.dkr.ecr.eu-central-1.amazonaws.com/octiv-booker
 " | sudo tee -a /etc/cron.d/slotbooker-cronjobs
 
 # Give execution rights on the cron job
