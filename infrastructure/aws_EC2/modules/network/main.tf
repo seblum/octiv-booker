@@ -29,7 +29,7 @@
 
 
 resource "aws_security_group" "octivbooker-sg" {
-  name   = "octivbooker-sg"
+  name = "octivbooker-sg"
   #vpc_id = aws_vpc.octivbooker-vpc.id
 
   egress = [

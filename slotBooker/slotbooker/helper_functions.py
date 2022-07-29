@@ -1,4 +1,39 @@
-from datetime import date
+import os
+import sys
+from datetime import date, datetime
+
+
+def start_logging() -> tuple[object, object]:
+    """Creates a log file and redirects the stdout output to it. The output is appended to the file
+
+    Returns:
+        tuple[object,object]: file object, stdout object
+    """
+    log_dir = "tmp"
+    if not os.path.exists(log_dir):
+        os.mkdir(log_dir)
+
+    week_number = datetime.now().isocalendar().week
+    orig_stdout = sys.stdout
+    file = open(f"{log_dir}/logout_{week_number}.log", "a+")
+    sys.stdout = file
+    print("-" * 55)
+    print(datetime.now())
+    print("-" * 55)
+    print("<>")
+    return file, orig_stdout
+
+
+def stop_logging(file: object, orig_stdout: object) -> None:
+    """redirects the output back to the system command line and closes the previously created file
+
+    Args:
+        file (object): file the output has been forwarded to
+        orig_stdout (object): original stdout object
+    """
+    print("<>")
+    sys.stdout = orig_stdout
+    file.close()
 
 
 def get_xpath_booking_head() -> str:

@@ -1,8 +1,11 @@
+import datetime
 import os
+import sys
 
 import yaml
 
 from .driver import close_driver, get_driver
+from .helper_functions import start_logging, stop_logging
 from .ui_interaction import book_slot, login, switch_day
 
 # Load config yaml
@@ -14,9 +17,13 @@ def main():
     """Main of Slotbooker. Gets driver, logs into website, selects
     the day wanted, and books slot. Closes driver afterwards
     """
+    # start writing output to logfile
+    file, orig_stdout = start_logging()
+
     # get env variables
     USER = os.environ.get("OCTIV_USERNAME")
     PASSWORD = os.environ.get("OCTIV_PASSWORD")
+
     # check whether env variables are set or None
     if USER is None or PASSWORD is None:
         print("USERNAME and PASSWORD not set")
@@ -38,6 +45,8 @@ def main():
         )
 
         close_driver(driver)
+
+    stop_logging(file, orig_stdout)
 
 
 if __name__ == "__main__":

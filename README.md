@@ -2,11 +2,11 @@
 
 ![Octive Overview](https://github.com/seblum/octiv_booker/blob/d434b11827b830aa7dd0e0614558034dbaabe66f/octiv_overview.png)
 
-Octiv Slotbooker is, as the name says, used to book a slot/class for the fitness app Octiv. I developed it mainly for personal reasons so I can automate the weekly booking of classes. The functionality is based on selenium. 
+Octiv Slotbooker is, as the name says, used to book a slot/class for the fitness app Octiv. I developed it mainly for personal reasons so I can automate the weekly booking of classes. The functionality is based on selenium.
 
-## Structure 
+## Structure
 
-The repository includes the app itself written in python and a Dockerfile under `slotBooker`. The directory `infrastructure` includes the terraform scripts to deploy the app on AWS ECR and to either run it on an AWS EC2 instance with cron or run it on AWS Lambda using cloudwatch events. The latter is merely an attempt though and is not working properly due to the combination of docker and AWS Lambda. 
+The repository includes the app itself written in python and a Dockerfile under `slotBooker`. The directory `infrastructure` includes the terraform scripts to deploy the app on AWS ECR and to either run it on an AWS EC2 instance with cron or run it on AWS Lambda using cloudwatch events. The latter is merely an attempt though and is not working properly due to the combination of docker and AWS Lambda.
 
 Deployment of terraform can be done using Github actions or of course manually on a local environment.
 
@@ -107,8 +107,10 @@ seblum/slotbooker:v1
 - [x] move terraform to github actions
 - [x] terraform statefile save on aws
 - [x] resolve issue with statefile s3 bucket on deletion
-- [x] enable full network on terraform
+- [ ] enable full vpc network on terraform
 - [x] put tags in infrastructure
 - [x] own network for ec2
-- [ ] pull docker image on ec2 and make it run on cronjobs
+- [x] pull docker image on ec2 and
+- [x] make it run on cronjobs
+- [x] write docker outputs to logs
 - [ ] refactor AWS_Lambda for github actions

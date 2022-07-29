@@ -26,7 +26,6 @@ def login(driver: object, base_url: str, username: str, password: str) -> None:
         username (str): username for login
         password (str): password for login
     """
-    print("<>")
     driver.get(base_url)
 
     # username field

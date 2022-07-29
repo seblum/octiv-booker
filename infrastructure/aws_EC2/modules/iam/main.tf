@@ -43,7 +43,9 @@ resource "aws_iam_role_policy" "ec2_policy" {
         "ecr:BatchGetImage",
         "ecr:GetDownloadUrlForLayer",
         "ecr:BatchImportUpstreamImage",
-        "ecr:CreatePullThroughCacheRule"
+        "ecr:CreatePullThroughCacheRule",
+        "ecr:DescribeImages",
+        "ecr:ListImages"
       ],
       "Effect": "Allow",
       "Resource": "*"
