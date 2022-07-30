@@ -115,3 +115,6 @@ seblum/slotbooker:v1
 - [x] make it run on cronjobs
 - [x] write docker outputs to logs
 - [ ] refactor AWS_Lambda for github actions
+- [ ] documentation for lambda
+- [ ] rename terraform ressources to ec2 and lambda rollouts
+- [ ] tag lambda

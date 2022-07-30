@@ -6,6 +6,9 @@ RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable 
 RUN apt-get -y update
 RUN apt-get install -y google-chrome-stable
 
+# SET TIMEZONE
+RUN apt update && apt install tzdata -y
+ENV TZ="Europe/Berlin"
 
 # install chromedriver
 RUN apt-get install -yqq unzip
@@ -15,9 +18,18 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 # set display port to avoid crash
 ENV DISPLAY=:99
 
+# arg directivy to pass at build-time
+ARG OCTIV_USERNAME=${OCTIV_USERNAME:-""}
+# set environment variables
+ENV OCTIV_USERNAME=${OCTIV_USERNAME}
+
+ARG OCTIV_PASSWORD=${OCTIV_PASSWORD:-""}
+ENV OCTIV_PASSWORD=${OCTIV_PASSWORD}
+
+
 RUN mkdir /app
 COPY slotbooker/* /app/
-#COPY poetry.lock pyproject.toml ./
+
 
 COPY ./requirements.txt /app/requirements.txt
 

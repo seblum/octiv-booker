@@ -10,6 +10,7 @@ terraform {
 
   backend "s3" {
     bucket = "octivebookerterraform"
+    # rename in next run
     key    = "terraform.tfstate"
     region = "eu-central-1"
     #dynamodb_table = "aws-locks"

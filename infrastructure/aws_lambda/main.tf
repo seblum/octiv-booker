@@ -9,7 +9,11 @@ resource "docker_registry_image" "docker_ecr_image" {
 
   build {
     context    = "../../slotBooker"
-    dockerfile = "Dockerfile"
+    dockerfile = "venv.Dockerfile"
+    build_args = {
+      OCTIV_USERNAME = var.octiv_username
+      OCTIV_PASSWORD = var.octiv_password
+    }
   }
 }
 
