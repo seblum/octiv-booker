@@ -22,6 +22,7 @@ def get_driver(chromedriver: str) -> object:
     options.add_argument("--single-process")
     options.add_argument("--disable-dev-tools")
     options.add_argument("--no-zygote")
+    options.add_argument("--incognito")
     options.add_argument("--remote-debugging-port=9222")
 
     driver = webdriver.Chrome(chrome_options=options, executable_path=chromedriver)
