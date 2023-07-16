@@ -108,6 +108,12 @@ def book_slot(driver: object, class_name: str, booking_action: bool = True) -> N
 
     def _click_book_button(class_slots: list, booking_action: bool) -> None:
         # book max slot: if list contains multiple elements, then last element
+        # TODO: get slot according to time. get index of timeslot and get value of 
+        # for time in TIME_LIST:
+        #   if time in time_slots:
+        #       TIME_LIST.remove(time)
+        #       return class_slots[time_slots.index(time)]
+        #   else: TIME_LIST.remove(time)
         xpath_button_book = get_booking_slot(booking_slot=max(class_slots), book_action=booking_action)
         # Use execute_script() when another element is covering the element to be clicked
         element = driver.find_element(By.XPATH, xpath_button_book)
