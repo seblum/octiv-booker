@@ -10,6 +10,7 @@ selenium = "^4.3.0"
 DateTime = "^4.5"
 PyYAML = "^6.0"
 tqdm = "^4.64.0"
+termcolor = "^2.3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
