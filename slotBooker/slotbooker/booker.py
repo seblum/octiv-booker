@@ -6,7 +6,7 @@ import yaml
 
 from .driver import close_driver, get_driver
 from .helper_functions import start_logging, stop_logging
-from .ui_interaction import book_slot, login, switch_day
+from .ui_interaction import Booker
 
 # Load config yaml
 config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
@@ -18,7 +18,7 @@ def main():
     the day wanted, and books slot. Closes driver afterwards
     """
     # start writing output to logfile
-    file, orig_stdout = start_logging()
+    # file, orig_stdout = start_logging()
 
     # get env variables
     USER = os.environ.get("OCTIV_USERNAME")
@@ -34,19 +34,18 @@ def main():
 
         driver = get_driver(chromedriver=config.get("chromedriver"))
 
-        login(driver, base_url=config.get("base_url"), username=USER, password=PASSWORD)
+        booker = Booker(driver=driver,
+            days_before_bookable=config.get("days_before_bookable"),
+            base_url=config.get("base_url")
+            )
+        booker.login(username=USER, password=PASSWORD)
+        booker.switch_day()
 
-        day = switch_day(driver, days_before_bookable=config.get("days_before_bookable"))
+        booker.book_slot(class_list=config.get("class_list"),booking_action=config.get("book_class"))
 
-        book_slot(
-            driver,
-            class_name=config.get("class").get(day),  # depending on day, select class
-            booking_action=config.get("book_class"),
-        )
+        # close_driver(driver)
 
-        close_driver(driver)
-
-    stop_logging(file, orig_stdout)
+    # stop_logging(file, orig_stdout)
 
 
 if __name__ == "__main__":
