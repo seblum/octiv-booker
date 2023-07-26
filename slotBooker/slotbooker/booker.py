@@ -34,14 +34,17 @@ def main():
 
         driver = get_driver(chromedriver=config.get("chromedriver"))
 
-        booker = Booker(driver=driver,
+        booker = Booker(
+            driver=driver,
             days_before_bookable=config.get("days_before_bookable"),
-            base_url=config.get("base_url")
-            )
+            base_url=config.get("base_url"),
+        )
+
         booker.login(username=USER, password=PASSWORD)
         booker.switch_day()
-
-        booker.book_slot(class_list=config.get("class_list"),booking_action=config.get("book_class"))
+        booker.book_class(
+            class_list=config.get("class_list"), booking_action=config.get("book_class")
+        )
 
         # close_driver(driver)
 

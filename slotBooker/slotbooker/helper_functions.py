@@ -74,7 +74,15 @@ def get_day(days_before_bookable: int) -> tuple[str, bool]:
     Returns:
         tuple[str, bool]: weekday to be selected, True if weekday is in the next week
     """
-    week_days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    week_days = (
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    )
     today = date.today().weekday()
     future_day = today + days_before_bookable
     if future_day < 7:
@@ -134,4 +142,8 @@ def get_booking_slot(booking_slot: int, book_action: bool) -> str:
     def _get_xpath_cancel(slot: int) -> str:
         return f"{get_xpath_booking_head()}[{slot}]/div/div[2]/div[3]/button"
 
-    return _get_xpath_book(booking_slot) if book_action else _get_xpath_cancel(booking_slot)
+    return (
+        _get_xpath_book(booking_slot)
+        if book_action
+        else _get_xpath_cancel(booking_slot)
+    )
