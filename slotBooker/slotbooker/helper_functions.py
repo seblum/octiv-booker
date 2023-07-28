@@ -9,13 +9,15 @@ def start_logging() -> tuple[object, object]:
     Returns:
         tuple[object,object]: file object, stdout object
     """
-    log_dir = "tmp"
+    log_dir = "logs"
     if not os.path.exists(log_dir):
         os.mkdir(log_dir)
 
-    week_number = datetime.now().isocalendar().week
+    datetime_now = datetime.now()
+
+    exact_datetime = datetime_now.strftime("%Y-%m-%d_%H-%M-%S")
     orig_stdout = sys.stdout
-    file = open(f"{log_dir}/logout_{week_number}.log", "a+")
+    file = open(f"{log_dir}/logs_{exact_datetime}.log", "a+")
     sys.stdout = file
     print("-" * 55)
     print(datetime.now())

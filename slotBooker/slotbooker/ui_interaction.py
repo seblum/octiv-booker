@@ -1,6 +1,8 @@
 import time
 from xml.dom.minidom import Element
 from termcolor import colored
+from collections import defaultdict
+from enum import Enum
 
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -8,6 +10,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
+
 
 from .helper_functions import (
     get_booking_slot,
@@ -17,6 +20,13 @@ from .helper_functions import (
     get_xpath_login_password_head,
     get_xpath_login_username_head,
 )
+
+class AlertTypes(Enum):
+    """This enum includes different models."""
+
+    ClassFull = "class_full"
+    MaxBookings = "maximum_bookings"
+
 
 
 class Booker:
@@ -127,7 +137,9 @@ class Booker:
             # Iterate over all found bounding boxes
             print(f"? possible classes for '{entry_list}'")
 
-            resultsdict, tmp_dict = {}, {}
+            resultsdict = {}
+            data_dict = defaultdict(list)
+
             for slot_index in range(len(all_slots_bounding_boxes)):
                 slot_index += 1
                 xpath_test = f"{get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
@@ -146,15 +158,21 @@ class Booker:
                         xpath_button_book = get_booking_slot(
                             booking_slot=slot_index, book_action=booking_action
                         )
+                        tmp_dict = {}
                         tmp_dict[time_slot] = {
                             "textfield": textfield,
                             "time_slot": time_slot,
                             "slot_index": slot_index,
                             "xpath": xpath_button_book,
                         }
-                        resultsdict[textfield] = tmp_dict
+                        #print(tmp_dict)
+                        data_dict[textfield].append(tmp_dict)
+                        resultsdict = data_dict
+                        # resultsdict = {key: value for key, value in zip(textfield, tmp_dict)}
+                        #resultsdict[textfield] = (tmp_dict)
                 except:
                     continue
+            #print(resultsdict)
             return resultsdict
 
         def __click_book_button(xpath_button_book: str) -> None:
@@ -162,14 +180,10 @@ class Booker:
             element = self.driver.find_element(By.XPATH, xpath_button_book)
             self.driver.execute_script("arguments[0].click();", element)
 
-        def __book_class_slot(button_xpath: str) -> bool:
-            print(
-                f"{colored('| Booking', 'blue')} {class_slot} {colored('at', 'blue')} {time_slot}"
-            )
-            __click_book_button(xpath_button_book=button_xpath)
 
-            # Check whether alert appears
+        def __alert_is_present() -> object:
             try:
+                # TODO: check which alert it is.
                 WebDriverWait(self.driver, 3).until(
                     EC.alert_is_present(),
                     "Timed out waiting for PA creation "
@@ -177,36 +191,78 @@ class Booker:
                 )
                 print(colored("! Alert present", "red"))
                 alert_obj = self.driver.switch_to.alert
-                # TODO: check which alert it is.
+                return alert_obj
+            except TimeoutException:
+                print("| no alert")
+                #self.driver.find_element(By.NAME, 'Error')
+
+            return None
+        
+
+
+        def __get_alert_type(alert_obj:object)->str:
+            alert_text = alert_obj.text
+            if any([x.lower() in alert_text.lower() for x in ["waiting list","Warteliste"]]):
                 print("! Class full")
-                # print(alert_obj.text)
-                if prioritize_waiting_list == True:
+                alert_check = AlertTypes.ClassFull.value # add enum
+            elif any([x.lower() in alert_text.lower() for x in ["maximum bookings"]]):
+                alert_check = AlertTypes.MaxBookings.value
+            else: 
+                alert_check = "None"
+            return alert_check
+
+
+        def __booking_waiting_list(prioritize_waiting_list:str,alert_obj:object) -> bool:
+            if prioritize_waiting_list == True:
                     print("! Booking waiting list...")
                     alert_obj.accept()
                     print(colored("| Waiting list booked", "blue"))
                     return True  # end program
-                else:
-                    print(
-                        f"! Parameter 'wl' is set to {prioritize_waiting_list} \n > Skipping waiting list..."
-                    )
-                    alert_obj.dismiss()
-                    print("> Looking for further slots...")
-                    # continue
-                    return False
-            except TimeoutException:
-                print(colored("! Class booked", "green"), "- no alert")
+            else:
+                print(
+                    f"! Parameter 'wl' is set to {prioritize_waiting_list} \n > Skipping waiting list..."
+                )
+                alert_obj.dismiss()
+                print("> Looking for further slots...")
+                return False # continue
+            
+
+        def __book_class_slot(button_xpath: str) -> bool:
+            
+            print(
+                f"{colored('| Booking', 'blue')} {class_slot} {colored('at', 'blue')} {time_slot}"
+            )
+            __click_book_button(xpath_button_book=button_xpath)
+
+            # Check whether alert appears
+            # TODO: currently only checks alerts that are full bookings
+            # no already booked on day
+            alert_obj=__alert_is_present()
+            if alert_obj is not None:
+
+                alert_check = __get_alert_type(alert_obj)
+
+                match alert_check:
+                    case "class_full":
+                        ret = __booking_waiting_list(prioritize_waiting_list,alert_obj)
+                        return ret
+                    case "maximum_bookings":
+                        # "/html/body/div/div[2]/div/div/div[1]/div/div"
+                        print("max bookings")
+                    case __:
+                        pass
+            print(colored("! Class booked", "green"))
             return True
 
         resultsdict = __get_all_bounding_boxes()
-
         for entry in self.class_list:
             time_slot, class_slot = entry.get("time"), entry.get("class")
             prioritize_waiting_list = entry.get("wl")
-
+            resultsdict_flatten = {k: v for d in resultsdict.get(class_slot) for k, v in d.items()}
             try:
                 # try getting an xpath for the given time and class. could also be an if-else statement
                 print(f"| Checking {class_slot} at {time_slot}...")
-                button_xpath = resultsdict.get(class_slot).get(time_slot).get("xpath")
+                button_xpath = resultsdict_flatten.get(time_slot).get("xpath")
                 # could check extra if already booked and need to check for cancel button
             except AttributeError:
                 # results in NoneType
@@ -224,5 +280,3 @@ class Booker:
                 __click_book_button(xpath_button_book=button_xpath)
                 time.sleep(5)
                 print(f"! Class cancelled")
-            # except:
-            #     continue

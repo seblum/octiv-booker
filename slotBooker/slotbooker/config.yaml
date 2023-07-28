@@ -2,7 +2,7 @@ chromedriver: '/usr/local/bin/chromedriver'
 base_url: 'https://app.octivfitness.com/login'
 
 # Hpw many days prior can I book
-days_before_bookable: 1
+days_before_bookable: 6
 # book class = True, cancel class = False
 book_class: True
 
@@ -10,31 +10,38 @@ class_list:
   Monday: 
     - time: "19:00"
       class: "Open Gym"
-    - time: "20:00"
+    - time: "19:00"
+      class: "Remote Coaching"
+    - time: "20:30"
       class: "Open Gym"
-    - time: "18:00"
-      class: "Class"
   Tuesday:
     - time: "19:00"
+      class: "Open Gym"
+    - time: "19:00"
+      class: "Remote Coaching"
+    - time: "20:30"
       class: "Open Gym"
   Wednesday:
     - time: "19:00"
       class: "Open Gym"
+    - time: "19:00"
+      class: "Remote Coaching"
+    - time: "20:30"
+      class: "Open Gym"
   Thursday:
     - time: "19:00"
       class: "Open Gym"
+    - time: "19:00"
+      class: "Remote Coaching"
     - time: "20:30"
       class: "Open Gym"
-    - time: "18:00"
-      class: "Class"
   Friday:
     - time: "19:00"
       class: "Open Gym"
-      wl: True
-    - time: "20:00"
-      class: "Open Gym"
-    - time: "18:00"
-      class: "Class"
+    - time: "19:00"
+      class: "Remote Coaching"
+    - time: "19:30"
+      class: "CLASS"
       wl: False
   Saturday: 
     - time: None

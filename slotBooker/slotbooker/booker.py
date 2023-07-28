@@ -46,7 +46,7 @@ def main():
             class_list=config.get("class_list"), booking_action=config.get("book_class")
         )
 
-        # close_driver(driver)
+        close_driver(driver)
 
     # stop_logging(file, orig_stdout)
 
