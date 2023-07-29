@@ -251,11 +251,18 @@ class Booker:
                         print("max bookings")
                     case __:
                         pass
+            # TODO: warning present
+            # warn_obj = __warning_is_present()
+
             print(colored("! Class booked", "green"))
             return True
 
         resultsdict = __get_all_bounding_boxes()
         for entry in self.class_list:
+            print(entry.get("class"))
+            if entry.get("class") == 'None':
+                print("No class set for this day.")
+                break
             time_slot, class_slot = entry.get("time"), entry.get("class")
             prioritize_waiting_list = entry.get("wl")
             resultsdict_flatten = {k: v for d in resultsdict.get(class_slot) for k, v in d.items()}
