@@ -2,14 +2,14 @@ name: publish docker CD
 
 env:
   DOCKERREPO: seblum/octivbooker
-  TAG: v0.1.0
+  TAG: latest
 
 on:
   push:
     branches: main
   pull_request:
     branches: [ main ]
-  workflow_dispatch:
+  workflow_dispatch: feat/remote-training
 
 jobs:
   docker:
