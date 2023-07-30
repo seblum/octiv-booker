@@ -89,9 +89,12 @@ docker build \
 --no-cache .
 
 docker run \
--e OCTIV_USERNAME \
--e OCTIV_PASSWORD \
-seblum/slotbooker:v1
+-e OCTIV_USERNAME="" \
+-e OCTIV_PASSWORD="" \
+-e EMAIL_SENDER="" \
+-e EMAIL_PASSWORD="" \
+-e EMAIL_RECEIVER="" \
+seblum/octivbooker:latest
 ```
 
 ## Known issues
