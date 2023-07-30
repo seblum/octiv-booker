@@ -1,43 +1,3 @@
-import os
-import sys
-from datetime import date, datetime
-
-
-def start_logging() -> tuple[object, object]:
-    """Creates a log file and redirects the stdout output to it. The output is appended to the file
-
-    Returns:
-        tuple[object,object]: file object, stdout object
-    """
-    log_dir = "logs"
-    if not os.path.exists(log_dir):
-        os.mkdir(log_dir)
-
-    datetime_now = datetime.now()
-
-    exact_datetime = datetime_now.strftime("%Y-%m-%d_%H-%M-%S")
-    orig_stdout = sys.stdout
-    file = open(f"{log_dir}/logs_{exact_datetime}.log", "a+")
-    sys.stdout = file
-    print("-" * 55)
-    print(datetime.now())
-    print("-" * 55)
-    print("<>")
-    return file, orig_stdout
-
-
-def stop_logging(file: object, orig_stdout: object) -> None:
-    """redirects the output back to the system command line and closes the previously created file
-
-    Args:
-        file (object): file the output has been forwarded to
-        orig_stdout (object): original stdout object
-    """
-    print("<>")
-    sys.stdout = orig_stdout
-    file.close()
-
-
 def get_xpath_booking_head() -> str:
     """Head of the XPath of the booking table page after log in
 
@@ -45,6 +5,9 @@ def get_xpath_booking_head() -> str:
         str: Head of XPath of booking table
     """
     return "/html/body/div/div[5]/div/div"
+
+
+from datetime import date
 
 
 def get_xpath_login_username_head() -> str:
