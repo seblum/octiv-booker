@@ -30,7 +30,8 @@ def start_logging() -> tuple[object, object]:
     dir_log_file = f"{log_dir}/logs_{exact_datetime}.log"
     file = open(dir_log_file, "a+")
     sys.stdout = file
-    print("-" * 55, datetime.now(), "-" * 55, "<>")
+    print("-" * 5, datetime.now(), "-" * 5)
+    print("\n<>")
     return file, orig_stdout, dir_log_file
 
 
