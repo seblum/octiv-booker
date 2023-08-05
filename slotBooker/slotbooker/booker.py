@@ -14,7 +14,7 @@ config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
 config = yaml.safe_load(open(config_path))
 
 
-def main():
+def main(retry: int = 3):
     """Slotbooker Main Function.
 
     This function represents the main flow of the Slotbooker application. It performs the following steps:
@@ -35,6 +35,7 @@ def main():
 
         >>> main()
     """
+
     # start writing output to logfile
     file, orig_stdout, dir_log_file = start_logging()
 
@@ -50,26 +51,37 @@ def main():
         print("USERNAME and PASSWORD prevalent")
         print(f"USER: {USER}")
 
-        driver = get_driver(chromedriver=config.get("chromedriver"))
+        count = 0
+        while count < retry:
+            try:
+                driver = get_driver(chromedriver=config.get("chromedriver"))
 
-        booker = Booker(
-            driver=driver,
-            days_before_bookable=config.get("days_before_bookable"),
-            base_url=config.get("base_url"),
-        )
+                booker = Booker(
+                    driver=driver,
+                    days_before_bookable=config.get("days_before_bookable"),
+                    base_url=config.get("base_url"),
+                )
 
-        booker.login(username=USER, password=PASSWORD)
-        booker.switch_day()
-        booker.book_class(
-            class_list=config.get("class_list"), booking_action=config.get("book_class")
-        )
+                booker.login(username=USER, password=PASSWORD)
+                booker.switch_day()
+                booker.book_class(
+                    class_list=config.get("class_list"),
+                    booking_action=config.get("book_class"),
+                )
 
-        close_driver(driver)
+                close_driver(driver)
+                print(f"! SUCCESS | TRY: {count+1}")
+                count = 3
+            except:
+                print(f"! AN ERROR OCCURED | TRY: {count+1}")
+                count += 1
+                continue
 
-    stop_logging(file, orig_stdout)
-
-    send_logs_to_mail(dir_log_file)
+        stop_logging(file, orig_stdout)
+        send_logs_to_mail(dir_log_file)
 
 
 if __name__ == "__main__":
+
     main()
+
