@@ -37,7 +37,7 @@ def main(retry: int = 3):
     """
 
     # start writing output to logfile
-    file, orig_stdout, dir_log_file = start_logging()
+    # file, orig_stdout, dir_log_file = start_logging()
 
     # get env variables
     USER = os.environ.get("OCTIV_USERNAME")
@@ -69,7 +69,7 @@ def main(retry: int = 3):
                     booking_action=config.get("book_class"),
                 )
 
-                close_driver(driver)
+                # close_driver(driver)
                 print(f"! SUCCESS | TRY: {count+1}")
                 count = 3
             except:
@@ -77,11 +77,9 @@ def main(retry: int = 3):
                 count += 1
                 continue
 
-        stop_logging(file, orig_stdout)
-        send_logs_to_mail(dir_log_file)
+        # stop_logging(file, orig_stdout)
+        # send_logs_to_mail(dir_log_file)
 
 
 if __name__ == "__main__":
-
     main()
-
