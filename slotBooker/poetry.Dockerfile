@@ -33,9 +33,8 @@ ENV EMAIL_PASSWORD=${EMAIL_PASSWORD}
 ENV EMAIL_RECEIVER=${EMAIL_RECEIVER}
 
 
-
 RUN mkdir /app
-COPY . /app
+COPY ./slotBooker /app
 COPY ./slotBooker/pyproject.toml /app
 
 WORKDIR /app
@@ -47,8 +46,8 @@ WORKDIR /app
 ENV PYTHONPATH=${PYTHONPATH}:${PWD}
 
 RUN pip3 install poetry
-RUN poetry config virtualenvs.create false
+RUN poetry config virtualenvs.create false && poetry install
 # RUN poetry install --no-dev
-RUN poetry install
+# RUN poetry install
 
 ENTRYPOINT [ "poetry", "run", "slotBooker" ]

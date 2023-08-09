@@ -282,7 +282,7 @@ class Booker:
                     return True  # end program
                 case _:
                     logging.info(
-                        f"! Parameter 'wl' is set to {prioritize_waiting_list} \n> Skipping waiting list..."
+                        f"! Parameter 'wl' is set to {prioritize_waiting_list} -> Skipping waiting list..."
                     )
                     alert_obj.dismiss()
                     logging.info("> Looking for further slots...")
