@@ -1,24 +1,51 @@
-import datetime
+from datetime import datetime
 import os
-import sys
-
+import logging
 import yaml
 
 from .driver import close_driver, get_driver
-from .helper_functions import start_logging, stop_logging
-from .ui_interaction import book_slot, login, switch_day
+from .logging import setup_log_dir, start_logging, stop_logging
+from .ui_interaction import Booker
+from .gmail import send_logs_to_mail
 
 # Load config yaml
 config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
 config = yaml.safe_load(open(config_path))
 
 
-def main():
-    """Main of Slotbooker. Gets driver, logs into website, selects
-    the day wanted, and books slot. Closes driver afterwards
+def main(retry: int = 3):
+    """Slotbooker Main Function.
+
+    This function represents the main flow of the Slotbooker application. It performs the following steps:
+    - Starts writing output to a logfile using 'start_logging' function.
+    - Retrieves environment variables 'OCTIV_USERNAME' and 'OCTIV_PASSWORD'.
+    - If the required environment variables are not set, it informs the user to set them.
+    - If the environment variables are set, it initializes a web driver and logs into the website.
+    - Switches to the desired day and books a slot according to the configuration.
+    - Closes the web driver after completing the booking process.
+    - Stops logging and restores the original stdout using 'stop_logging' function.
+    - Sends the log file to an email address using 'send_logs_to_mail' function.
+
+    Returns:
+        None: This function does not return anything.
+
+    Example:
+        Run this function to perform the slot booking process with the configured options:
+
+        >>> main()
     """
+
     # start writing output to logfile
-    file, orig_stdout = start_logging()
+    # file, orig_stdout, dir_log_file = start_logging()
+
+    dir_log_file = setup_log_dir()
+    logging.basicConfig(
+        filename=dir_log_file,
+        filemode="w",
+        encoding="utf-8",
+        format="%(asctime)s %(message)s",
+        level=logging.INFO,
+    )
 
     # get env variables
     USER = os.environ.get("OCTIV_USERNAME")
@@ -26,27 +53,40 @@ def main():
 
     # check whether env variables are set or None
     if USER is None or PASSWORD is None:
-        print("USERNAME and PASSWORD not set")
-        print("Please run 'source set-credentials.sh' if running local")
+        logging.info("USERNAME and PASSWORD not set")
+        logging.info("Please run 'source set-credentials.sh' if running local")
     else:
-        print("USERNAME and PASSWORD prevalent")
-        print(f"USER: {USER}")
+        logging.info("USERNAME and PASSWORD prevalent")
+        logging.info(f"USER: {USER}")
 
-        driver = get_driver(chromedriver=config.get("chromedriver"))
+        count = 0
+        while count < retry:
+            try:
+                driver = get_driver(chromedriver=config.get("chromedriver"))
 
-        login(driver, base_url=config.get("base_url"), username=USER, password=PASSWORD)
+                booker = Booker(
+                    driver=driver,
+                    days_before_bookable=config.get("days_before_bookable"),
+                    base_url=config.get("base_url"),
+                )
 
-        day = switch_day(driver, days_before_bookable=config.get("days_before_bookable"))
+                booker.login(username=USER, password=PASSWORD)
+                booker.switch_day()
+                booker.book_class(
+                    class_dict=config.get("class_dict"),
+                    booking_action=config.get("book_class"),
+                )
 
-        book_slot(
-            driver,
-            class_name=config.get("class").get(day),  # depending on day, select class
-            booking_action=config.get("book_class"),
-        )
+                close_driver(driver)
+                logging.info(f"! SUCCESS | TRY: {count+1}")
+                count = 3
+            except:
+                logging.info(f"! AN ERROR OCCURED | TRY: {count+1}")
+                count += 1
+                continue
 
-        close_driver(driver)
-
-    stop_logging(file, orig_stdout)
+        # stop_logging(file, orig_stdout)
+        send_logs_to_mail(dir_log_file)
 
 
 if __name__ == "__main__":
