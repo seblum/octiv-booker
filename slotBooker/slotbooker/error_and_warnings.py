@@ -88,8 +88,8 @@ def error_is_present(driver) -> str:
     if driver.find_element(By.XPATH, error_path):
         print(colored("! Error", "red") + "...")
         error_text = driver.find_element(By.XPATH, error_text_path).text
-    else:
-        error_text = "| no error"
+    # else:
+    #     error_text = "| no error"
     return error_text
 
 

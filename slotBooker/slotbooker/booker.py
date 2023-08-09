@@ -65,7 +65,7 @@ def main(retry: int = 3):
                 booker.login(username=USER, password=PASSWORD)
                 booker.switch_day()
                 booker.book_class(
-                    class_list=config.get("class_list"),
+                    class_dict=config.get("class_dict"),
                     booking_action=config.get("book_class"),
                 )
 

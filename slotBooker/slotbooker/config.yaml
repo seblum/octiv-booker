@@ -6,7 +6,7 @@ days_before_bookable: 6
 # book class = True, cancel class = False
 book_class: True
 
-class_list:
+class_dict:
   Monday: 
     - time: "19:00"
       class: "Remote Coaching"
