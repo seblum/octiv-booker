@@ -137,7 +137,6 @@ class Booker:
         logging.info("| switched to day:")
         self.day = day
 
-
     def book_class(self, class_dict: dict, booking_action: bool = True) -> None:
         """
         Book classes based on provided booking information.
@@ -155,6 +154,7 @@ class Booker:
         Raises:
             Various exceptions related to Selenium interactions.
         """
+
         def __load_and_transform_input_class_dict() -> list:
             """
             Load and transform the input class_dict into a list of unique class entries.
@@ -166,7 +166,9 @@ class Booker:
                 This function retrieves the class_dict entry for the selected day and extracts unique class entries.
             """
             self.class_dict = class_dict.get(self.day)
-            class_entry_list = list(set([entry.get("class") for entry in self.class_dict]))
+            class_entry_list = list(
+                set([entry.get("class") for entry in self.class_dict])
+            )
             return class_entry_list
 
         def __get_all_bounding_boxes_in_window() -> object:
@@ -222,9 +224,7 @@ class Booker:
                         time_slot = self.driver.find_element(
                             By.XPATH, xpath_time_slot
                         ).text
-                        logging.info(
-                            f"- time: {time_slot} - class: {textfield}"
-                        )
+                        logging.info(f"- time: {time_slot} - class: {textfield}")
                         # append index of class to list
                         xpath_button_book = get_booking_slot(
                             booking_slot=slot_index, book_action=booking_action
@@ -279,18 +279,16 @@ class Booker:
                     logging.info("! Booking waiting list...")
                     alert_obj.accept()
                     logging.info("| Waiting list booked")
-                    return True # end program
+                    return True  # end program
                 case _:
                     logging.info(
                         f"! Parameter 'wl' is set to {prioritize_waiting_list} \n> Skipping waiting list..."
                     )
                     alert_obj.dismiss()
                     logging.info("> Looking for further slots...")
-                    return False # continue
+                    return False  # continue
 
-        def __abort_canceling_slot(
-            alert_obj: object
-        ) -> bool:
+        def __abort_canceling_slot(alert_obj: object) -> bool:
             """
             Handle aborting the canceling of a slot.
 
@@ -303,9 +301,7 @@ class Booker:
             Note:
                 This function handles the situation when slot cancelation is aborted.
             """
-            logging.info(
-                f"! Aborted canceling slot..."
-            )
+            logging.info(f"! Aborted canceling slot...")
             alert_obj.dismiss()
             logging.info("> Looking for further slots...")
             return False  # continue
@@ -323,9 +319,7 @@ class Booker:
             Note:
                 This function attempts to book a class slot, handling alerts and errors.
             """
-            logging.info(
-                f"| Booking {class_slot} at {time_slot}"
-            )
+            logging.info(f"| Booking {class_slot} at {time_slot}")
             __click_book_button(xpath_button_book=button_xpath)
 
             # Check whether alert appears
@@ -365,7 +359,8 @@ class Booker:
         class_entry_list = __load_and_transform_input_class_dict()
 
         resultsdict = __get_all_bounding_boxes_by_class_name(
-            class_entry_list=class_entry_list, all_slots_bounding_boxes=all_slots_bounding_boxes
+            class_entry_list=class_entry_list,
+            all_slots_bounding_boxes=all_slots_bounding_boxes,
         )
 
         for entry in self.class_dict:

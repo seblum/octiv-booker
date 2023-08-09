@@ -13,6 +13,7 @@ class AlertTypes(Enum):
     """
     Enumeration of possible alert types that can be encountered.
     """
+
     ClassFull = "Die Stunde ist voll. Möchtest du auf die Warteliste kommen? Du wirst automatisch gebucht, wenn ein Platz frei wird."
     CancelBooking = "Möchtest du deine Buchung wirklich stornieren?"
     CannotBookInAdvance = "! You cannot book this far in advance"
@@ -60,7 +61,12 @@ def get_alert_type(alert_obj: object) -> Enum:
     if any([x.lower() in alert_text.lower() for x in ["waiting list", "Warteliste"]]):
         logging.info("! Class full")
         alert_check = AlertTypes.ClassFull
-    elif any([x.lower() in alert_text.lower() for x in ["wirklich", "stornieren", "stornieren?"]]):
+    elif any(
+        [
+            x.lower() in alert_text.lower()
+            for x in ["wirklich", "stornieren", "stornieren?"]
+        ]
+    ):
         alert_check = AlertTypes.MaxBookings
     else:
         alert_check = AlertTypes.NotIdentifyAlertError

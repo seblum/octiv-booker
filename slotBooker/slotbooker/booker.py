@@ -37,10 +37,16 @@ def main(retry: int = 3):
 
     # start writing output to logfile
     # file, orig_stdout, dir_log_file = start_logging()
-    
+
     dir_log_file = setup_log_dir()
-    logging.basicConfig(filename=dir_log_file, filemode='w', encoding='utf-8', format='%(asctime)s %(message)s', level=logging.INFO)
-    
+    logging.basicConfig(
+        filename=dir_log_file,
+        filemode="w",
+        encoding="utf-8",
+        format="%(asctime)s %(message)s",
+        level=logging.INFO,
+    )
+
     # get env variables
     USER = os.environ.get("OCTIV_USERNAME")
     PASSWORD = os.environ.get("OCTIV_PASSWORD")

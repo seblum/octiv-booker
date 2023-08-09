@@ -14,8 +14,9 @@ def setup_log_dir() -> str:
     if not os.path.exists(log_dir):
         os.mkdir(log_dir)
     exact_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    dir_log_file = f'{log_dir}/logs_{exact_datetime}.log'
+    dir_log_file = f"{log_dir}/logs_{exact_datetime}.log"
     return dir_log_file
+
 
 def start_logging() -> tuple[object, object]:
     """Start logging by redirecting stdout to a log file.
