@@ -29,6 +29,7 @@ ENV OCTIV_PASSWORD=${OCTIV_PASSWORD}
 
 RUN mkdir /app
 COPY . /app
+COPY pyproject.toml /app
 
 WORKDIR /app
 
