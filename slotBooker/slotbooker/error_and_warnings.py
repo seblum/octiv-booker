@@ -108,4 +108,4 @@ def evaluate_error(error_text) -> bool:
             return True
         case _:
             logging.info(AlertTypes.NotIdentifyAlertError.value)
-            return True
+            return False
