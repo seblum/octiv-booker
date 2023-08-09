@@ -1,6 +1,6 @@
 import time
 from xml.dom.minidom import Element
-from termcolor import colored
+import logging
 from collections import defaultdict
 from enum import Enum
 
@@ -30,6 +30,30 @@ from .error_and_warnings import (
 
 
 class Booker:
+    """
+    A class representing a booking agent for Octiv.
+
+    Attributes:
+        driver (object): The Selenium WebDriver instance.
+        base_url (str): The base URL of the booking website.
+        days_before_bookable (int): Number of days before a class becomes bookable.
+        class_dict (dict): Dictionary containing class booking information for a specific day.
+        booking_action (bool): Indicates whether to perform booking actions (True) or not (False).
+        day (str): The selected day for booking.
+
+    Methods:
+        login(username: str, password: str) -> None:
+            Log in to the booking website using provided credentials.
+
+        switch_day() -> str:
+            Switch to the desired day for booking slots.
+
+        book_class(class_dict: dict, booking_action: bool = True) -> None:
+            Book classes based on provided booking information.
+
+    Note:
+        This class provides methods for logging in, switching days, and booking classes on a specific website.
+    """
 
     def __init__(self, driver: object, base_url: str, days_before_bookable: int):
         self.driver = driver
@@ -66,7 +90,7 @@ class Booker:
         self.driver.find_element(
             By.XPATH, f"{get_xpath_login_username_head()}/button"
         ).send_keys(Keys.RETURN)
-        print(colored("| submit user name successful", "blue"))
+        logging.info("| submit user name successful")
 
         # password field
         WebDriverWait(self.driver, 20).until(
@@ -82,7 +106,7 @@ class Booker:
         self.driver.find_element(
             By.XPATH, f"{get_xpath_login_password_head()}/button"
         ).send_keys(Keys.RETURN)
-        print(colored("| login successful", "blue"))
+        logging.info("| login successful")
 
     def switch_day(self) -> str:
         """Switch to the desired day for booking slots.
@@ -103,24 +127,58 @@ class Booker:
                     (By.XPATH, f"{get_xpath_booking_head()}[3]/div[9]/div/div/i")
                 )
             ).click()
-            print("| switched to next week")
+            logging.info("| switched to next week")
 
         day_button = get_day_button(day)
         WebDriverWait(self.driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, day_button))
         ).click()
 
-        print(colored("| switched to day:", "blue"), f"{day}")
+        logging.info("| switched to day:")
         self.day = day
 
 
     def book_class(self, class_dict: dict, booking_action: bool = True) -> None:
+        """
+        Book classes based on provided booking information.
+
+        Args:
+            class_dict (dict): Dictionary containing class booking information for a specific day.
+            booking_action (bool, optional): Indicates whether to perform booking actions (True) or not (False). Default is True.
+
+        Returns:
+            None: This function does not return anything.
+
+        Note:
+            This function iterates through class information and performs booking actions based on provided data.
+
+        Raises:
+            Various exceptions related to Selenium interactions.
+        """
         def __load_and_transform_input_class_dict() -> list:
+            """
+            Load and transform the input class_dict into a list of unique class entries.
+
+            Returns:
+                list: A list of unique class entries.
+
+            Note:
+                This function retrieves the class_dict entry for the selected day and extracts unique class entries.
+            """
             self.class_dict = class_dict.get(self.day)
             class_entry_list = list(set([entry.get("class") for entry in self.class_dict]))
             return class_entry_list
 
         def __get_all_bounding_boxes_in_window() -> object:
+            """
+            Get all bounding boxes containing booking slots present in the current window.
+
+            Returns:
+                object: A list of WebElements representing the bounding boxes.
+
+            Note:
+                This function uses Selenium to find all booking slot bounding boxes in the current window.
+            """
             WebDriverWait(self.driver, 20).until(
                 EC.element_to_be_clickable((By.XPATH, get_xpath_booking_head()))
             )
@@ -132,7 +190,20 @@ class Booker:
         def __get_all_bounding_boxes_by_class_name(
             class_entry_list: list, all_slots_bounding_boxes: list
         ) -> dict:
-            print(f"? possible classes for '{class_entry_list}'")
+            """
+            Get all possible booking slots for specified class entries and bounding boxes.
+
+            Args:
+                class_entry_list (list): List of unique class entries.
+                all_slots_bounding_boxes (list): List of WebElements representing bounding boxes.
+
+            Returns:
+                dict: A dictionary containing possible booking slots for each class entry.
+
+            Note:
+                This function iterates through bounding boxes, identifies valid booking slots, and records relevant data.
+            """
+            logging.info(f"? possible classes for '{class_entry_list}'")
 
             # /div/div[?]/div[2]/p[1] the XPath of the booking slot bounding boxes changes depending on
             # whether there has been a booking or not. 1 if not yet booked, 2 if already has been booked
@@ -151,8 +222,8 @@ class Booker:
                         time_slot = self.driver.find_element(
                             By.XPATH, xpath_time_slot
                         ).text
-                        print(
-                            f"- time: {time_slot} - class: {textfield} - index: {slot_index}"
+                        logging.info(
+                            f"- time: {time_slot} - class: {textfield}"
                         )
                         # append index of class to list
                         xpath_button_book = get_booking_slot(
@@ -171,6 +242,18 @@ class Booker:
             return all_possible_booking_slots_dict
 
         def __click_book_button(xpath_button_book: str) -> None:
+            """
+            Click the book button using JavaScript execution.
+
+            Args:
+                xpath_button_book (str): XPath of the book button.
+
+            Returns:
+                None: This function does not return anything.
+
+            Note:
+                This function uses JavaScript execution to click the book button in cases where it may be covered.
+            """
             # Use execute_script() when another element is covering the element to be clicked
             element = self.driver.find_element(By.XPATH, xpath_button_book)
             self.driver.execute_script("arguments[0].click();", element)
@@ -178,33 +261,70 @@ class Booker:
         def __booking_waiting_list(
             prioritize_waiting_list: str, alert_obj: object
         ) -> bool:
+            """
+            Handle booking waiting list option in the alert.
+
+            Args:
+                prioritize_waiting_list (str): Indicates whether to prioritize the waiting list (True) or not (False).
+                alert_obj (object): The alert object.
+
+            Returns:
+                bool: True if program should end, False if it should continue.
+
+            Note:
+                This function handles the waiting list booking option in the alert dialog.
+            """
             match prioritize_waiting_list:
                 case True:
-                    print("! Booking waiting list...")
+                    logging.info("! Booking waiting list...")
                     alert_obj.accept()
-                    print(colored("| Waiting list booked", "blue"))
+                    logging.info("| Waiting list booked")
                     return True # end program
                 case _:
-                    print(
+                    logging.info(
                         f"! Parameter 'wl' is set to {prioritize_waiting_list} \n> Skipping waiting list..."
                     )
                     alert_obj.dismiss()
-                    print("> Looking for further slots...")
+                    logging.info("> Looking for further slots...")
                     return False # continue
 
         def __abort_canceling_slot(
             alert_obj: object
         ) -> bool:
-            print(
+            """
+            Handle aborting the canceling of a slot.
+
+            Args:
+                alert_obj (object): The alert object.
+
+            Returns:
+                bool: False to continue searching for further slots.
+
+            Note:
+                This function handles the situation when slot cancelation is aborted.
+            """
+            logging.info(
                 f"! Aborted canceling slot..."
             )
             alert_obj.dismiss()
-            print("> Looking for further slots...")
+            logging.info("> Looking for further slots...")
             return False  # continue
 
         def __book_class_slot(button_xpath: str) -> bool:
-            print(
-                f"{colored('| Booking', 'blue')} {class_slot} {colored('at', 'blue')} {time_slot}"
+            """
+            Book a specific class slot.
+
+            Args:
+                button_xpath (str): XPath of the book button.
+
+            Returns:
+                bool: True if class is successfully booked, False if not.
+
+            Note:
+                This function attempts to book a class slot, handling alerts and errors.
+            """
+            logging.info(
+                f"| Booking {class_slot} at {time_slot}"
             )
             __click_book_button(xpath_button_book=button_xpath)
 
@@ -225,15 +345,15 @@ class Booker:
                         ret = __abort_canceling_slot
                         return ret
                     case _:
-                        print(AlertTypes.NotIdentifyAlertError.value)
+                        logging.info(AlertTypes.NotIdentifyAlertError.value)
 
             error_text = error_is_present(self.driver)
             if error_text is None:
-                print(f"| {AlertTypes.NotAlertError.value}r")
+                logging.info(f"| {AlertTypes.NotAlertError.value}")
             else:
                 return evaluate_error(error_text)
 
-            print(colored("! Class booked", "green"))
+            logging.info("! Class booked")
             return True
 
         #
@@ -250,7 +370,7 @@ class Booker:
 
         for entry in self.class_dict:
             if entry.get("class") == "None":
-                print("No class set for this day.")
+                logging.info("No class set for this day.")
                 break
             else:
                 time_slot, class_slot, prioritize_waiting_list = (
@@ -263,13 +383,13 @@ class Booker:
                 }
                 try:
                     # try getting an xpath for the given time and class. could also be an if-else statement
-                    print(f"| Checking {class_slot} at {time_slot}...")
+                    logging.info(f"| Checking {class_slot} at {time_slot}...")
                     button_xpath = resultsdict_flatten.get(time_slot).get("xpath")
                     # could check extra if already booked and need to check for cancel button
                 except AttributeError:
                     # results in NoneType
-                    print(
-                        f"{colored('! It is likely that no class of type', 'red')} {class_slot} {colored('is present on', 'red')} {self.day} {time_slot} {colored('(results in NoneType)', 'red')}"
+                    logging.info(
+                        f"! It is likely that no class of type {class_slot} is present on {self.day} {time_slot} (results in NoneType)"
                     )
                     continue
 

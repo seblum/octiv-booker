@@ -3,6 +3,20 @@ import sys
 from datetime import datetime
 
 
+def setup_log_dir() -> str:
+    """
+    Creates a directory for logs if it doesn't exist and generates a log file path based on the current date and time.
+
+    Returns:
+        str: Path to the generated log file.
+    """
+    log_dir = "logs"
+    if not os.path.exists(log_dir):
+        os.mkdir(log_dir)
+    exact_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    dir_log_file = f'{log_dir}/logs_{exact_datetime}.log'
+    return dir_log_file
+
 def start_logging() -> tuple[object, object]:
     """Start logging by redirecting stdout to a log file.
 
@@ -21,13 +35,8 @@ def start_logging() -> tuple[object, object]:
         >>> log_file.close()
         >>> sys.stdout = original_stdout  # Restore the original stdout after logging is done.
     """
-    log_dir = "logs"
-    if not os.path.exists(log_dir):
-        os.mkdir(log_dir)
-
-    exact_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    dir_log_file = setup_log_dir()
     orig_stdout = sys.stdout
-    dir_log_file = f"{log_dir}/logs_{exact_datetime}.log"
     file = open(dir_log_file, "a+")
     sys.stdout = file
     print("-" * 5, datetime.now(), "-" * 5)
