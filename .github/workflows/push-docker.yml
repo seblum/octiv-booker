@@ -34,4 +34,4 @@ jobs:
           file: ./slotBooker/poetry.Dockerfile
           push: true
           tags: ${{ env.DOCKERREPO }}:${{ env.TAG }}
-          context: .
+          # context: .
