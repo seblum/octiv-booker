@@ -31,7 +31,6 @@ RUN mkdir /app
 COPY . /app
 
 WORKDIR /app
-COPY poetry.lock pyproject.toml /app/
 
 # make files executable
 #RUN chmod 644 $(find . -type f)
