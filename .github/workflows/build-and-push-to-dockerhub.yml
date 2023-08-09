@@ -1,8 +1,8 @@
-name: Dockerhub CD
+name: publish docker CD
 
 env:
   DOCKERREPO: seblum/octivbooker
-  TAG: cdtest
+  TAG: latest
 
 on:
   push:
@@ -34,4 +34,4 @@ jobs:
           file: ./slotBooker/poetry.Dockerfile
           push: true
           tags: ${{ env.DOCKERREPO }}:${{ env.TAG }}
-          #context: .
+          # context: .
