@@ -1,6 +1,5 @@
-import datetime
 import os
-import sys
+import logging
 
 import yaml
 
@@ -38,7 +37,8 @@ def main(retry: int = 3):
 
     # start writing output to logfile
     # file, orig_stdout, dir_log_file = start_logging()
-
+    logging.basicConfig(filename='example.log', filemode='w', encoding='utf-8', format='%(asctime)s %(message)s', level=logging.INFO)
+    
     # get env variables
     USER = os.environ.get("OCTIV_USERNAME")
     PASSWORD = os.environ.get("OCTIV_PASSWORD")
@@ -48,34 +48,36 @@ def main(retry: int = 3):
         print("USERNAME and PASSWORD not set")
         print("Please run 'source set-credentials.sh' if running local")
     else:
+        logging.info("USERNAME and PASSWORD prevalent")
+        logging.info(f"USER: {USER}")
         print("USERNAME and PASSWORD prevalent")
         print(f"USER: {USER}")
 
         count = 0
         while count < retry:
-            try:
-                driver = get_driver(chromedriver=config.get("chromedriver"))
+            # try:
+            driver = get_driver(chromedriver=config.get("chromedriver"))
 
-                booker = Booker(
-                    driver=driver,
-                    days_before_bookable=config.get("days_before_bookable"),
-                    base_url=config.get("base_url"),
-                )
+            booker = Booker(
+                driver=driver,
+                days_before_bookable=config.get("days_before_bookable"),
+                base_url=config.get("base_url"),
+            )
 
-                booker.login(username=USER, password=PASSWORD)
-                booker.switch_day()
-                booker.book_class(
-                    class_dict=config.get("class_dict"),
-                    booking_action=config.get("book_class"),
-                )
+            booker.login(username=USER, password=PASSWORD)
+            booker.switch_day()
+            booker.book_class(
+                class_dict=config.get("class_dict"),
+                booking_action=config.get("book_class"),
+            )
 
-                # close_driver(driver)
-                print(f"! SUCCESS | TRY: {count+1}")
-                count = 3
-            except:
-                print(f"! AN ERROR OCCURED | TRY: {count+1}")
-                count += 1
-                continue
+            # close_driver(driver)
+            print(f"! SUCCESS | TRY: {count+1}")
+            count = 3
+            # except:
+            #     print(f"! AN ERROR OCCURED | TRY: {count+1}")
+            #     count += 1
+            #     continue
 
         # stop_logging(file, orig_stdout)
         # send_logs_to_mail(dir_log_file)

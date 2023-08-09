@@ -1,7 +1,7 @@
 chromedriver: '/usr/local/bin/chromedriver'
 base_url: 'https://app.octivfitness.com/login'
 
-# Hpw many days prior can I book: current 6
+# How many days prior can I book: current 6
 days_before_bookable: 6
 # book class = True, cancel class = False
 book_class: True

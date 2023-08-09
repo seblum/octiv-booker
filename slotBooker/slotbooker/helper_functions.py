@@ -1,3 +1,6 @@
+from datetime import date
+
+
 def get_xpath_booking_head() -> str:
     """Head of the XPath of the booking table page after log in
 
@@ -5,9 +8,6 @@ def get_xpath_booking_head() -> str:
         str: Head of XPath of booking table
     """
     return "/html/body/div/div[5]/div/div"
-
-
-from datetime import date
 
 
 def get_xpath_login_username_head() -> str:
@@ -67,25 +67,25 @@ def get_day_button(day_to_book: str) -> str:
         str: XPath of the button of the corresponding weekday
     """
 
-    def _get_xpath_button(day_index: int) -> str:
+    def __get_xpath_button(day_index: int) -> str:
         return f"/html/body/div/div[5]/div/div[3]/div[{day_index}]/div/p"
 
     # monday=2, sunday=8
     match day_to_book:
         case "Monday":
-            day_button = _get_xpath_button(2)
+            day_button = __get_xpath_button(2)
         case "Tuesday":
-            day_button = _get_xpath_button(3)
+            day_button = __get_xpath_button(3)
         case "Wednesday":
-            day_button = _get_xpath_button(4)
+            day_button = __get_xpath_button(4)
         case "Thursday":
-            day_button = _get_xpath_button(5)
+            day_button = __get_xpath_button(5)
         case "Friday":
-            day_button = _get_xpath_button(6)
+            day_button = __get_xpath_button(6)
         case "Saturday":
-            day_button = _get_xpath_button(7)
+            day_button = __get_xpath_button(7)
         case "Sunday":
-            day_button = _get_xpath_button(8)
+            day_button = __get_xpath_button(8)
     return day_button
 
 
@@ -112,3 +112,23 @@ def get_booking_slot(booking_slot: int, book_action: bool) -> str:
         if book_action
         else _get_xpath_cancel(booking_slot)
     )
+
+
+def get_error_window() -> str:
+    """
+    Get the XPath of the error message within the booking page.
+
+    Returns:
+        str: XPath of the error message element within the HTML structure.
+    """
+    return "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[1]"
+
+
+def get_error_text_window() -> str:
+    """
+    Get the XPath of the error text message within the booking page.
+
+    Returns:
+        str: XPath of the element containing the detailed error text within the HTML structure.
+    """
+    return "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[2]"

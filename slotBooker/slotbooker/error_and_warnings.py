@@ -6,44 +6,19 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
+from .helper_functions import get_error_window, get_error_text_window
+
 
 class AlertTypes(Enum):
-    """Enumeration of Alert Types for Slotbooker.
-
-    This enumeration represents different types of alerts that can be raised during the slot booking process
-    in the Slotbooker application.
-
-    Attributes:
-        ClassFull (str): Alert indicating that the class is already full and cannot be booked.
-        MaxBookings (str): Alert indicating that the maximum number of bookings for the class has been reached.
-        NoAlert (str): Indicating that no alert is present.
-
-    Example:
-        To use the AlertTypes enumeration, access the attributes as follows:
-
-        >>> alert_type = AlertTypes.ClassFull
-        >>> if alert_type == AlertTypes.ClassFull:
-        ...     print("The class is already full.")
-        ...
-        The class is already full.
-    """
-
-    ClassFull = "class_full"
-    CancelBooking = "stornieren"
-    CannotBookInAdvance = "You cannot book this far in advance"
-    MaxBookings = "You have reached your maximum bookings per day limit"
-    NoAlert = "none"
+    ClassFull = "Die Stunde ist voll. Möchtest du auf die Warteliste kommen? Du wirst automatisch gebucht, wenn ein Platz frei wird."
+    CancelBooking = "Möchtest du deine Buchung wirklich stornieren?"
+    CannotBookInAdvance = "! You cannot book this far in advance"
+    MaxBookings = "! You have reached your maximum bookings per day limit"
+    NotIdentifyAlertError = "! Could not identify Error/Alert"
+    NotAlertError = "! No Error/Alert present"
 
 
 def alert_is_present(driver) -> object:
-    """Check if an alert is present on the website.
-
-    Returns:
-        object: The alert object if present, None otherwise.
-
-    Note:
-        This function checks for the presence of an alert and returns the alert object if found.
-    """
     try:
         WebDriverWait(driver, 3).until(
             EC.alert_is_present(),
@@ -60,47 +35,32 @@ def alert_is_present(driver) -> object:
 
 
 def get_alert_type(alert_obj: object) -> Enum:
-    """Determine the type of the alert based on its text.
-
-    Args:
-        alert_obj (object): The alert object.
-
-    Returns:
-        Enum: An enumeration value indicating the type of alert.
-
-    Note:
-        This function analyzes the alert's text and returns the corresponding AlertTypes enumeration value.
-    """
     alert_text = alert_obj.text
     if any([x.lower() in alert_text.lower() for x in ["waiting list", "Warteliste"]]):
         print("! Class full")
         alert_check = AlertTypes.ClassFull
-    elif any([x.lower() in alert_text.lower() for x in ["wirklich", "stornieren"]]):
+    elif any([x.lower() in alert_text.lower() for x in ["wirklich", "stornieren", "stornieren?"]]):
         alert_check = AlertTypes.MaxBookings
     else:
-        alert_check = AlertTypes.NoAlert
+        alert_check = AlertTypes.NotIdentifyAlertError
     return alert_check
 
 
 def error_is_present(driver) -> str:
-    error_path = "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[1]"
-    error_text_path = "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[2]"
-    if driver.find_element(By.XPATH, error_path):
+    if driver.find_element(By.XPATH, get_error_window()):
         print(colored("! Error", "red") + "...")
-        error_text = driver.find_element(By.XPATH, error_text_path).text
-    # else:
-    #     error_text = "| no error"
+        error_text = driver.find_element(By.XPATH, get_error_text_window()).text
     return error_text
 
 
 def evaluate_error(error_text) -> bool:
     match error_text:
         case AlertTypes.MaxBookings.value:
-            print(colored(error_text, "red"))
+            print(colored(AlertTypes.MaxBookings.value, "red"))
             return True
         case AlertTypes.CannotBookInAdvance.value:
-            print(colored(error_text, "red"))
+            print(colored(AlertTypes.CannotBookInAdvance.value, "red"))
             return True
         case _:
-            print("Could not identify error")
+            print(AlertTypes.NotIdentifyAlertError.value)
             return True
