@@ -16,8 +16,8 @@ class AlertTypes(Enum):
 
     ClassFull = "Die Stunde ist voll. Möchtest du auf die Warteliste kommen? Du wirst automatisch gebucht, wenn ein Platz frei wird."
     CancelBooking = "Möchtest du deine Buchung wirklich stornieren?"
-    CannotBookInAdvance = "! You cannot book this far in advance"
-    MaxBookings = "! You have reached your maximum bookings per day limit"
+    CannotBookInAdvance = "You cannot book this far in advance"
+    MaxBookings = "You have reached your maximum bookings per day limit"
     NotIdentifyAlertError = "! Could not identify Error/Alert"
     NotAlertError = "! No Error/Alert present"
 
@@ -101,10 +101,10 @@ def evaluate_error(error_text) -> bool:
     """
     match error_text:
         case AlertTypes.MaxBookings.value:
-            logging.info(AlertTypes.MaxBookings.value)
+            logging.info(f"! {AlertTypes.MaxBookings.value}")
             return True
         case AlertTypes.CannotBookInAdvance.value:
-            logging.info(AlertTypes.CannotBookInAdvance.value)
+            logging.info(f"! {AlertTypes.CannotBookInAdvance.value}")
             return True
         case _:
             logging.info(AlertTypes.NotIdentifyAlertError.value)
