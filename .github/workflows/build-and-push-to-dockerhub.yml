@@ -1,15 +1,15 @@
-name: publish docker CD
+name: Dockerhub CD
 
 env:
   DOCKERREPO: seblum/octivbooker
-  TAG: latest
+  TAG: cdtest
 
 on:
   push:
     branches: main
   pull_request:
     branches: [ main ]
-  workflow_dispatch: feat/remote-training
+  workflow_dispatch:
 
 jobs:
   docker:
@@ -31,7 +31,7 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v3
         with:
-          file: ./Dockerfile
+          file: ./slotBooker/poetry.Dockerfile
           push: true
           tags: ${{ env.DOCKERREPO }}:${{ env.TAG }}
           #context: .
