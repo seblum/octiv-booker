@@ -134,7 +134,7 @@ class Booker:
             EC.element_to_be_clickable((By.XPATH, day_button))
         ).click()
 
-        logging.info("| switched to day:")
+        logging.info(f"| switched to day: {day}")
         self.day = day
 
     def book_class(self, class_dict: dict, booking_action: bool = True) -> None:
