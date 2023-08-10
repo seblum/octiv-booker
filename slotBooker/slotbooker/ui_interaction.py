@@ -343,7 +343,7 @@ class Booker:
 
             error_text = error_is_present(self.driver)
             if error_text is None:
-                logging.info(f"| {AlertTypes.NotAlertError.value}")
+                logging.info(f"| {AlertTypes.NotError.value}")
             else:
                 return evaluate_error(error_text)
 
@@ -358,14 +358,17 @@ class Booker:
         all_slots_bounding_boxes = __get_all_bounding_boxes_in_window()
         class_entry_list = __load_and_transform_input_class_dict()
 
-        resultsdict = __get_all_bounding_boxes_by_class_name(
+        all_possible_booking_slots_dict = __get_all_bounding_boxes_by_class_name(
             class_entry_list=class_entry_list,
             all_slots_bounding_boxes=all_slots_bounding_boxes,
         )
 
         for entry in self.class_dict:
             if entry.get("class") == "None":
-                logging.info("No class set for this day.")
+                logging.info("! No class set for this day.")
+                break
+            elif not all_possible_booking_slots_dict: # dict is empty
+                logging.info("! No class found for this day.")
                 break
             else:
                 time_slot, class_slot, prioritize_waiting_list = (
@@ -373,13 +376,13 @@ class Booker:
                     entry.get("class"),
                     entry.get("wl"),
                 )
-                resultsdict_flatten = {
-                    k: v for d in resultsdict.get(class_slot) for k, v in d.items()
+                all_possible_booking_slots_dict_flatten = {
+                    k: v for d in all_possible_booking_slots_dict.get(class_slot) for k, v in d.items()
                 }
                 try:
                     # try getting an xpath for the given time and class. could also be an if-else statement
                     logging.info(f"| Checking {class_slot} at {time_slot}...")
-                    button_xpath = resultsdict_flatten.get(time_slot).get("xpath")
+                    button_xpath = all_possible_booking_slots_dict_flatten.get(time_slot).get("xpath")
                     # could check extra if already booked and need to check for cancel button
                 except AttributeError:
                     # results in NoneType

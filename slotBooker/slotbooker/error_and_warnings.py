@@ -19,7 +19,8 @@ class AlertTypes(Enum):
     CannotBookInAdvance = "You cannot book this far in advance"
     MaxBookings = "You have reached your maximum bookings per day limit"
     NotIdentifyAlertError = "Could not identify Error/Alert"
-    NotAlertError = "No Error/Alert present"
+    NotError = "No Error present"
+    NotAlert = "No Alert present"
 
 
 def alert_is_present(driver) -> object:
@@ -41,7 +42,7 @@ def alert_is_present(driver) -> object:
         alert_obj = driver.switch_to.alert
         return alert_obj
     except TimeoutException:
-        logging.info("| No Alert")
+        logging.info(f"| {AlertTypes.NotAlert.value}")
         # self.driver.find_element(By.NAME, 'Error')
 
     return None
