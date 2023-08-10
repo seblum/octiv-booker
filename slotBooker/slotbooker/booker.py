@@ -78,10 +78,10 @@ def main(retry: int = 3):
                 )
 
                 close_driver(driver)
-                logging.info(f"! SUCCESS | TRY: {count+1}")
+                logging.info(f"OctivBooker succeeded | try: {count+1}")
                 count = 3
             except:
-                logging.info(f"! AN ERROR OCCURED | TRY: {count+1}")
+                logging.info(f"OctivBooker failed | TRY: {count+1}")
                 count += 1
                 continue
 
