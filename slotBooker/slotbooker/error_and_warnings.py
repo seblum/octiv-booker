@@ -4,7 +4,7 @@ import logging
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 from .helper_functions import get_error_window, get_error_text_window
 
@@ -18,8 +18,8 @@ class AlertTypes(Enum):
     CancelBooking = "Möchtest du deine Buchung wirklich stornieren?"
     CannotBookInAdvance = "You cannot book this far in advance"
     MaxBookings = "You have reached your maximum bookings per day limit"
-    NotIdentifyAlertError = "! Could not identify Error/Alert"
-    NotAlertError = "! No Error/Alert present"
+    NotIdentifyAlertError = "Could not identify Error/Alert"
+    NotAlertError = "No Error/Alert present"
 
 
 def alert_is_present(driver) -> object:
@@ -83,10 +83,13 @@ def error_is_present(driver) -> str:
     Returns:
         str: The error text if present, else an empty string.
     """
-    if driver.find_element(By.XPATH, get_error_window()):
+    try:
+        driver.find_element(By.XPATH, get_error_window())
         logging.info("! Error !")
         error_text = driver.find_element(By.XPATH, get_error_text_window()).text
-    return error_text
+        return error_text
+    except NoSuchElementException:
+        return None
 
 
 def evaluate_error(error_text) -> bool:
@@ -107,5 +110,5 @@ def evaluate_error(error_text) -> bool:
             logging.info(f"! {AlertTypes.CannotBookInAdvance.value}")
             return True
         case _:
-            logging.info(AlertTypes.NotIdentifyAlertError.value)
+            logging.info(f"! {AlertTypes.NotIdentifyAlertError.value}")
             return False
