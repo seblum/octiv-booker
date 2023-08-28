@@ -47,5 +47,5 @@ class_dict:
     - time: None
       class: None
   Sunday:
-    - time: "11:30"
-      class: "Weightlifting"
+    - time: None
+      class: None
