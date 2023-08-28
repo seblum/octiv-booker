@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import logging
 import yaml
+from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
 
 from .driver import close_driver, get_driver
 from .logging import setup_log_dir, start_logging, stop_logging
@@ -80,6 +81,16 @@ def main(retry: int = 3):
                 close_driver(driver)
                 logging.info(f"OctivBooker succeeded | try: {count+1}")
                 count = 3
+            except SessionNotCreatedException:
+                logging.info(f"OctivBooker failed | TRY: {count+1}")
+                logging.info(f"! SessionNotCreatedException")
+                count += 1
+                continue
+            except NoSuchDriverException:
+                logging.info(f"OctivBooker failed | TRY: {count+1}")
+                logging.info(f"! NoSuchDriverException")
+                count += 1
+                continue
             except:
                 logging.info(f"OctivBooker failed | TRY: {count+1}")
                 count += 1
