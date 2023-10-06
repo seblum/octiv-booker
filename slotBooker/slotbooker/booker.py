@@ -51,6 +51,7 @@ def main(retry: int = 3):
     # get env variables
     USER = os.environ.get("OCTIV_USERNAME")
     PASSWORD = os.environ.get("OCTIV_PASSWORD")
+		 DAYS_BEFORE_BOOKABLE = os.environ.get("DAYS_BEFORE_BOOKABLE")
 
     # check whether env variables are set or None
     if USER is None or PASSWORD is None:
@@ -67,7 +68,7 @@ def main(retry: int = 3):
 
                 booker = Booker(
                     driver=driver,
-                    days_before_bookable=config.get("days_before_bookable"),
+                    days_before_bookable=DAYS_BEFORE_BOOKABLE,
                     base_url=config.get("base_url"),
                 )
 
