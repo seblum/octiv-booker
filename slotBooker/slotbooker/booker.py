@@ -51,8 +51,9 @@ def main(retry: int = 3):
     # get env variables
     USER = os.environ.get("OCTIV_USERNAME")
     PASSWORD = os.environ.get("OCTIV_PASSWORD")
-    DAYS_BEFORE_BOOKABLE = os.environ.get("DAYS_BEFORE_BOOKABLE")
-
+    days_before_bookable_env = os.environ.get("DAYS_BEFORE_BOOKABLE")
+    DAYS_BEFORE_BOOKABLE = int(days_before_bookable_env)
+    
     # check whether env variables are set or None
     if USER is None or PASSWORD is None:
         logging.info("USERNAME and PASSWORD not set")
