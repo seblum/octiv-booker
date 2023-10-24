@@ -52,7 +52,8 @@ def main(retry: int = 3):
     USER = os.environ.get("OCTIV_USERNAME")
     PASSWORD = os.environ.get("OCTIV_PASSWORD")
     DAYS_BEFORE_BOOKABLE = int(os.environ.get("DAYS_BEFORE_BOOKABLE"))
-    
+    EXECUTION_BOOKING_TIME = os.environ.get("EXECUTION_BOOKING_TIME")
+
     # check whether env variables are set or None
     if USER is None or PASSWORD is None:
         logging.info("USERNAME and PASSWORD not set")
@@ -70,6 +71,7 @@ def main(retry: int = 3):
                     driver=driver,
                     days_before_bookable=DAYS_BEFORE_BOOKABLE,
                     base_url=config.get("base_url"),
+                    execution_booking_time=EXECUTION_BOOKING_TIME
                 )
 
                 booker.login(username=USER, password=PASSWORD)

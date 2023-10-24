@@ -3,6 +3,7 @@ from xml.dom.minidom import Element
 import logging
 from collections import defaultdict
 from enum import Enum
+from datetime import datetime
 
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -37,6 +38,7 @@ class Booker:
         driver (object): The Selenium WebDriver instance.
         base_url (str): The base URL of the booking website.
         days_before_bookable (int): Number of days before a class becomes bookable.
+        execution_booking_time (str): time the booking is executed
         class_dict (dict): Dictionary containing class booking information for a specific day.
         booking_action (bool): Indicates whether to perform booking actions (True) or not (False).
         day (str): The selected day for booking.
@@ -55,10 +57,11 @@ class Booker:
         This class provides methods for logging in, switching days, and booking classes on a specific website.
     """
 
-    def __init__(self, driver: object, base_url: str, days_before_bookable: int):
+    def __init__(self, driver: object, base_url: str, days_before_bookable: int, execution_booking_time: str):
         self.driver = driver
         self.base_url = base_url
         self.days_before_bookable = days_before_bookable
+        self.execution_booking_time = execution_booking_time
         self.class_dict = None
         self.booking_action = None
         self.day = None
@@ -320,7 +323,12 @@ class Booker:
                 This function attempts to book a class slot, handling alerts and errors.
             """
             logging.info(f"| Booking {class_slot} at {time_slot}")
-            __click_book_button(xpath_button_book=button_xpath)
+            
+            while True:
+                if datetime.now().time().strftime("%H:%M:%S") >= self.execution_booking_time:
+                    logging.info(f"| Booking executed at {datetime.now().time()}")
+                    __click_book_button(xpath_button_book=button_xpath)
+                    break
 
             # Check whether alert appears
             alert_obj = alert_is_present(self.driver)
