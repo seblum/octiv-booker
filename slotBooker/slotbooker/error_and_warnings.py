@@ -68,7 +68,7 @@ def get_alert_type(alert_obj: object) -> Enum:
             for x in ["wirklich", "stornieren", "stornieren?"]
         ]
     ):
-        alert_check = AlertTypes.MaxBookings
+        alert_check = AlertTypes.MaxBookings # This seems not to be the correct error message
     else:
         alert_check = AlertTypes.NotIdentifyAlertError
     return alert_check
@@ -112,4 +112,5 @@ def evaluate_error(error_text) -> bool:
             return True
         case _:
             logging.info(f"! {AlertTypes.NotIdentifyAlertError.value}")
+            logging.info(f"! Error message: {error_text}")
             return False
