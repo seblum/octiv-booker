@@ -1,11 +1,10 @@
-from datetime import datetime
 import os
 import logging
 import yaml
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
 
 from .driver import close_driver, get_driver
-from .logging import setup_log_dir, start_logging, stop_logging
+from .logging import setup_log_dir
 from .ui_interaction import Booker
 from .gmail import send_logs_to_mail
 

@@ -1,16 +1,12 @@
-import time
-from xml.dom.minidom import Element
 import logging
 from collections import defaultdict
-from enum import Enum
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException
 
 from .helper_functions import (
     get_booking_slot,
@@ -19,11 +15,13 @@ from .helper_functions import (
     get_xpath_booking_head,
     get_xpath_login_password_head,
     get_xpath_login_username_head,
+    continue_bookings, 
+    stop_booking_process
 )
 
-from .error_and_warnings import (
+from .alerts_and_errors import (
     alert_is_present,
-    get_alert_type,
+    evaluate_alert,
     error_is_present,
     evaluate_error,
     AlertTypes,
@@ -137,7 +135,9 @@ class Booker:
             EC.element_to_be_clickable((By.XPATH, day_button))
         ).click()
 
-        logging.info(f"| switched to day: {day}")
+        future_date = datetime.today() + timedelta(days=self.days_before_bookable)
+        future_date_formatted = future_date.date().strftime("%d-%m-%Y")
+        logging.info(f"| switched to day: {day}, {future_date_formatted}")
         self.day = day
 
     def book_class(self, class_dict: dict, booking_action: bool = True) -> None:
@@ -261,54 +261,6 @@ class Booker:
             element = self.driver.find_element(By.XPATH, xpath_button_book)
             self.driver.execute_script("arguments[0].click();", element)
 
-        def __booking_waiting_list(
-            prioritize_waiting_list: str, alert_obj: object
-        ) -> bool:
-            """
-            Handle booking waiting list option in the alert.
-
-            Args:
-                prioritize_waiting_list (str): Indicates whether to prioritize the waiting list (True) or not (False).
-                alert_obj (object): The alert object.
-
-            Returns:
-                bool: True if program should end, False if it should continue.
-
-            Note:
-                This function handles the waiting list booking option in the alert dialog.
-            """
-            match prioritize_waiting_list:
-                case True:
-                    logging.info("! Booking waiting list...")
-                    alert_obj.accept()
-                    logging.info("| Waiting list booked")
-                    return True  # end program
-                case _:
-                    logging.info(
-                        f"! Parameter 'wl' is set to {prioritize_waiting_list} > Skipping waiting list"
-                    )
-                    alert_obj.dismiss()
-                    logging.info("> Looking for further slots...")
-                    return False  # continue
-
-        def __abort_canceling_slot(alert_obj: object) -> bool:
-            """
-            Handle aborting the canceling of a slot.
-
-            Args:
-                alert_obj (object): The alert object.
-
-            Returns:
-                bool: False to continue searching for further slots.
-
-            Note:
-                This function handles the situation when slot cancelation is aborted.
-            """
-            logging.info(f"! Aborted canceling slot...")
-            alert_obj.dismiss()
-            logging.info("> Looking for further slots...")
-            return False  # continue
-
         def __book_class_slot(button_xpath: str) -> bool:
             """
             Book a specific class slot.
@@ -323,40 +275,29 @@ class Booker:
                 This function attempts to book a class slot, handling alerts and errors.
             """
             logging.info(f"| Booking {class_slot} at {time_slot}")
+            logging.info(f"| Execution starts at >= {self.execution_booking_time}...")
             
             while True:
                 if datetime.now().time().strftime("%H:%M:%S") >= self.execution_booking_time:
-                    logging.info(f"| Booking executed at {datetime.now().time()}")
+                    logging.info(f"| ...Booking executed at {datetime.now().time()}")
                     __click_book_button(xpath_button_book=button_xpath)
                     break
 
             # Check whether alert appears
             alert_obj = alert_is_present(self.driver)
-            if alert_obj is not None:
-                alert_check = get_alert_type(alert_obj)
-
-                match alert_check:
-                    case AlertTypes.ClassFull:
-                        ret = __booking_waiting_list(
-                            prioritize_waiting_list=prioritize_waiting_list,
-                            alert_obj=alert_obj,
-                        )
-                        return ret
-                    # currently not necessarily needed as canceling class is not listed in all_possible_booking_slots_dict
-                    case AlertTypes.CancelBooking:
-                        ret = __abort_canceling_slot
-                        return ret
-                    case _:
-                        logging.info(AlertTypes.NotIdentifyAlertError.value)
+            if alert_obj is None:
+                logging.info(f"| {AlertTypes.NotAlert.value}")
+            else:
+                return evaluate_alert(alert_obj,prioritize_waiting_list)
 
             error_text = error_is_present(self.driver)
             if error_text is None:
                 logging.info(f"| {AlertTypes.NotError.value}")
             else:
-                return evaluate_error(error_text)
+                return evaluate_error(error_text) # returns False to continue bookings
 
             logging.info("! Class booked")
-            return True
+            return stop_booking_process()
 
         #
         # ACTUAL CODE OF FUNCTION
@@ -389,7 +330,7 @@ class Booker:
                 }
                 try:
                     # try getting an xpath for the given time and class. could also be an if-else statement
-                    logging.info(f"| Checking {class_slot} at {time_slot}...")
+                    logging.info(f"? Checking {class_slot} at {time_slot}...")
                     button_xpath = all_possible_booking_slots_dict_flatten.get(time_slot).get("xpath")
                     # could check extra if already booked and need to check for cancel button
                 except AttributeError:

@@ -1,5 +1,3 @@
-from tempfile import mkdtemp
-import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 

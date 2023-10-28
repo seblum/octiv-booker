@@ -132,3 +132,23 @@ def get_error_text_window() -> str:
         str: XPath of the element containing the detailed error text within the HTML structure.
     """
     return "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[2]"
+
+
+def continue_bookings() -> bool:
+    """
+    Determine whether to continue booking others slots.
+
+    Returns:
+    bool: True if new bookings should be continued, False if further bookings should be stopped.
+    """
+    return False
+
+
+def stop_booking_process() -> bool:
+    """
+    Determine whether to stop the booking process of slots.
+
+    Returns:
+    bool: True if further bookings should be stopped, False if new bookings can continue.
+    """
+    return True
