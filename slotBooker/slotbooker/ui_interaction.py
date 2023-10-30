@@ -278,7 +278,7 @@ class Booker:
             
             while True:
                 if datetime.now().time().strftime("%H:%M:%S") >= self.execution_booking_time:
-                    logging.info(f"| ...Booking executed at {datetime.now().time()}")
+                    logging.info(f"| Executed at {datetime.now().time()}")
                     __click_book_button(xpath_button_book=button_xpath)
                     break
 
@@ -301,7 +301,7 @@ class Booker:
         #
         # ACTUAL CODE OF FUNCTION
         #
-        logging.info(f"| Execution starts at >= {self.execution_booking_time}...")
+        logging.info(f"| Execution starts at >= {self.execution_booking_time}")
         self.booking_action = booking_action
 
         all_slots_bounding_boxes = __get_all_bounding_boxes_in_window()
