@@ -275,7 +275,6 @@ class Booker:
                 This function attempts to book a class slot, handling alerts and errors.
             """
             logging.info(f"| Booking {class_slot} at {time_slot}")
-            logging.info(f"| Execution starts at >= {self.execution_booking_time}...")
             
             while True:
                 if datetime.now().time().strftime("%H:%M:%S") >= self.execution_booking_time:
@@ -302,6 +301,7 @@ class Booker:
         #
         # ACTUAL CODE OF FUNCTION
         #
+        logging.info(f"| Execution starts at >= {self.execution_booking_time}...")
         self.booking_action = booking_action
 
         all_slots_bounding_boxes = __get_all_bounding_boxes_in_window()

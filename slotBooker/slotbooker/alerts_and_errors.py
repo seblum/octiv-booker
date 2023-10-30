@@ -14,8 +14,8 @@ class AlertTypes(Enum):
     """
     Enumeration of possible alert types that can be encountered.
     """
-
-    ClassFull = "Die Stunde ist voll. Möchtest du auf die Warteliste kommen? Du wirst automatisch gebucht, wenn ein Platz frei wird."
+    ClassFull = "Class is fully booked"
+    ClassFullGerman = "Die Stunde ist voll. Möchtest du auf die Warteliste kommen? Du wirst automatisch gebucht, wenn ein Platz frei wird."
     CancelBooking = "Möchtest du deine Buchung wirklich stornieren?"
     CannotBookInAdvance = "You cannot book this far in advance"
     MaxBookings = "You have reached your maximum bookings per day limit"
@@ -169,6 +169,9 @@ def evaluate_error(error_text) -> bool:
         case AlertTypes.CannotBookInAdvance.value:
             logging.info(f"! {AlertTypes.CannotBookInAdvance.value}")
             return True
+        case AlertTypes.ClassFull.value:
+            logging.info(f"! {AlertTypes.ClassFull.value}")
+            return False
         case _:
             logging.info(f"! {AlertTypes.NotIdentifyError.value}")
             logging.info(f"! Error message: {error_text}")
