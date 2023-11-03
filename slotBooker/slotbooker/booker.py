@@ -81,20 +81,20 @@ def main(retry: int = 3):
                 )
 
                 close_driver(driver)
-                logging.info(f"[{count+1}] OctivBooker succeeded")
+                logging.info(f"| [{count+1}] OctivBooker succeeded")
                 count = 3
             except SessionNotCreatedException:
-                logging.info(f"[{count+1}] OctivBooker failed")
+                logging.info(f"| [{count+1}] OctivBooker failed")
                 logging.info(f"! SessionNotCreatedException")
                 count += 1
                 continue
             except NoSuchDriverException:
-                logging.info(f"[{count+1}] OctivBooker failed")
+                logging.info(f"| [{count+1}] OctivBooker failed")
                 logging.info(f"! NoSuchDriverException")
                 count += 1
                 continue
             except:
-                logging.info(f"OctivBooker failed | TRY: {count+1}")
+                logging.info(f"| [{count+1}] OctivBooker failed")
                 count += 1
                 continue
 
