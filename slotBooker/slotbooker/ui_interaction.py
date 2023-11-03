@@ -259,7 +259,14 @@ class Booker:
             """
             # Use execute_script() when another element is covering the element to be clicked
             element = self.driver.find_element(By.XPATH, xpath_button_book)
-            self.driver.execute_script("arguments[0].click();", element)
+
+            while True:
+                if datetime.now().time().strftime("%H:%M:%S") >= self.execution_booking_time:
+                    logging.info(f"| Executed at {datetime.now().time()}")
+                    self.driver.execute_script("arguments[0].click();", element)
+                    break
+
+
 
         def __book_class_slot(button_xpath: str) -> bool:
             """
@@ -276,11 +283,7 @@ class Booker:
             """
             logging.info(f"| Booking {class_slot} at {time_slot}")
             
-            while True:
-                if datetime.now().time().strftime("%H:%M:%S") >= self.execution_booking_time:
-                    logging.info(f"| Executed at {datetime.now().time()}")
-                    __click_book_button(xpath_button_book=button_xpath)
-                    break
+            __click_book_button(xpath_button_book=button_xpath)
 
             # Check whether alert appears
             alert_obj = alert_is_present(self.driver)

@@ -2,7 +2,7 @@ name: publish docker CD
 
 env:
   DOCKERREPO: seblum/octivbooker
-  TAG: v1.2.2
+  TAG: v1.3.0
 
 on:
   push:

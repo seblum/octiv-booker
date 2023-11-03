@@ -19,7 +19,7 @@ RUN apt-get install -yqq unzip
 # https://googlechromelabs.github.io/chrome-for-testing/#stable
 ENV ChromedriverVersion="119.0.6045.105"
 # $ChromedriverVersion
-RUN wget -O /tmp/chromedriver.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/119.0.6045.105/linux64/chromedriver-linux64.zip
+RUN wget -O /tmp/chromedriver.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$ChromedriverVersion/linux64/chromedriver-linux64.zip
 RUN unzip /tmp/chromedriver.zip chromedriver-linux64/chromedriver -d /usr/local/bin/
 
 # set display port to avoid crash
