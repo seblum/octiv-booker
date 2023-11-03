@@ -259,6 +259,7 @@ class Booker:
             """
             # Use execute_script() when another element is covering the element to be clicked
             element = self.driver.find_element(By.XPATH, xpath_button_book)
+            
             while True:
                 if datetime.now().time().strftime("%H:%M:%S") >= self.execution_booking_time:
                     logging.info(f"| Executed at {datetime.now().time()}")
