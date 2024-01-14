@@ -29,7 +29,7 @@ def get_xpath_login_password_head() -> str:
     return "/html/body/div[1]/div[3]/div/div/div/div/div/div/form"
 
 
-def get_day(days_before_bookable: int) -> tuple[str, bool]:
+def get_day(days_before_bookable: int) -> tuple[str, bool, int]:
     """Checks and selects which day will be selected,
     based on how many days from today shall be selected
 
@@ -51,10 +51,14 @@ def get_day(days_before_bookable: int) -> tuple[str, bool]:
     today = date.today().weekday()
     future_day = today + days_before_bookable
     if future_day < 7:
-        return week_days[future_day], False
+        return week_days[future_day], False, 0
     else:
+        nr_weeks = int(round(days_before_bookable / 7,0))
         future_day = future_day - 7
-        return week_days[future_day], True
+        if future_day == 7:
+            future_day = 0
+        return week_days[future_day], True, nr_weeks
+
 
 
 def get_day_button(day_to_book: str) -> str:

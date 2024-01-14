@@ -21,8 +21,8 @@ class AlertTypes(Enum):
     MaxBookings = "You have reached your maximum bookings per day limit"
     NotIdentifyAlert = "Could not identify Alert"
     NotIdentifyError = "Could not identify Error"
-    NotAlert = "No Alert present"
-    NotError = "No Error present"
+    NotAlert = "No Alert"
+    NotError = "No Error"
 
 
 def alert_is_present(driver) -> object:
