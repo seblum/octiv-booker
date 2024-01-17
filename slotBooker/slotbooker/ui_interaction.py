@@ -123,7 +123,7 @@ class Booker:
         """
         day, next_week, nr_weeks = get_day(self.days_before_bookable)
         if next_week:
-            while nr_weeks >= 0:
+            while nr_weeks > 0:
                 WebDriverWait(self.driver, 20).until(
                     EC.element_to_be_clickable(
                         (By.XPATH, f"{get_xpath_booking_head()}[3]/div[9]/div/div/i")
