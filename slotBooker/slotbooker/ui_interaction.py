@@ -121,25 +121,24 @@ class Booker:
         Raises:
             TimeoutException: If the day switch process times out.
         """
-        day, next_week, nr_weeks = get_day(self.days_before_bookable)
-        if next_week:
-            while nr_weeks > 0:
+        future_date, diff_week = get_day(self.days_before_bookable)
+        day = future_date.strftime("%A")
+        if diff_week > 0:
+            while diff_week > 0:
                 WebDriverWait(self.driver, 20).until(
                     EC.element_to_be_clickable(
                         (By.XPATH, f"{get_xpath_booking_head()}[3]/div[9]/div/div/i")
                     )
                 ).click()
                 logging.info("| switched to following week")
-                nr_weeks -= 1
+                diff_week -= 1
 
         day_button = get_day_button(day)
         WebDriverWait(self.driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, day_button))
         ).click()
 
-        future_date = datetime.today() + timedelta(days=self.days_before_bookable)
-        future_date_formatted = future_date.date().strftime("%d-%m-%Y")
-        logging.info(f"| switched to day: {day}, {future_date_formatted}")
+        logging.info(f"| switched to day: {day}, {future_date}")
         self.day = day
 
     def book_class(self, class_dict: dict, booking_action: bool = True) -> None:

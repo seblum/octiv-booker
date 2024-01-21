@@ -1,5 +1,4 @@
-from datetime import date
-
+from datetime import date, timedelta
 
 def get_xpath_booking_head() -> str:
     """Head of the XPath of the booking table page after log in
@@ -29,7 +28,7 @@ def get_xpath_login_password_head() -> str:
     return "/html/body/div[1]/div[3]/div/div/div/div/div/div/form"
 
 
-def get_day(days_before_bookable: int) -> tuple[str, bool, int]:
+def get_day(days_before_bookable: int) -> tuple[date, int]:
     """Checks and selects which day will be selected,
     based on how many days from today shall be selected
 
@@ -37,27 +36,15 @@ def get_day(days_before_bookable: int) -> tuple[str, bool, int]:
         days_before_bookable (int): Number of days to go in the future
 
     Returns:
-        tuple[str, bool]: weekday to be selected, True if weekday is in the next week
+        tuple[date, int]: future day to be selected, nr of different calendar weeks
     """
-    week_days = (
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-    )
-    today = date.today().weekday()
-    future_day = today + days_before_bookable
-    if future_day < 7:
-        return week_days[future_day], False, 0
-    else:
-        nr_weeks = int(round(days_before_bookable / 7,0))
-        future_day = future_day - 7
-        if future_day == 7:
-            future_day = 0
-        return week_days[future_day], True, nr_weeks
+    today = date.today()
+    future_date = today + timedelta(days=days_before_bookable)
+    today_calendar_week = today.isocalendar().week
+    future_calendar_week = future_date.isocalendar().week
+    diff_week = future_calendar_week-today_calendar_week
+
+    return future_date, diff_week
 
 
 
