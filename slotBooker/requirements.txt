@@ -11,7 +11,7 @@ outcome==1.2.0; python_version >= "3.7" and python_version < "4.0"
 pycparser==2.21; python_version >= "3.7" and python_full_version < "3.0.0" and os_name == "nt" and implementation_name != "pypy" and python_version < "4.0" or os_name == "nt" and implementation_name != "pypy" and python_version >= "3.7" and python_version < "4.0" and python_full_version >= "3.4.0"
 pyopenssl==22.0.0; python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "4.0" or python_full_version >= "3.6.0" and python_version < "4" and python_version >= "3.7"
 pysocks==1.7.1; python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "4.0" or python_full_version >= "3.6.0" and python_version < "4" and python_version >= "3.7"
-pytz==2022.1
+pytz==2024.1
 pyyaml==6.0; python_version >= "3.6"
 selenium==4.3.0; python_version >= "3.7" and python_version < "4.0"
 sniffio==1.2.0; python_version >= "3.7" and python_version < "4.0"
