@@ -3,7 +3,7 @@ import os
 from email.message import EmailMessage
 import ssl
 import smtplib
-
+from .html_format import format_to_html
 
 def send_logs_to_mail(filename: str) -> None:
     """Send an email with the content of the specified file as the email body.
@@ -37,6 +37,8 @@ def send_logs_to_mail(filename: str) -> None:
     with open(filename) as fp:
         body = fp.read()
 
+    # body = format_to_html(body)
+        
     # build email
     em = EmailMessage()
     em["From"] = email_sender

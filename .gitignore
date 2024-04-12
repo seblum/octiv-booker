@@ -174,3 +174,5 @@ registry.terraform.io
 
 #providers.tf
 .DS_Store
+
+**/commands.md

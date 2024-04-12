@@ -262,9 +262,11 @@ class Booker:
             element = self.driver.find_element(By.XPATH, xpath_button_book)
             
             while True:
-                if datetime.now().time().strftime("%H:%M:%S") >= self.execution_booking_time:
-                    logging.info(f"| Executed at {datetime.now().time()}")
+                if datetime.now().time().strftime("%H:%M:%S.%f") >= self.execution_booking_time:
+                    start_time = datetime.now()
+                    logging.info(f"| Start execution at {datetime.now().time()}")
                     self.driver.execute_script("arguments[0].click();", element)
+                    logging.info(f"| Executed at {datetime.now().time()} (took {(datetime.now() - start_time)}s)")
                     break
 
 

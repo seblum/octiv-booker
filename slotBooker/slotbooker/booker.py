@@ -3,14 +3,17 @@ import logging
 import yaml
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
 
-from .driver import close_driver, get_driver
-from .logging import setup_log_dir
+from .utils.driver import close_driver, get_driver
+from .utils.logging import setup_log_dir
 from .ui_interaction import Booker
-from .gmail import send_logs_to_mail
+from .utils.gmail import send_logs_to_mail
 
 # Load config yaml
-config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
+config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
 config = yaml.safe_load(open(config_path))
+
+classes_path = os.path.join(os.path.dirname(__file__), "classes.yaml")
+classes = yaml.safe_load(open(classes_path))
 
 
 def main(retry: int = 3):
@@ -76,25 +79,28 @@ def main(retry: int = 3):
                 booker.login(username=USER, password=PASSWORD)
                 booker.switch_day()
                 booker.book_class(
-                    class_dict=config.get("class_dict"),
-                    booking_action=config.get("book_class"),
+                    class_dict=classes.get("class_dict"),
+                    booking_action=classes.get("book_class"),
                 )
 
                 close_driver(driver)
                 logging.info(f"| [{count+1}] OctivBooker succeeded")
                 count = 3
-            except SessionNotCreatedException:
+            except SessionNotCreatedException as e:
                 logging.info(f"| [{count+1}] OctivBooker failed")
                 logging.info(f"! SessionNotCreatedException")
+                logging.info(e)
                 count += 1
                 continue
-            except NoSuchDriverException:
+            except NoSuchDriverException as e:
                 logging.info(f"| [{count+1}] OctivBooker failed")
                 logging.info(f"! NoSuchDriverException")
+                logging.info(e)
                 count += 1
                 continue
-            except:
+            except Exception as e:
                 logging.info(f"| [{count+1}] OctivBooker failed")
+                logging.info(e)
                 count += 1
                 continue
 
