@@ -266,7 +266,9 @@ class Booker:
                     start_time = datetime.now()
                     logging.info(f"| Start execution at {datetime.now().time()}")
                     self.driver.execute_script("arguments[0].click();", element)
-                    logging.info(f"| Executed at {datetime.now().time()} (took {(datetime.now() - start_time)}s)")
+                    end_time = datetime.now()
+                    logging.info(f"| Executed at {end_time.time()}")
+                    logging.info(f"| Took {(end_time - start_time)}s - Ideal start time: {(end_time-(end_time - start_time)).time()}")
                     break
 
 
