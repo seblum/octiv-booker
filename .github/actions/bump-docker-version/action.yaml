@@ -1,0 +1,50 @@
+name: "Bump python package versions"
+description: "Bumps versions of python packages if changes since a given commit are detected."
+inputs:
+  ci_bot_email:
+    description: email to use as author of the commit
+    required: false
+  ci_bot_name:
+    description: Name to use as author of the commit
+    required: false
+  directory:
+    description: The directory in source to filter the python packages by
+    required: false
+runs:
+  using: "composite"
+  steps:
+    -
+      name: Bump python package versions
+      shell: bash
+      if: github.event_name == 'pull_request'
+      run: |
+        if [ -z "${{ inputs.directory }}" ]; then
+          PY_PACKAGE_VERSION_UPDATES=$(bash ./scripts/bump_py_package_versions.sh --changed-since=${{ github.event.pull_request.base.sha }} --base-branch=${{ github.event.pull_request.base.ref }})
+        else
+          PY_PACKAGE_VERSION_UPDATES=$(bash ./scripts/bump_py_package_versions.sh --changed-since=${{ github.event.pull_request.base.sha }} --base-branch=${{ github.event.pull_request.base.ref }} --filter-address-regex=src/${{ inputs.directory }})
+        fi
+        if [ -z "$PY_PACKAGE_VERSION_UPDATES" ]; then
+          echo "No python package version changes detected."
+        else
+          echo "## Python package version changes detected:" >> pr-comment.txt
+          echo "$PY_PACKAGE_VERSION_UPDATES" >> pr-comment.txt
+          cat pr-comment.txt >> $GITHUB_STEP_SUMMARY
+        fi
+    - 
+      name: Comment version changes on PR
+      if: ${{ hashFiles('pr-comment.txt') != '' }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        path: pr-comment.txt
+    - 
+      name: Commit and Push
+      if: ${{ hashFiles('pr-comment.txt') != '' }}
+      shell: bash
+      run: |
+        git checkout ${{ github.event.pull_request.head.ref }}
+        shopt -s globstar # enable recursive globbing
+        git config --global user.email ${{ inputs.ci_bot_email }}
+        git config --global user.name ${{ inputs.ci_bot_name }}
+        git add **/BUILD
+        git commit -m "chore: bump python package versions"
+        git push
