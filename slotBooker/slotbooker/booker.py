@@ -12,7 +12,7 @@ from .utils.gmail import send_logs_to_mail
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
 config = yaml.safe_load(open(config_path))
 
-classes_path = os.path.join(os.path.dirname(__file__), "classes.yaml")
+classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
 classes = yaml.safe_load(open(classes_path))
 
 
