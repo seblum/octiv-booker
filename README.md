@@ -103,21 +103,11 @@ seblum/octivbooker:latest
 - `Error: Error building docker image: 0: failed to solve with frontend dockerfile.v0: failed to create LLB definition: no active session for wx08tjz0ezhyc8zt4z1qlmica: context deadline exceeded` This Error can occur during terraform apply in Github Actions during building of the Docker image.. It works running terraform apply locally though.
 
 
-## TODO
-
-- [x] create envs for octiv passwords
-- [x] create docker envs for octiv passwords
-- [x] pass envs from tf to docker envs for octiv passwords
-- [x] move terraform to github actions
-- [x] terraform statefile save on aws
-- [x] resolve issue with statefile s3 bucket on deletion
-- [ ] enable full vpc network on terraform
-- [x] put tags in infrastructure
-- [x] own network for ec2
-- [x] pull docker image on ec2 and
-- [x] make it run on cronjobs
-- [x] write docker outputs to logs
-- [ ] refactor AWS_Lambda for github actions
-- [ ] documentation for lambda
-- [ ] rename terraform ressources to ec2 and lambda rollouts
-- [ ] tag lambda
+docker run -it -e OCTIV_USERNAME=sebast.blum@gmail.com \           sebastian.blum@MBPvonSebastian
+-e OCTIV_PASSWORD=8Rollercoaster8 \
+-e EMAIL_SENDER=seblumautomated@gmail.com \
+-e EMAIL_PASSWORD=smwtrkqslxmkzhpu \
+-e EMAIL_RECEIVER=sebast.blum@gmail.com \
+-e DAYS_BEFORE_BOOKABLE=6 \
+-e EXECUTION_BOOKING_TIME=08:59:59.95 --volume /Users/sebastian.blum/Github/octiv-booker/slotBooker/slotbooker/:/app/slotbooker/data/ \
+octivbooker:latest
