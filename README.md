@@ -102,12 +102,3 @@ seblum/octivbooker:latest
 - `Error: Error pushing docker image: Error response from daemon: Bad parameters and missing X-Registry-Auth: EOF` This Error can occur during terraform apply in Github Actions during building of the Docker image.. It works running terraform apply locally though.
 - `Error: Error building docker image: 0: failed to solve with frontend dockerfile.v0: failed to create LLB definition: no active session for wx08tjz0ezhyc8zt4z1qlmica: context deadline exceeded` This Error can occur during terraform apply in Github Actions during building of the Docker image.. It works running terraform apply locally though.
 
-
-docker run -it -e OCTIV_USERNAME=sebast.blum@gmail.com \           sebastian.blum@MBPvonSebastian
--e OCTIV_PASSWORD=8Rollercoaster8 \
--e EMAIL_SENDER=seblumautomated@gmail.com \
--e EMAIL_PASSWORD=smwtrkqslxmkzhpu \
--e EMAIL_RECEIVER=sebast.blum@gmail.com \
--e DAYS_BEFORE_BOOKABLE=6 \
--e EXECUTION_BOOKING_TIME=08:59:59.95 --volume /Users/sebastian.blum/Github/octiv-booker/slotBooker/slotbooker/:/app/slotbooker/data/ \
-octivbooker:latest
