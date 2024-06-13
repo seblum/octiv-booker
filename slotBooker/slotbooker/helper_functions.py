@@ -6,7 +6,7 @@ def get_xpath_booking_head() -> str:
     Returns:
         str: Head of XPath of booking table
     """
-    return "/html/body/div/div[5]/div/div"
+    return "/html/body/div/div[6]/div/div"
 
 
 def get_xpath_login_username_head() -> str:
@@ -59,7 +59,8 @@ def get_day_button(day_to_book: str) -> str:
     """
 
     def __get_xpath_button(day_index: int) -> str:
-        return f"/html/body/div/div[5]/div/div[3]/div[{day_index}]/div/p"
+        return f"{get_xpath_booking_head()}[3]/div[{day_index}]/div/p"
+
 
     # monday=2, sunday=8
     match day_to_book:

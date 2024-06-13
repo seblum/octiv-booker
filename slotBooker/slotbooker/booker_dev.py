@@ -6,25 +6,24 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverE
 from .utils.driver import close_driver, get_driver
 from .utils.logging import setup_log_dir
 from .ui_interaction import Booker
-from .utils.gmail import send_logs_to_mail
-from .utils.logging import start_logging, stop_logging
+# from .utils.logging import start_logging, stop_logging
 
 # Load config yaml
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
 config = yaml.safe_load(open(config_path))
 
-classes_path = os.path.join(os.path.dirname(__file__), "classes.yaml")
+classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
 classes = yaml.safe_load(open(classes_path))
 
 
 def main(retry: int = 3):
 
     # start writing output to logfile
-    file, orig_stdout, dir_log_file = start_logging()
+    #  file, orig_stdout, dir_log_file = start_logging()
 
-    dir_log_file = setup_log_dir()
+    # dir_log_file = setup_log_dir()
     logging.basicConfig(
-        filename=dir_log_file,
+        # filename=dir_log_file,
         filemode="w",
         encoding="utf-8",
         format="%(asctime)s %(message)s",
@@ -67,7 +66,7 @@ def main(retry: int = 3):
             logging.info(f"| [{count+1}] OctivBooker succeeded")
             count = 3
 
-        stop_logging(file, orig_stdout)
+        # stop_logging(file, orig_stdout)
         # send_logs_to_mail(dir_log_file)
 
 
