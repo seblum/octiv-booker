@@ -40,7 +40,7 @@ jobs:
       - 
         name: Run linting with ruff
         run: |
-          cd slotBooker
+          pwd
           poetry run ruff slotBooker --fix
       # - 
       #   name: Run tests
