@@ -7,7 +7,7 @@ from .utils.driver import close_driver, get_driver
 from .utils.logging import setup_log_dir
 from .ui_interaction import Booker
 from .utils.gmail import send_logs_to_mail
-
+from .utils.settings import set_credentials
 # Load config yaml
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
 config = yaml.safe_load(open(config_path))
@@ -59,7 +59,7 @@ def main(retry: int = 3):
     # check whether env variables are set or None
     if user is None or password is None:
         logging.info("USERNAME and PASSWORD not set")
-        logging.info("Please run 'source set-credentials.sh' if running local")
+        set_credentials()  # Call the function to set credentials if not already set
     else:
         logging.info("USERNAME and PASSWORD prevalent")
         logging.info(f"USER: {user}")
