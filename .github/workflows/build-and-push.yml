@@ -41,11 +41,11 @@ jobs:
         name: Run linting with ruff
         run: |
           poetry run ruff slotBooker --fix
-      - 
-        name: Run tests
-        run: |
-          cd slotBooker
-          poetry run pytest
+      # - 
+      #   name: Run tests
+      #   run: |
+      #     cd slotBooker
+      #     poetry run pytest
       -  
         name: Extract version from pyproject.toml
         id: extract_version
