@@ -51,8 +51,6 @@ jobs:
       - 
         name: Display version
         run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
-
-
       # - 
       #   name: Install ruff
       #   run: |
@@ -63,7 +61,7 @@ jobs:
       #     poetry run ruff slotBooker
 
   docker:
-    name: "Build & Push : ${{ matrix.directory }}""
+    name: "Build & Push : ${{ matrix.directory }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
