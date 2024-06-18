@@ -61,11 +61,11 @@ jobs:
         #   poetry run pytest
 
   docker:
-    name: Build & Push octiverbooker:${{ matrix.directory }}
+    name: "Build & Push : ${{ matrix.directory }}""
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tags: ["test1","${{ needs.test-and-lint.outputs.PACKAGE_VERSION }}"]
+        tags: ["latest","${{ needs.test-and-lint.outputs.PACKAGE_VERSION }}"]
     needs: test-and-lint
     steps:
       - 
