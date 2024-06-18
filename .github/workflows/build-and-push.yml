@@ -19,12 +19,12 @@ jobs:
     steps:
       - 
         name: Checkout code
-        uses: actions/checkout@v4a
+        uses: actions/checkout@v4
       - 
         name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.11'
       - 
         name: Install Poetry
         run: |
@@ -47,18 +47,6 @@ jobs:
         # name: Run tests
         # run: |
         #   poetry run pytest
-
-  docker:
-    name: Build & Push octiverbooker:${{ matrix.directory }}
-    runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     tags: ["test1",${{ env.TAG }}]
-    needs: test-and-lint
-    steps:
-      - 
-        name: Checkout code
-        uses: actions/checkout@v4a
       -  
         name: Extract version from pyproject.toml
         id: extract_version
@@ -68,6 +56,18 @@ jobs:
       - 
         name: Display version
         run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
+
+  docker:
+    name: Build & Push octiverbooker:${{ matrix.directory }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tags: ["test1",${{ env.PACKAGE_VERSION }}]
+    needs: test-and-lint
+    steps:
+      - 
+        name: Checkout code
+        uses: actions/checkout@v4a
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
