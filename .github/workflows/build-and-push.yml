@@ -41,9 +41,7 @@ jobs:
         name: Run linting with ruff
         run: |
           cd slotBooker
-          pwd
-          ls
-          poetry run ruff slotbooker --fix
+          poetry run ruff . --fix
       # - 
       #   name: Run tests
       #   run: |
@@ -60,7 +58,7 @@ jobs:
         run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
 
   docker:
-    name: "Build & Push : ${{ matrix.directory }}"
+    name: "Build & Push : ${{ matrix.tags }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
