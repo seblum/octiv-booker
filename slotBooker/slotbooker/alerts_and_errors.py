@@ -38,17 +38,12 @@ def alert_is_present(driver) -> object:
     try:
         WebDriverWait(driver, 3).until(
             EC.alert_is_present(),
-            "Timed out waiting for PA creation " + "confirmation popup to appear.",
+            "Timed out waiting for alert to appear.",
         )
         logging.info("! Alert present")
-        alert_obj = driver.switch_to.alert
-        return alert_obj
+        return driver.switch_to.alert
     except TimeoutException:
-        pass
-        # logging.info(f"| {AlertTypes.NotAlert.value}")
-        # self.driver.find_element(By.NAME, 'Error')
-
-    return None
+        return None
 
 
 def evaluate_alert(alert_obj: object, prioritize_waiting_list: Any) -> Enum:
@@ -57,35 +52,24 @@ def evaluate_alert(alert_obj: object, prioritize_waiting_list: Any) -> Enum:
 
     Args:
         alert_obj (object): The alert object.
-        prioritize_waiting_list (): 
+        prioritize_waiting_list (Any): Indicates whether to prioritize the waiting list (True) or not (False).
+
     Returns:
         Enum: The AlertTypes enum corresponding to the detected alert type.
     """
     alert_text = alert_obj.text
-    if any([x.lower() in alert_text.lower() for x in ["waiting list", "Warteliste"]]):
-
+    if any(keyword.lower() in alert_text.lower() for keyword in ["waiting list", "Warteliste"]):
         logging.info("! Class full")
-        ret = _alert_waiting_list_booking(
-                prioritize_waiting_list=prioritize_waiting_list,
-                alert_obj=alert_obj,
-            )
-        return ret
-    elif any(
-        [
-            x.lower() in alert_text.lower()
-            for x in ["wirklich", "stornieren", "stornieren?"]
-        ]
-    ):
-        ret = _alert_cancel_slot(alert_obj)
-        return ret
+        return _alert_waiting_list_booking(prioritize_waiting_list, alert_obj)
+    elif any(keyword.lower() in alert_text.lower() for keyword in ["wirklich", "stornieren", "stornieren?"]):
+        return _alert_cancel_slot(alert_obj)
     else:
         logging.info(AlertTypes.NotIdentifyAlert.value)
-        logging.info(f"! Alert message: {alert_obj.text}")
+        logging.info(f"! Alert message: {alert_text}")
         return continue_bookings()
 
 
-def _alert_waiting_list_booking(prioritize_waiting_list: str, alert_obj: object
-) -> bool:
+def _alert_waiting_list_booking(prioritize_waiting_list: str, alert_obj: object) -> bool:
     """
     Handle booking waiting list option in the alert.
 
@@ -99,19 +83,16 @@ def _alert_waiting_list_booking(prioritize_waiting_list: str, alert_obj: object
     Note:
         This function handles the waiting list booking option in the alert dialog.
     """
-    match prioritize_waiting_list:
-        case True:
-            logging.info("! Booking waiting list...")
-            alert_obj.accept()
-            logging.info("| Waiting list booked")
-            return stop_booking_process()  # end program
-        case _:
-            logging.info(
-                f"! Parameter 'wl' is set to {prioritize_waiting_list} > Skipping waiting list"
-            )
-            alert_obj.dismiss()
-            logging.info("> Looking for further slots...")
-            return continue_bookings()  # continue
+    if prioritize_waiting_list:
+        logging.info("! Booking waiting list...")
+        alert_obj.accept()
+        logging.info("| Waiting list booked")
+        return stop_booking_process()
+    else:
+        logging.info(f"! Parameter 'wl' is set to {prioritize_waiting_list} > Skipping waiting list")
+        alert_obj.dismiss()
+        logging.info("> Looking for further slots...")
+        return continue_bookings()
 
 
 def _alert_cancel_slot(alert_obj: object) -> bool:
@@ -127,10 +108,10 @@ def _alert_cancel_slot(alert_obj: object) -> bool:
     Note:
         This function handles the situation when slot cancelation is aborted.
     """
-    logging.info(f"! Aborted canceling slot...")
+    logging.info("! Aborted canceling slot...")
     alert_obj.dismiss()
     logging.info("> Looking for further slots...")
-    return continue_bookings()  # continue
+    return continue_bookings()
 
 
 def error_is_present(driver) -> str:
@@ -152,12 +133,12 @@ def error_is_present(driver) -> str:
         return None
 
 
-def evaluate_error(error_text) -> bool:
+def evaluate_error(error_text: str) -> bool:
     """
     Evaluates the error text and determines if it matches certain conditions.
 
     Args:
-        error_text: The error text to evaluate.
+        error_text (str): The error text to evaluate.
 
     Returns:
         bool: True if the error matches specific conditions, else False.
