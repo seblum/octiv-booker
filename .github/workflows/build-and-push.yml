@@ -52,8 +52,7 @@ jobs:
         id: extract_version
         run: |
           VERSION=$(grep -Po '(?<=^version = ")[^"]*' ./slotBooker/pyproject.toml)
-          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
-          echo "::set-output name=PACKAGE_VERSION::$VERSION"
+          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
       - 
         name: Display version
         run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
