@@ -70,7 +70,7 @@ jobs:
     steps:
       - 
         name: Checkout code
-        uses: actions/checkout@v4a
+        uses: actions/checkout@v4
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -83,11 +83,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          file: ./slotBooker/poetry.Dockerfile
-          push: true
-          tags: ${{ env.DOCKERREPO }}:${{ matrix.tags }}
-          # context: .
+      # -
+      #   name: Build and push
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     file: ./slotBooker/poetry.Dockerfile
+      #     push: true
+      #     tags: ${{ env.DOCKERREPO }}:${{ matrix.tags }}
