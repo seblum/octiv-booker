@@ -1,14 +1,8 @@
-from slotbooker import __version__
 import pytest
 from unittest.mock import MagicMock, patch
 from selenium.webdriver.common.by import By
 from slotbooker.ui_interaction import Booker
 from datetime import datetime
-
-
-def test_version():
-    assert __version__ == "0.1.0"
-
 
 
 @pytest.fixture

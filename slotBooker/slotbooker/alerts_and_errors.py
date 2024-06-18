@@ -1,19 +1,16 @@
 from enum import Enum
 import logging
-from typing import Any
+from typing import Any, Optional
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as exco
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 from .helper_functions import get_error_window, get_error_text_window, continue_bookings, stop_booking_process
 
-
 class AlertTypes(Enum):
-    """
-    Enumeration of possible alert types that can be encountered.
-    """
+    """Enumeration of possible alert types that can be encountered."""
     ClassFull = "Class is fully booked"
     ClassFullGerman = "Die Stunde ist voll. Möchtest du auf die Warteliste kommen? Du wirst automatisch gebucht, wenn ein Platz frei wird."
     CancelBooking = "Möchtest du deine Buchung wirklich stornieren?"
@@ -24,20 +21,18 @@ class AlertTypes(Enum):
     NotAlert = "No Alert"
     NotError = "No Error"
 
-
-def alert_is_present(driver) -> object:
-    """
-    Checks if an alert is present and returns the alert object.
+def alert_is_present(driver) -> Optional[object]:
+    """Checks if an alert is present and returns the alert object.
 
     Args:
         driver: The Selenium WebDriver instance.
 
     Returns:
-        object: The alert object if present, else None.
+        Optional[object]: The alert object if present, else None.
     """
     try:
         WebDriverWait(driver, 3).until(
-            exco.alert_is_present(),
+            EC.alert_is_present(),
             "Timed out waiting for alert to appear.",
         )
         logging.info("! Alert present")
@@ -45,10 +40,8 @@ def alert_is_present(driver) -> object:
     except TimeoutException:
         return None
 
-
 def evaluate_alert(alert_obj: object, prioritize_waiting_list: Any) -> Enum:
-    """
-    Determines the type of alert based on its text.
+    """Determines the type of alert based on its text.
 
     Args:
         alert_obj (object): The alert object.
@@ -60,18 +53,16 @@ def evaluate_alert(alert_obj: object, prioritize_waiting_list: Any) -> Enum:
     alert_text = alert_obj.text
     if any(keyword.lower() in alert_text.lower() for keyword in ["waiting list", "Warteliste"]):
         logging.info("! Class full")
-        return _alert_waiting_list_booking(prioritize_waiting_list, alert_obj)
+        return _handle_waiting_list_booking(prioritize_waiting_list, alert_obj)
     elif any(keyword.lower() in alert_text.lower() for keyword in ["wirklich", "stornieren", "stornieren?"]):
-        return _alert_cancel_slot(alert_obj)
+        return _handle_cancel_slot(alert_obj)
     else:
         logging.info(AlertTypes.NotIdentifyAlert.value)
         logging.info(f"! Alert message: {alert_text}")
         return continue_bookings()
 
-
-def _alert_waiting_list_booking(prioritize_waiting_list: str, alert_obj: object) -> bool:
-    """
-    Handle booking waiting list option in the alert.
+def _handle_waiting_list_booking(prioritize_waiting_list: str, alert_obj: object) -> bool:
+    """Handle booking waiting list option in the alert.
 
     Args:
         prioritize_waiting_list (str): Indicates whether to prioritize the waiting list (True) or not (False).
@@ -79,9 +70,6 @@ def _alert_waiting_list_booking(prioritize_waiting_list: str, alert_obj: object)
 
     Returns:
         bool: True if program should end, False if it should continue.
-
-    Note:
-        This function handles the waiting list booking option in the alert dialog.
     """
     if prioritize_waiting_list:
         logging.info("! Booking waiting list...")
@@ -94,35 +82,28 @@ def _alert_waiting_list_booking(prioritize_waiting_list: str, alert_obj: object)
         logging.info("> Looking for further slots...")
         return continue_bookings()
 
-
-def _alert_cancel_slot(alert_obj: object) -> bool:
-    """
-    Handle aborting the canceling of a slot.
+def _handle_cancel_slot(alert_obj: object) -> bool:
+    """Handle aborting the canceling of a slot.
 
     Args:
         alert_obj (object): The alert object.
 
     Returns:
         bool: False to continue searching for further slots.
-
-    Note:
-        This function handles the situation when slot cancelation is aborted.
     """
     logging.info("! Aborted canceling slot...")
     alert_obj.dismiss()
     logging.info("> Looking for further slots...")
     return continue_bookings()
 
-
-def error_is_present(driver) -> str:
-    """
-    Checks if an error is present and returns the error text.
+def error_is_present(driver) -> Optional[str]:
+    """Checks if an error is present and returns the error text.
 
     Args:
         driver: The Selenium WebDriver instance.
 
     Returns:
-        str: The error text if present, else an empty string.
+        Optional[str]: The error text if present, else None.
     """
     try:
         driver.find_element(By.XPATH, get_error_window())
@@ -132,10 +113,8 @@ def error_is_present(driver) -> str:
     except NoSuchElementException:
         return None
 
-
 def evaluate_error(error_text: str) -> bool:
-    """
-    Evaluates the error text and determines if it matches certain conditions.
+    """Evaluates the error text and determines if it matches certain conditions.
 
     Args:
         error_text (str): The error text to evaluate.
