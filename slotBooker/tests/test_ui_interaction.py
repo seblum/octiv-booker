@@ -7,7 +7,7 @@ def test_version():
 import pytest
 from unittest.mock import MagicMock, patch
 from selenium.webdriver.common.by import By
-from slotbooker.ui_interaction import Booker, get_xpath_login_username_head, get_xpath_login_password_head, get_xpath_booking_head
+from slotbooker.ui_interaction import Booker
 
 @pytest.fixture
 def mock_driver():
