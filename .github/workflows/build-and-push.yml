@@ -33,8 +33,14 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
       - 
+        name: Install dependencies
+        run: |
+          cd slotBooker
+          poetry install
+      - 
         name: Run tests
         run: |
+          cd slotBooker
           poetry run pytest
       -  
         name: Extract version from pyproject.toml
@@ -46,11 +52,7 @@ jobs:
         name: Display version
         run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
 
-      # - 
-      #   name: Install dependencies
-      #   run: |
-      #     cd slotBooker
-      #     poetry install
+
       # - 
       #   name: Install ruff
       #   run: |
