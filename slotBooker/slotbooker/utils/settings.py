@@ -1,3 +1,4 @@
+import os
 
 # Function to set credentials
 def set_credentials():
