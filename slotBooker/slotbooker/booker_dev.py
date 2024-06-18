@@ -29,18 +29,18 @@ def main(retry: int = 3):
     )
 
     # get env variables
-    USER = os.environ.get("OCTIV_USERNAME")
-    PASSWORD = os.environ.get("OCTIV_PASSWORD")
-    DAYS_BEFORE_BOOKABLE = int(os.environ.get("DAYS_BEFORE_BOOKABLE"))
-    EXECUTION_BOOKING_TIME = os.environ.get("EXECUTION_BOOKING_TIME")
+    user = os.environ.get("OCTIV_USERNAME")
+    password = os.environ.get("OCTIV_PASSWORD")
+    days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE"))
+    execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
 
     # check whether env variables are set or None
-    if USER is None or PASSWORD is None:
+    if user is None or password is None:
         logging.info("USERNAME and PASSWORD not set")
         logging.info("Please run 'source set-credentials.sh' if running local")
     else:
         logging.info("USERNAME and PASSWORD prevalent")
-        logging.info(f"USER: {USER}")
+        logging.info(f"USER: {user}")
 
         count = 0
         while count < retry:
@@ -48,12 +48,12 @@ def main(retry: int = 3):
 
             booker = Booker(
                 driver=driver,
-                days_before_bookable=DAYS_BEFORE_BOOKABLE,
+                days_before_bookable=days_before_bookable,
                 base_url=config.get("base_url"),
-                execution_booking_time=EXECUTION_BOOKING_TIME
+                execution_booking_time=execution_booking_time
             )
 
-            booker.login(username=USER, password=PASSWORD)
+            booker.login(username=user, password=password)
             booker.switch_day()
             booker.book_class(
                 class_dict=classes.get("class_dict"),

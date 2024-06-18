@@ -2,7 +2,7 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as exco
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 
@@ -118,12 +118,12 @@ class Booker:
 
     def _input_text(self, xpath: str, text: str) -> None:
         WebDriverWait(self.driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, xpath))
+            exco.element_to_be_clickable((By.XPATH, xpath))
         ).send_keys(text)
 
     def _click_button(self, xpath: str) -> None:
         WebDriverWait(self.driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, xpath))
+            exco.element_to_be_clickable((By.XPATH, xpath))
         ).click()
 
     def _load_and_transform_input_class_dict(self) -> list:
@@ -133,7 +133,7 @@ class Booker:
     def _get_all_bounding_boxes_in_window(self) -> object:
         """Get all bounding boxes containing booking slots present in the current window."""
         WebDriverWait(self.driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, get_xpath_booking_head()))
+            exco.element_to_be_clickable((By.XPATH, get_xpath_booking_head()))
         )
         return self.driver.find_elements(By.XPATH, get_xpath_booking_head())
 
