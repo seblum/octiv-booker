@@ -88,13 +88,13 @@ def main(retry: int = 3):
                 count = 3
             except SessionNotCreatedException as e:
                 logging.info(f"| [{count+1}] OctivBooker failed")
-                logging.info(f"! SessionNotCreatedException")
+                logging.info("! SessionNotCreatedException")
                 logging.info(e)
                 count += 1
                 continue
             except NoSuchDriverException as e:
                 logging.info(f"| [{count+1}] OctivBooker failed")
-                logging.info(f"! NoSuchDriverException")
+                logging.info("! NoSuchDriverException")
                 logging.info(e)
                 count += 1
                 continue

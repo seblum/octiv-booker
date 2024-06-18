@@ -2,7 +2,6 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
@@ -14,7 +13,6 @@ from .helper_functions import (
     get_xpath_booking_head,
     get_xpath_login_password_head,
     get_xpath_login_username_head,
-    continue_bookings, 
     stop_booking_process
 )
 
@@ -130,7 +128,7 @@ class Booker:
 
     def _load_and_transform_input_class_dict(self) -> list:
         """Load and transform the input class_dict into a list of unique class entries."""
-        return list(set([entry.get("class") for entry in self.class_dict]))
+        return list({entry.get("class") for entry in self.class_dict})
 
     def _get_all_bounding_boxes_in_window(self) -> object:
         """Get all bounding boxes containing booking slots present in the current window."""

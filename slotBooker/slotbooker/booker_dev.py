@@ -1,10 +1,8 @@
 import os
 import logging
 import yaml
-from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
 
 from .utils.driver import close_driver, get_driver
-from .utils.logging import setup_log_dir
 from .ui_interaction import Booker
 # from .utils.logging import start_logging, stop_logging
 

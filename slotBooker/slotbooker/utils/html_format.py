@@ -5,13 +5,13 @@ def format_to_html(body) -> str:
     log_content = body
 
     # Splitting the log content into individual lines
-    log_lines = log_content.strip().split('\n')
+    log_lines = log_content.strip().split("\n")
 
     # Regular expressions for different log entry types
-    regex_datetime = re.compile(r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})')
-    regex_info = re.compile(r'\| (.+)')
-    regex_warning = re.compile(r'! (.+)')
-    regex_error = re.compile(r'\? (.+)')
+    regex_datetime = re.compile(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})")
+    regex_info = re.compile(r"\| (.+)")
+    regex_warning = re.compile(r"! (.+)")
+    regex_error = re.compile(r"\? (.+)")
 
     # HTML table template
     html_template = """
