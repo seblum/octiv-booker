@@ -16,6 +16,8 @@ jobs:
   test-and-lint:
     name: Test & Lint
     runs-on: ubuntu-latest
+    outputs:
+      PACKAGE_VERSION: ${{ steps.extract_version.outputs.PACKAGE_VERSION }}
     steps:
       - 
         name: Checkout code
@@ -30,6 +32,16 @@ jobs:
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+      -  
+        name: Extract version from pyproject.toml
+        id: extract_version
+        run: |
+          VERSION=$(grep -Po '(?<=^version = ")[^"]*' ./slotBooker/pyproject.toml)
+          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
+      - 
+        name: Display version
+        run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
+
       # - 
       #   name: Install dependencies
       #   run: |
@@ -47,22 +59,13 @@ jobs:
         # name: Run tests
         # run: |
         #   poetry run pytest
-      -  
-        name: Extract version from pyproject.toml
-        id: extract_version
-        run: |
-          VERSION=$(grep -Po '(?<=^version = ")[^"]*' ./slotBooker/pyproject.toml)
-          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
-      - 
-        name: Display version
-        run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
 
   docker:
     name: Build & Push octiverbooker:${{ matrix.directory }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tags: ["test1",${{ env.PACKAGE_VERSION }}]
+        tags: ["test1","${{ needs.test-and-lint.outputs.PACKAGE_VERSION }}"]
     needs: test-and-lint
     steps:
       - 
