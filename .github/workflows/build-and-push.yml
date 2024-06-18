@@ -53,9 +53,9 @@ jobs:
         run: |
           VERSION=$(grep -Po '(?<=^version = ")[^"]*' ./slotBooker/pyproject.toml)
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
-      - 
-        name: Display version
-        run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
+      # - 
+      #   name: Display version
+      #   run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
 
   docker:
     name: "Build & Push : ${{ matrix.tags }}"
@@ -68,10 +68,10 @@ jobs:
       - 
         name: Checkout code
         uses: actions/checkout@v4
-      - 
-        name: Echo tag
-        run: |
-          echo Tag: ${{ matrix.tags }}
+      # - 
+      #   name: Echo tag
+      #   run: |
+      #     echo Tag: ${{ matrix.tags }}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
