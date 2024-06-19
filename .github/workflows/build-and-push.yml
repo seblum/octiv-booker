@@ -51,7 +51,7 @@ jobs:
         name: Extract version from pyproject.toml
         id: extract_version
         run: |
-          VERSION=$(grep -Po '(?<=^version = ")[^"]*' ./slotBooker/pyproject.toml)
+          VERSION=$(grep -Po '(?<=^version = ")[^"]*' ./pyproject.toml)
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
       # - 
       #   name: Display version
@@ -88,6 +88,6 @@ jobs:
       #   name: Build and push
       #   uses: docker/build-push-action@v3
       #   with:
-      #     file: ./slotBooker/poetry.Dockerfile
+      #     file: ./poetry.Dockerfile
       #     push: true
       #     tags: ${{ env.DOCKERREPO }}:${{ matrix.tags }}
