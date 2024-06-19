@@ -102,3 +102,17 @@ seblum/octivbooker:latest
 - `Error: Error pushing docker image: Error response from daemon: Bad parameters and missing X-Registry-Auth: EOF` This Error can occur during terraform apply in Github Actions during building of the Docker image.. It works running terraform apply locally though.
 - `Error: Error building docker image: 0: failed to solve with frontend dockerfile.v0: failed to create LLB definition: no active session for wx08tjz0ezhyc8zt4z1qlmica: context deadline exceeded` This Error can occur during terraform apply in Github Actions during building of the Docker image.. It works running terraform apply locally though.
 
+
+
+create dotenv-poetry `.env` file
+
+```bash
+# .env
+OCTIV_PASSWORD=password
+EMAIL_SENDER=email@email.com
+EMAIL_PASSWORD=password_2
+EMAIL_RECEIVER=email@email.com
+DAYS_BEFORE_BOOKABLE=1
+EXECUTION_BOOKING_TIME=HH:MM:SS.XX
+
+```
