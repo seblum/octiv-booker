@@ -41,8 +41,8 @@ ENV EXECUTION_BOOKING_TIME=${EXECUTION_BOOKING_TIME}
 RUN mkdir /app
 
 # Copy the Python application files into the container
-COPY ./slotBooker /app
-COPY ./slotBooker/pyproject.toml /app
+COPY ./src /app
+COPY ./pyproject.toml /app
 
 WORKDIR /app
 

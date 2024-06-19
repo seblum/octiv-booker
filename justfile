@@ -24,6 +24,24 @@ run:
 run-dev:
     poetry run slotBookerDev
 
+alias docker := docker-full
+
+docker-build:
+    #!/usr/bin/env bash
+    poetry_version=$(poetry version | awk '{print $2}')
+    docker build -t slotbockertest:${poetry_version} -f poetry.Dockerfile .
+
+docker-run:
+    #!/usr/bin/env bash
+    poetry_version=$(poetry version | awk '{print $2}')
+    docker run -it --env-file .env \
+    --volume $(pwd)/octiv-booker/src/slotbooker/data/:/app/slotbooker/data/ \
+    slotbockertest:${poetry_version}
+
+docker-full:
+    just docker-build
+    just docker-run
+
 # Install project dependencies using Poetry
 install-venv:
     python3 -m venv .venv
@@ -61,11 +79,22 @@ clean-venv:
     rm -r .venv
 
 
+alias gpa := git-push-all
 
-# # Create new Git tag
-# git-tag: 
-# # git tag -a "v{{version()}}" -m ""
-# # git push origin "v{{version()}}"
+# Create new Git tag
+git-tag: 
+    #!/usr/bin/env bash
+    poetry_version=$(poetry version | awk '{print $2}')
+    git tag -a "v${poetry_version}" -m ""
+    git push origin "v${poetry_version}"
+
+git-push-all message:
+    #!/usr/bin/env bash
+    git add .
+    git commit -m {{message}}
+    poetry_version=$(poetry version | awk '{print $2}')
+    git tag -a "v${poetry_version}" -m ""
+    git push origin "v${poetry_version}"
 
 # Bump major version
 bump-major:
