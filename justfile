@@ -1,9 +1,7 @@
-# # Show the help
-# help:
-#     @echo "Usage: just <target>"
-#     @echo ""
-#     @echo "Targets:"
-#     @grep "##" justfile | grep -v grep
+# Show the help
+# ommited _default command is triggered when running "just"
+_default:
+    @just --list --unsorted
 
 # # Show the current environment
 # show: ##
@@ -11,19 +9,14 @@
 #     @poetry env info
 
 
-# # Remove the installed virtual environment
-# clean-venv: 
-#     rm -r .venv
 
 # # Create a virtual environment
 # venv:
 #     export POETRY_VIRTUALENVS_IN_PROJECT=true && \
-#     poetry install
-#     pre-commit install
 
-# # Run pre-commit hooks
-# pre-commit:
-#     pre-commit run --all-files
+# Run pre-commit hooks
+pre-commit:
+    pre-commit run --all-files
 
 run:
     poetry run slotBooker
@@ -32,7 +25,10 @@ run-dev:
     poetry run slotBookerDev
 
 # Install project dependencies using Poetry
-install:
+install-venv:
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pre-commit install
     poetry install
 
 # Run tests using Poetry and pytest
@@ -47,22 +43,23 @@ fmt:
     ruff
 
 # Clean up generated files
-clean:
-    rm -rf **/__pycache__
-    rm -rf **/.cache
-    rm -rf **/.pytest_cache
-    rm -rf **/.mypy_cache
-    rm -rf **/build
-    rm -rf **/dist
-    rm -rf **/*.egg-info
-    rm -rf **/htmlcov
-    rm -rf **/.tox/
-    rm -rf **/docs/_build
+@clean:
+    echo "🧹 Cleaning repository 🧹"
+    find . -type d -name "__pycache__" -exec rm -rf {} +
+    find . -type d -name ".cache" -exec rm -rf {} +
+    find . -type d -name ".pytest_cache" -exec rm -rf {} +
+    find . -type d -name ".mypy_cache" -exec rm -rf {} +
+    find . -type d -name "build" -exec rm -rf {} +
+    find . -type d -name "dist" -exec rm -rf {} +
+    find . -type d -name "*.egg-info" -exec rm -rf {} +
+    find . -type d -name "htmlcov" -exec rm -rf {} +
+    find . -type d -name ".tox" -exec rm -rf {} +
+    find . -type d -name "_build" -path "*/docs/_build" -exec rm -rf {} +
 
-# Run the development environment (install, run, and watch for changes)
-dev:
-    just install
-    just run
+# Remove the installed virtual environment
+clean-venv: 
+    rm -r .venv
+
 
 
 # # Create new Git tag
