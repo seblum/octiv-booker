@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, patch
 from selenium.webdriver.common.by import By
-from src.ui_interaction import Booker
+from slotbooker.ui_interaction import Booker
 from datetime import datetime
 
 
