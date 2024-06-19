@@ -1,71 +1,74 @@
-# Show the help
-help:
-    @echo "Usage: just <target>"
-    @echo ""
-    @echo "Targets:"
-    @grep "##" justfile | grep -v grep
+# # Show the help
+# help:
+#     @echo "Usage: just <target>"
+#     @echo ""
+#     @echo "Targets:"
+#     @grep "##" justfile | grep -v grep
 
-# Show the current environment
-show: ##
-    @echo "Current environment:"
-    @poetry env info
+# # Show the current environment
+# show: ##
+#     @echo "Current environment:"
+#     @poetry env info
 
-# Format code using black & isort
-fmt: 
-    {{env_prefix()}}isort {{project_name()}}/
-    {{env_prefix()}}black {{project_name()}}/
-    {{env_prefix()}}black tests/
 
-# Run pep8, black, mypy linters
-lint: 
-    {{env_prefix()}}pylint {{project_name()}}/
-    {{env_prefix()}}black --check {{project_name()}}/
-    {{env_prefix()}}black --check tests/
-    {{env_prefix()}}mypy --ignore-missing-imports {{project_name()}}/
+# # Remove the installed virtual environment
+# clean-venv: 
+#     rm -r .venv
 
-# Run tests and generate coverage report
-test: lint ## 
-    {{env_prefix()}}pytest -v --cov-config .coveragerc --cov={{project_name()}} -l --tb=short --maxfail=1 tests/
-    {{env_prefix()}}coverage xml
-    {{env_prefix()}}coverage html
+# # Create a virtual environment
+# venv:
+#     export POETRY_VIRTUALENVS_IN_PROJECT=true && \
+#     poetry install
+#     pre-commit install
 
-# Clean unused files
-clean: ##
-    find ./ -name '*.pyc' -exec rm -f {} \;
-    find ./ -name '__pycache__' -exec rm -rf {} \;
-    find ./ -name 'Thumbs.db' -exec rm -f {} \;
-    find ./ -name '*~' -exec rm -f {} \;
-    rm -rf .cache
-    rm -rf .pytest_cache
-    rm -rf .mypy_cache
-    rm -rf build
-    rm -rf dist
-    rm -rf *.egg-info
-    rm -rf htmlcov
-    rm -rf .tox/
-    rm -rf docs/_build
+# # Run pre-commit hooks
+# pre-commit:
+#     pre-commit run --all-files
 
-# Remove the installed virtual environment
-clean-venv: ## 
-    rm -r .venv
+run:
+    poetry run slotBooker
 
-# Create a virtual environment
-venv:
-    export POETRY_VIRTUALENVS_IN_PROJECT=true && \
+run-dev:
+    poetry run slotBookerDev
+
+# Install project dependencies using Poetry
+install:
     poetry install
 
-# Install pre-commit hooks
-pre-commit: 
-    pre-commit install
-    
-# Run pre-commit hooks
-pre-commit: pre-commit-install
-    {{env_prefix()}}pre-commit run --all-files
+# Run tests using Poetry and pytest
+test:
+    poetry run pytest
+    poetry run coverage run -m pytest
+    poetry run coverage report -m
 
-# Create new Git tag
-git-tag: ## 
-    git tag -a "v{{version()}}" -m ""
-    git push origin "v{{version()}}"
+# Format code using Poetry and black
+fmt:
+    poetry run black .
+    ruff
+
+# Clean up generated files
+clean:
+    rm -rf **/__pycache__
+    rm -rf **/.cache
+    rm -rf **/.pytest_cache
+    rm -rf **/.mypy_cache
+    rm -rf **/build
+    rm -rf **/dist
+    rm -rf **/*.egg-info
+    rm -rf **/htmlcov
+    rm -rf **/.tox/
+    rm -rf **/docs/_build
+
+# Run the development environment (install, run, and watch for changes)
+dev:
+    just install
+    just run
+
+
+# # Create new Git tag
+# git-tag: 
+# # git tag -a "v{{version()}}" -m ""
+# # git push origin "v{{version()}}"
 
 # Bump major version
 bump-major:
@@ -79,7 +82,3 @@ bump-minor:
 bump-patch:
     poetry version patch
 
-# Utility functions
-env_prefix = @($(ENV_PREFIX))
-project_name = $(PROJECT_NAME)
-version = $(VERSION)
