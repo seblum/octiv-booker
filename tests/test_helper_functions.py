@@ -1,6 +1,6 @@
 import pytest
 from datetime import date, timedelta
-from slotbooker.helper_functions import (
+from src.helper_functions import (
     get_xpath_booking_head,
     get_xpath_login_username_head,
     get_xpath_login_password_head,

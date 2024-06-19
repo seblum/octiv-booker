@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from slotbooker.alerts_and_errors import (
+from src.alerts_and_errors import (
     alert_is_present,
     evaluate_alert,
     error_is_present,
