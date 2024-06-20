@@ -82,7 +82,7 @@ clean-venv:
 git-tag: 
     #!/usr/bin/env bash
     poetry_version=$(poetry version | awk '{print $2}')
-    git tag -a "v${poetry_version}" -m ""
+    git tag -a "v${poetry_version}" -m "feat: tag v${poetry_version}"
     git push origin "v${poetry_version}"
 
 # Add, commit, tag, and push changes to Git
@@ -90,9 +90,8 @@ git-push-all message:
     #!/usr/bin/env bash
     git add .
     git commit -m "{{message}}"
-    poetry_version=$(poetry version | awk '{print $2}')
-    git tag -a "v${poetry_version}" -m ""
-    git push origin "v${poetry_version}"
+    git push
+    just git-tag
 
 # Bump major version
 bump-major:
