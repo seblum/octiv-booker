@@ -1,44 +1,48 @@
+# Aliases
+alias docker := docker-full
+alias gpa := git-push-all
+
 # Show the help
-# ommited _default command is triggered when running "just"
+# omitted _default command is triggered when running "just"
 _default:
     @just --list --unsorted
 
-
-
+# Install project dependencies and pre-commit hooks
 install:
     brew install poetry
     pre-commit install
     poetry install
-    
+
 # Run pre-commit hooks
 pre-commit:
     pre-commit run --all-files
 
+# Run the slotBooker application
 run:
     poetry run slotBooker
 
+# Run the slotBookerDev application
 run-dev:
     poetry run slotBookerDev
 
-alias docker := docker-full
-
+# Build Docker image
 docker-build:
-    #!/usr/bin/env bash
     poetry_version=$(poetry version | awk '{print $2}')
-    docker build -t slotbockertest:${poetry_version} -f poetry.Dockerfile .
+    docker build -t slotbookertest:${poetry_version} -f poetry.Dockerfile .
 
+# Run Docker container
 docker-run:
-    #!/usr/bin/env bash
     poetry_version=$(poetry version | awk '{print $2}')
     docker run -it --env-file .env \
     --volume $(pwd)/octiv-booker/src/slotbooker/data/:/app/slotbooker/data/ \
-    slotbockertest:${poetry_version}
+    slotbookertest:${poetry_version}
 
+# Build and run Docker container
 docker-full:
     just docker-build
     just docker-run
 
-# Install project dependencies using Poetry
+# Install project dependencies using Poetry and virtual environment
 install-venv:
     python3 -m venv .venv
     source .venv/bin/activate
@@ -54,7 +58,7 @@ test:
 # Format code using Poetry and black
 fmt:
     poetry run black .
-    ruff
+    poetry run ruff
 
 # Clean up generated files
 @clean:
@@ -72,10 +76,7 @@ fmt:
 
 # Remove the installed virtual environment
 clean-venv: 
-    rm -r .venv
-
-
-alias gpa := git-push-all
+    rm -rf .venv
 
 # Create new Git tag
 git-tag: 
@@ -84,10 +85,11 @@ git-tag:
     git tag -a "v${poetry_version}" -m ""
     git push origin "v${poetry_version}"
 
+# Add, commit, tag, and push changes to Git
 git-push-all message:
     #!/usr/bin/env bash
     git add .
-    git commit -m {{message}}
+    git commit -m "{{message}}"
     poetry_version=$(poetry version | awk '{print $2}')
     git tag -a "v${poetry_version}" -m ""
     git push origin "v${poetry_version}"
@@ -103,4 +105,3 @@ bump-minor:
 # Bump patch version
 bump-patch:
     poetry version patch
-
