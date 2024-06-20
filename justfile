@@ -3,17 +3,13 @@
 _default:
     @just --list --unsorted
 
-# # Show the current environment
-# show: ##
-#     @echo "Current environment:"
-#     @poetry env info
 
 
-
-# # Create a virtual environment
-# venv:
-#     export POETRY_VIRTUALENVS_IN_PROJECT=true && \
-
+install:
+    brew install poetry
+    pre-commit install
+    poetry install
+    
 # Run pre-commit hooks
 pre-commit:
     pre-commit run --all-files
