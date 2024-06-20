@@ -48,14 +48,13 @@ COPY ./pyproject.toml /app
 
 WORKDIR /app
 
-# Install Poetry for managing dependencies
-RUN pip3 install poetry
-
-# Configure Poetry to not create a virtual environment and install dependencies
-RUN poetry config virtualenvs.create false && poetry install
-
 # Set PYTHONPATH to include the current working directory
 ENV PYTHONPATH=${PYTHONPATH}:${PWD}
+
+# Install Poetry for managing dependencies
+RUN pip3 install poetry
+# Configure Poetry to not create a virtual environment and install dependencies
+RUN poetry config virtualenvs.create false && poetry install
 
 # Set the entrypoint command to run the application with Poetry
 ENTRYPOINT [ "poetry", "run", "slotBooker" ]
