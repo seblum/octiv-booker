@@ -1,20 +1,20 @@
-name: Deployment CI/CD
+name: Deployment CD
 
 env:
   DOCKERREPO: seblum/octivbooker
 
 
 on:
-  # push:
-    # branches: master
-    # tags: v[12].[0-9]+.[0-9]+
-  pull_request:
-    branches: [ master ]
+  push:
+    branches: master
+    tags: v[12].[0-9]+.[0-9]+
+  # pull_request:
+  #   branches: [ master ]
   workflow_dispatch:
 
 jobs:
-  test-and-lint:
-    name: Test & Lint
+  get-tag:
+    name: Get Tag
     runs-on: ubuntu-latest
     outputs:
       PACKAGE_VERSION: ${{ steps.extract_version.outputs.PACKAGE_VERSION }}
@@ -22,26 +22,26 @@ jobs:
       - 
         name: Checkout code
         uses: actions/checkout@v4
-      - 
-        name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - 
-        name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - 
-        name: Install dependencies
-        run: |
-          cd slotBooker
-          poetry install
-      - 
-        name: Run linting with ruff
-        run: |
-          cd slotBooker
-          poetry run ruff . --fix
+      # - 
+      #   name: Set up Python
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: '3.11'
+      # - 
+      #   name: Install Poetry
+      #   run: |
+      #     curl -sSL https://install.python-poetry.org | python3 -
+      #     echo "$HOME/.local/bin" >> $GITHUB_PATH
+      # - 
+      #   name: Install dependencies
+      #   run: |
+      #     cd slotBooker
+      #     poetry install
+      # - 
+      #   name: Run linting with ruff
+      #   run: |
+      #     cd slotBooker
+      #     poetry run ruff . --fix
       # - 
       #   name: Run tests
       #   run: |
@@ -63,7 +63,7 @@ jobs:
     strategy:
       matrix:
         tags: ["latest","${{ needs.test-and-lint.outputs.PACKAGE_VERSION }}"]
-    needs: test-and-lint
+    needs: get-tag
     steps:
       - 
         name: Checkout code
@@ -86,7 +86,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       # -
       #   name: Build and push
-      #   uses: docker/build-push-action@v3
+      #   uses: docker/build-push-action@v6
       #   with:
       #     file: ./poetry.Dockerfile
       #     push: true
