@@ -1,7 +1,7 @@
 name: Deployment CI
 
 env:
-  TEST_TAG: user/app:test
+  TEST_TAG: octivbooker:test
 
 
 on:
@@ -71,11 +71,11 @@ jobs:
         with:
           file: ./poetry.Dockerfile
           load: true
-          tags: octivbooker:${{ env.TEST_TAG }}
+          tags: ${{ env.TEST_TAG }}
       - 
         name: Test Run
         run: |
-          docker run --rm octivbooker:${{ env.TEST_TAG }}   
+          docker run --rm ${{ env.TEST_TAG }}   
 
   # docker:
   #   name: "Build & Push : ${{ matrix.tags }}"
