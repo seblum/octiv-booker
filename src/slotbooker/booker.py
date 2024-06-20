@@ -50,15 +50,17 @@ def main(retry: int = 3):
         level=logging.INFO,
     )
 
-    # if os.environ.get("IS_TEST"):
-    #     run_test()
-    #     driver = get_driver(chromedriver=config.get("chromedriver"))
+    print(os.environ.get("IS_TEST"))
+    if os.environ.get("IS_TEST"):
+        print("test")
+        exit()
+    #     driver = get_driver(chromedriver=config.get("chromedriver"),env="dev")
 
     #     booker = Booker(
     #         driver=driver,
-    #         days_before_bookable=days_before_bookable,
+    #         days_before_bookable=0,
     #         base_url=config.get("base_url"),
-    #         execution_booking_time=execution_booking_time
+    #         execution_booking_time=00:00:00.00
     #     )
     #     user = os.environ.get("OCTIV_USERNAME")
     #     password = "if-this-would-be-the-password"

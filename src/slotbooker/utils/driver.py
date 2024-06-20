@@ -17,7 +17,7 @@ def get_driver(chromedriver: str,env:str="prd") -> object:
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_experimental_option("detach", True)
-    if env is not "dev":
+    if env != "dev":
         options.add_argument("--headless")  # needs to be set to run in docker image
     
     # added for lambda | if run locally not working.
