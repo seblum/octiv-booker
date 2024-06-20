@@ -43,7 +43,7 @@ ENV EXECUTION_BOOKING_TIME=${EXECUTION_BOOKING_TIME}
 # Create a directory for the application
 RUN mkdir /app
 # Copy the Python application files into the container
-COPY ./src /app
+COPY ./src /app/src
 COPY ./pyproject.toml /app
 
 WORKDIR /app
