@@ -45,7 +45,7 @@ def main(retry: int = 3):
     if os.environ.get("IS_TEST"):
         logging.info("! Test env")
         print("! Test env")
-        driver = get_driver(chromedriver=config.get("chromedriver"), env="dev")
+        driver = get_driver(chromedriver=config.get("chromedriver"))
 
         booker = Booker(
             driver=driver,
