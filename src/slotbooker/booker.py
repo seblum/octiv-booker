@@ -42,6 +42,25 @@ def main(retry: int = 3):
     # start writing output to logfile
     # file, orig_stdout, dir_log_file = start_logging()
 
+    if os.environ.get("IS_TEST"):
+        logging.info("! Test env")
+        print("! Test env")
+        driver = get_driver(chromedriver=config.get("chromedriver"), env="dev")
+
+        booker = Booker(
+            driver=driver,
+            days_before_bookable=0,
+            base_url=config.get("base_url"),
+            execution_booking_time="00:00:00.00",
+        )
+        user = "sebast.blum@gmail.com"  # os.environ.get("OCTIV_USERNAME")
+        password = "if-this-would-be-the-password"
+
+        result = booker.login(username=user, password=password)
+        if not result:
+            print("TEST OK")
+        exit()
+
     dir_log_file = setup_log_dir()
     logging.basicConfig(
         filename=dir_log_file,
@@ -50,24 +69,6 @@ def main(retry: int = 3):
         format="%(asctime)s %(message)s",
         level=logging.INFO,
     )
-
-    print(os.environ.get("IS_TEST"))
-    if os.environ.get("IS_TEST"):
-        print("test")
-        driver = get_driver(chromedriver=config.get("chromedriver"))
-        print(config.get("base_url"))
-        booker = Booker(
-            driver=driver,
-            days_before_bookable=0,
-            base_url=config.get("base_url"),
-            execution_booking_time="00:00:00.00",
-        )
-        user = os.environ.get("OCTIV_USERNAME")
-        password = "if-this-would-be-the-password"
-
-        booker.login(username=user, password=password)
-        exit()
-
     # get env variables
     user = os.environ.get("OCTIV_USERNAME")
     password = os.environ.get("OCTIV_PASSWORD")
@@ -94,7 +95,7 @@ def main(retry: int = 3):
                     execution_booking_time=execution_booking_time,
                 )
 
-                booker.login(username=user, password=password)
+                _ = booker.login(username=user, password=password)
                 booker.switch_day()
                 booker.book_class(
                     class_dict=classes.get("class_dict"),
