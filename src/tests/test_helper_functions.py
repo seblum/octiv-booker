@@ -58,7 +58,7 @@ def test_get_error_text_window():
     assert get_error_text_window() == "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[2]"
 
 def test_continue_bookings():
-    assert continue_bookings() == False
+    assert continue_bookings() is False
 
 def test_stop_booking_process():
-    assert stop_booking_process() == True
+    assert stop_booking_process() is True

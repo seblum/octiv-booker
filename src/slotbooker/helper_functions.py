@@ -96,6 +96,8 @@ def get_error_window() -> str:
         str: XPath of the error message element within the HTML structure.
     """
     return "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[1]"
+         # "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[1]" # for normal
+         # "/html/body/div/div[2]/div/div/div[1]/div" # for login
 
 def get_error_text_window() -> str:
     """Get the XPath of the error text message within the booking page.

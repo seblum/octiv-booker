@@ -6,5 +6,5 @@ def set_credentials():
     input_password = input("Insert password: ")
     
     # Set environment variables
-    os.environ['OCTIV_USERNAME'] = input_username
-    os.environ['OCTIV_PASSWORD'] = input_password
+    os.environ["OCTIV_USERNAME"] = input_username
+    os.environ["OCTIV_PASSWORD"] = input_password

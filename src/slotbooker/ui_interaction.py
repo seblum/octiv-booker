@@ -68,6 +68,13 @@ class Booker:
         self._input_text(f"{get_xpath_login_password_head()}/div[2]/input", password)
         self._click_button(f"{get_xpath_login_password_head()}/div[3]/div/div/div[1]/div/i")
         self._click_button(f"{get_xpath_login_password_head()}/button")
+        
+        # error_text = error_is_present(self.driver)
+        # if error_text is None:
+        #     logging.info(f"| {AlertTypes.NotError.value}")
+        # else:
+        #     return evaluate_error(error_text)  # returns False to continue bookings
+        
         logging.info("| login successful")
 
     def switch_day(self) -> str:
