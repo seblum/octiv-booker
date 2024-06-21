@@ -44,7 +44,7 @@ repos:
     hooks:
       - id: update-chromedriver-version
         name: Update ChromeDriver Version
-        entry: bash update_chromedriver_version.sh
+        entry: bash .github/scripts/update_chromedriver_version.sh
         language: system
         files: poetry.Dockerfile
         args:
