@@ -24,6 +24,7 @@ RUN unzip /tmp/chromedriver.zip chromedriver-linux64/chromedriver -d /usr/local/
 ENV DISPLAY=:99
 
 # Define build-time arguments to pass credentials and configuration
+ARG IS_TEST=${IS_TEST:-""}
 ARG OCTIV_USERNAME=${OCTIV_USERNAME:-""}
 ARG OCTIV_PASSWORD=${OCTIV_PASSWORD:-""}
 ARG EMAIL_SENDER=${EMAIL_SENDER:-""}
@@ -31,6 +32,7 @@ ARG EMAIL_PASSWORD=${EMAIL_PASSWORD:-""}
 ARG EMAIL_RECEIVER=${EMAIL_RECEIVER:-""}
 ARG DAYS_BEFORE_BOOKABLE=${DAYS_BEFORE_BOOKABLE:-""}
 ARG EXECUTION_BOOKING_TIME=${EXECUTION_BOOKING_TIME:-""}
+
 # Set environment variables for the application
 ENV OCTIV_USERNAME=${OCTIV_USERNAME}
 ENV OCTIV_PASSWORD=${OCTIV_PASSWORD}
