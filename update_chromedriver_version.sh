@@ -12,6 +12,6 @@ fi
 LATEST_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone.json | jq -r '.milestones | to_entries | map(.value.version) | max')
 
 # Update the Dockerfile with the latest version
-sed -i "s/ENV ChromedriverVersion=\"[^\"]*\"/ENV ChromedriverVersion=\"$LATEST_VERSION\"/" Dockerfile
+sed -i "s/ENV ChromedriverVersion=\"[^\"]*\"/ENV ChromedriverVersion=\"$LATEST_VERSION\"/" poetry.Dockerfile
 
 echo "Updated Dockerfile with ChromeDriver version $LATEST_VERSION"
