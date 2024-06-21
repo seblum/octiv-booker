@@ -8,6 +8,7 @@ from .utils.logging import setup_log_dir
 from .ui_interaction import Booker
 from .utils.gmail import send_logs_to_mail
 from .utils.settings import set_credentials
+
 # Load config yaml
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
 config = yaml.safe_load(open(config_path))
@@ -53,20 +54,19 @@ def main(retry: int = 3):
     print(os.environ.get("IS_TEST"))
     if os.environ.get("IS_TEST"):
         print("test")
-        driver = get_driver(chromedriver=config.get("chromedriver"),env="dev")
+        driver = get_driver(chromedriver=config.get("chromedriver"))
         print(config.get("base_url"))
         booker = Booker(
             driver=driver,
             days_before_bookable=0,
             base_url=config.get("base_url"),
-            execution_booking_time="00:00:00.00"
+            execution_booking_time="00:00:00.00",
         )
         user = os.environ.get("OCTIV_USERNAME")
         password = "if-this-would-be-the-password"
 
         booker.login(username=user, password=password)
         exit()
-
 
     # get env variables
     user = os.environ.get("OCTIV_USERNAME")
@@ -91,7 +91,7 @@ def main(retry: int = 3):
                     driver=driver,
                     days_before_bookable=days_before_bookable,
                     base_url=config.get("base_url"),
-                    execution_booking_time=execution_booking_time
+                    execution_booking_time=execution_booking_time,
                 )
 
                 booker.login(username=user, password=password)
