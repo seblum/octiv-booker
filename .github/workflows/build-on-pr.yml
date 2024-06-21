@@ -72,13 +72,13 @@ jobs:
           file: ./poetry.Dockerfile
           load: true
           tags: ${{ env.TEST_TAG }}
-        env:
-          IS_TEST: "True"
-          OCTIV_USERNAME: "Test-mail"
       - 
         name: Test Run
         run: |
-          docker run --rm ${{ env.TEST_TAG }}   
+          docker run --env IS_TEST=$IS_TEST --env OCTIV_USERNAME=$OCTIV_USERNAME --rm ${{ env.TEST_TAG }}
+        env:
+          IS_TEST: "True"
+          OCTIV_USERNAME: "Test-mail"
 
   # docker:
   #   name: "Build & Push : ${{ matrix.tags }}"
