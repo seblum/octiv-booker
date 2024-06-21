@@ -47,3 +47,5 @@ repos:
         entry: bash update_chromedriver_version.sh
         language: system
         files: poetry.Dockerfile
+        args:
+          - poetry.Dockerfile

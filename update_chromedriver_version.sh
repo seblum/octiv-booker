@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <Dockerfile>"
+    exit 1
+fi
+
+DOCKERFILE=$1
+
 # Ensure jq is installed
 if ! command -v jq &> /dev/null
 then
@@ -12,6 +19,6 @@ fi
 LATEST_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone.json | jq -r '.milestones | to_entries | map(.value.version) | max')
 
 # Update the Dockerfile with the latest version
-sed -i "s/ENV ChromedriverVersion=\"[^\"]*\"/ENV ChromedriverVersion=\"$LATEST_VERSION\"/" poetry.Dockerfile
+sed -i '' -e "s/ENV ChromedriverVersion=\"[^\"]*\"/ENV ChromedriverVersion=\"$LATEST_VERSION\"/" "$DOCKERFILE"
 
-echo "Updated Dockerfile with ChromeDriver version $LATEST_VERSION"
+echo "Updated $DOCKERFILE with ChromeDriver version $LATEST_VERSION"
