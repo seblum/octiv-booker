@@ -46,6 +46,6 @@ repos:
         name: Update ChromeDriver Version
         entry: bash .github/scripts/update_chromedriver_version.sh
         language: system
-        files: poetry.Dockerfile
+        # files: poetry.Dockerfile # run every-time
         args:
           - poetry.Dockerfile
