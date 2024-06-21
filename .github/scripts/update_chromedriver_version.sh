@@ -16,6 +16,7 @@ then
 fi
 
 # Fetch the latest version number from GoogleChromeLabs
+DOCKERFILE="poetry.Dockerfile"
 LATEST_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone.json | jq -r '.milestones | to_entries | map(.value.version) | max')
 
 # Update the Dockerfile with the latest version
