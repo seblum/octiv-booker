@@ -14,7 +14,7 @@ ENV TZ="Europe/Berlin"
 # Install Chromedriver
 RUN apt-get install -yqq unzip
 # https://googlechromelabs.github.io/chrome-for-testing/#stable
-ENV ChromedriverVersion="128.0.6548.0"
+ENV ChromedriverVersion="126.0.6478.63"
 RUN wget -O /tmp/chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/$ChromedriverVersion/linux64/chromedriver-linux64.zip
 # https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$ChromedriverVersion/linux64/chromedriver-linux64.zip
 RUN unzip /tmp/chromedriver.zip chromedriver-linux64/chromedriver -d /usr/local/bin/

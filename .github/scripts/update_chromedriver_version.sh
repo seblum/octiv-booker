@@ -17,10 +17,10 @@ then
 fi
 
 # Fetch the latest version number from GoogleChromeLabs
-echo "Fetching Version"
-LATEST_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone.json | jq -r '.milestones | to_entries | map(.value.version) | max')
+# LATEST_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone.json | jq -r '.milestones | to_entries | map(.value.version) | max')
+LATEST_STABLE_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions.json" | jq -r '.channels.Stable.version')
 
 # Update the Dockerfile with the latest version
-sed -i '' -e "s/ENV ChromedriverVersion=\"[^\"]*\"/ENV ChromedriverVersion=\"$LATEST_VERSION\"/" "$DOCKERFILE"
+sed -i '' -e "s/ENV ChromedriverVersion=\"[^\"]*\"/ENV ChromedriverVersion=\"$LATEST_STABLE_VERSION\"/" "$DOCKERFILE"
 
-echo "Updated $DOCKERFILE with ChromeDriver version $LATEST_VERSION"
+echo "Updated $DOCKERFILE with ChromeDriver version $LATEST_STABLE_VERSION"
