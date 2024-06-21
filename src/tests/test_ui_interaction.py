@@ -32,8 +32,8 @@ def test_login(booker, mock_driver):
 def test_switch_day(booker, mock_driver):
     mock_driver.find_element.return_value.text = "Mocked Text"
     
-    with patch("booker_module.get_day", return_value=(datetime(2022, 1, 10), 1)):
-        with patch("booker_module.get_day_button", return_value="mocked_xpath"):
+    with patch("Booker.get_day", return_value=(datetime(2022, 1, 10), 1)):
+        with patch("Booker.get_day_button", return_value="mocked_xpath"):
             booker.switch_day()
 
             assert mock_driver.find_element.call_count == 1
@@ -51,7 +51,7 @@ def test_book_class(booker, mock_driver):
     booker.day = "Monday"
 
     mock_driver.find_elements.return_value = ["MockElement"]
-    with patch("booker_module.get_booking_slot", return_value="mocked_xpath"):
+    with patch("Booker.get_booking_slot", return_value="mocked_xpath"):
         booker.book_class(class_dict)
 
         assert mock_driver.find_elements.call_count == 1
