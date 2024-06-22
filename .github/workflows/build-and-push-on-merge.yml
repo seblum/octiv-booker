@@ -26,20 +26,15 @@ jobs:
         name: Extract version from pyproject.toml
         id: extract_version
         run: |
-          pwd
           VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' ./pyproject.toml)
-          echo "PACKAGE_VERSION=$VERSION"
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
-      - 
-        name: Display version
-        run: echo "The package version is ${{ steps.extract_version.outputs.PACKAGE_VERSION }}"
 
   docker:
     name: "Build & Push : ${{ matrix.tags }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tags: ["latest","${{ needs.test-and-lint.outputs.PACKAGE_VERSION }}"]
+        tags: ["latest","${{ needs.get-tag.outputs.PACKAGE_VERSION }}"]
     needs: get-tag
     steps:
       - 
