@@ -44,13 +44,14 @@ jobs:
         name: Run tests
         run: |
           poetry run coverage run -m pytest
+          poetry run coverage report -m
       - 
         name: Export coverage HTML
         run: |
           poetry run coverage html -d coverage_html
       - 
         name: Upload coverage HTML artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage_html
