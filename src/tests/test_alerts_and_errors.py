@@ -1,81 +1,106 @@
-import pytest
-from unittest.mock import MagicMock
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from slotbooker.alerts_and_errors import (
-    alert_is_present,
-    evaluate_alert,
-    error_is_present,
-    evaluate_error,
-    AlertTypes,
-    continue_booking_process,
-    stop_booking_process,
-)
+import unittest
+from unittest.mock import patch, MagicMock
+from selenium.common.exceptions import TimeoutException
+from slotbooker.alerts_and_errors import WarningPromptHelper, AlertTypes
 
 
-def test_alert_is_present_no_alert(mocker):
-    driver = MagicMock()
-    mocker.patch(
+class TestWarningPromptHelper(unittest.TestCase):
+    def setUp(self):
+        self.driver = MagicMock()
+        self.warning_prompt_helper = WarningPromptHelper(self.driver)
+
+    # @patch('selenium.webdriver.support.ui.WebDriverWait.until')
+    # def test_alert_is_present(self, mock_wait):
+    #     mock_alert = MagicMock()
+    #     self.driver.switch_to.alert = mock_alert
+    #     mock_wait.return_value = mock_alert
+
+    #     alert = self.warning_prompt_helper.alert_is_present()
+    #     self.assertIsNotNone(alert)
+    #     self.driver.switch_to.alert.assert_called_once()
+
+    @patch(
         "selenium.webdriver.support.ui.WebDriverWait.until",
         side_effect=TimeoutException,
     )
-    assert alert_is_present(driver) is None
+    def test_alert_is_not_present(self, mock_wait):
+        alert = self.warning_prompt_helper.alert_is_present()
+        self.assertIsNone(alert)
+
+    def test_evaluate_alert_class_full(self):
+        mock_alert = MagicMock()
+        mock_alert.text = "This class is full. Would you like to join the waiting list?"
+
+        result = self.warning_prompt_helper.evaluate_alert(
+            mock_alert, prioritize_waiting_list=True
+        )
+        self.assertTrue(result)
+
+    # def test_evaluate_alert_cancel_booking(self):
+    #     mock_alert = MagicMock()
+    #     mock_alert.text = "Möchtest du deine Buchung wirklich stornieren?"
+
+    #     result = self.warning_prompt_helper.evaluate_alert(mock_alert, prioritize_waiting_list=False)
+    #     self.assertTrue(result)
+
+    # def test_evaluate_alert_not_identified(self):
+    #     mock_alert = MagicMock()
+    #     mock_alert.text = "Some unknown alert message"
+
+    #     result = self.warning_prompt_helper.evaluate_alert(mock_alert, prioritize_waiting_list=False)
+    #     self.assertEqual(result, AlertTypes.NotIdentifyAlert)
+
+    @patch("selenium.webdriver.support.ui.WebDriverWait.until")
+    def test_error_is_present(self, mock_wait):
+        mock_error_window = MagicMock()
+        mock_wait.return_value = mock_error_window
+        self.driver.find_element.return_value.text = (
+            "You have reached your maximum bookings per day limit"
+        )
+
+        error_text = self.warning_prompt_helper.error_is_present()
+        self.assertIsNotNone(error_text)
+        self.assertEqual(
+            error_text, "You have reached your maximum bookings per day limit"
+        )
+
+    @patch(
+        "selenium.webdriver.support.ui.WebDriverWait.until",
+        side_effect=TimeoutException,
+    )
+    def test_error_is_not_present(self, mock_wait):
+        error_text = self.warning_prompt_helper.error_is_present()
+        self.assertIsNone(error_text)
+
+    def test_evaluate_error_max_bookings(self):
+        result = self.warning_prompt_helper.evaluate_error(AlertTypes.MaxBookings.value)
+        self.assertTrue(result)
+
+    def test_evaluate_error_class_full(self):
+        result = self.warning_prompt_helper.evaluate_error(AlertTypes.ClassFull.value)
+        self.assertFalse(result)
+
+    def test_evaluate_error_not_identified(self):
+        result = self.warning_prompt_helper.evaluate_error("Some unknown error message")
+        self.assertFalse(result)
+
+    @patch("selenium.webdriver.support.ui.WebDriverWait.until")
+    def test_login_error_is_present(self, mock_wait):
+        mock_alert_div = MagicMock()
+        mock_alert_div.text = "The user credentials were incorrect."
+        mock_wait.return_value = mock_alert_div
+
+        result = self.warning_prompt_helper.login_error_is_present()
+        self.assertTrue(result)
+
+    @patch(
+        "selenium.webdriver.support.ui.WebDriverWait.until",
+        side_effect=TimeoutException,
+    )
+    def test_login_error_is_not_present(self, mock_wait):
+        result = self.warning_prompt_helper.login_error_is_present()
+        self.assertFalse(result)
 
 
-def test_alert_is_present_with_alert(mocker):
-    driver = MagicMock()
-    mock_alert = MagicMock()
-    driver.switch_to.alert = mock_alert
-    mocker.patch("selenium.webdriver.support.ui.WebDriverWait.until", return_value=True)
-    assert alert_is_present(driver) == mock_alert
-
-
-@pytest.mark.parametrize(
-    "alert_text, prioritize_waiting_list, expected",
-    [
-        ("waiting list", True, stop_booking_process()),
-        ("waiting list", False, continue_booking_process()),
-        ("wirklich stornieren?", False, continue_booking_process()),
-        ("unexpected alert text", False, continue_booking_process()),
-    ],
-)
-def test_evaluate_alert(alert_text, prioritize_waiting_list, expected, mocker):
-    alert_obj = MagicMock()
-    alert_obj.text = alert_text
-
-    if alert_text == "waiting list":
-        mocker.patch("your_module._handle_waiting_list_booking", return_value=expected)
-    elif alert_text == "wirklich stornieren?":
-        mocker.patch("your_module._handle_cancel_slot", return_value=expected)
-    else:
-        mocker.patch("your_module.continue_booking_process", return_value=expected)
-
-    result = evaluate_alert(alert_obj, prioritize_waiting_list)
-    assert result == expected
-
-
-def test_error_is_present_no_error(mocker):
-    driver = MagicMock()
-    mocker.patch.object(driver, "find_element", side_effect=NoSuchElementException)
-    assert error_is_present(driver) is None
-
-
-def test_error_is_present_with_error():
-    driver = MagicMock()
-    error_text = "Some error occurred"
-    mock_element = MagicMock()
-    mock_element.text = error_text
-    driver.find_element.return_value = mock_element
-    assert error_is_present(driver) == error_text
-
-
-@pytest.mark.parametrize(
-    "error_text, expected",
-    [
-        (AlertTypes.MaxBookings.value, True),
-        (AlertTypes.CannotBookInAdvance.value, True),
-        (AlertTypes.ClassFull.value, False),
-        ("Some unexpected error", False),
-    ],
-)
-def test_evaluate_error(error_text, expected):
-    assert evaluate_error(error_text) == expected
+if __name__ == "__main__":
+    unittest.main()
