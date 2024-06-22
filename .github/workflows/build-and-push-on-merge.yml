@@ -6,10 +6,10 @@ env:
 
 on:
   push:
-    branches: master
-    tags: v[12].[0-9]+.[0-9]+
-  # pull_request:
-  #   branches: [ master ]
+    branches: 
+    - master
+  tags: 
+    - v[12].[0-9]+.[0-9]+
   workflow_dispatch:
 
 jobs:
@@ -22,56 +22,24 @@ jobs:
       - 
         name: Checkout code
         uses: actions/checkout@v4
-      # - 
-      #   name: Set up Python
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: '3.11'
-      # - 
-      #   name: Install Poetry
-      #   run: |
-      #     curl -sSL https://install.python-poetry.org | python3 -
-      #     echo "$HOME/.local/bin" >> $GITHUB_PATH
-      # - 
-      #   name: Install dependencies
-      #   run: |
-      #     cd slotBooker
-      #     poetry install
-      # - 
-      #   name: Run linting with ruff
-      #   run: |
-      #     cd slotBooker
-      #     poetry run ruff . --fix
-      # - 
-      #   name: Run tests
-      #   run: |
-      #     cd slotBooker
-      #     poetry run pytest
       -  
         name: Extract version from pyproject.toml
         id: extract_version
         run: |
-          VERSION=$(grep -Po '(?<=^version = ")[^"]*' ./pyproject.toml)
+          VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' ./pyproject.toml)
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
-      # - 
-      #   name: Display version
-      #   run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
 
   docker:
     name: "Build & Push : ${{ matrix.tags }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tags: ["latest","${{ needs.test-and-lint.outputs.PACKAGE_VERSION }}"]
+        tags: ["latest","${{ needs.get-tag.outputs.PACKAGE_VERSION }}"]
     needs: get-tag
     steps:
       - 
         name: Checkout code
         uses: actions/checkout@v4
-      # - 
-      #   name: Echo tag
-      #   run: |
-      #     echo Tag: ${{ matrix.tags }}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -84,10 +52,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      # -
-      #   name: Build and push
-      #   uses: docker/build-push-action@v6
-      #   with:
-      #     file: ./poetry.Dockerfile
-      #     push: true
-      #     tags: ${{ env.DOCKERREPO }}:${{ matrix.tags }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          file: ./poetry.Dockerfile
+          push: true
+          tags: ${{ env.DOCKERREPO }}:${{ matrix.tags }}
