@@ -1,3 +1,5 @@
+[![Deployment CD](https://github.com/seblum/octiv-booker/actions/workflows/build-and-push-on-merge.yml/badge.svg?branch=master)](https://github.com/seblum/octiv-booker/actions/workflows/build-and-push-on-merge.yml)
+
 # Octiv SlotBooker
 
 ![Octiv Overview](https://github.com/seblum/octiv_booker/blob/d434b11827b830aa7dd0e0614558034dbaabe66f/octiv_overview.png)
