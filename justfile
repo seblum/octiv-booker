@@ -51,7 +51,6 @@ install-venv:
 
 # Run tests using Poetry and pytest
 test:
-    poetry run pytest
     poetry run coverage run -m pytest
     poetry run coverage report -m
 
@@ -73,6 +72,7 @@ fmt:
     find . -type d -name "htmlcov" -exec rm -rf {} +
     find . -type d -name ".tox" -exec rm -rf {} +
     find . -type d -name "_build" -path "*/docs/_build" -exec rm -rf {} +
+    find . -type d -name "logs" -exec rm -rf {} +
 
 # Remove the installed virtual environment
 clean-venv: 

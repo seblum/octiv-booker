@@ -40,10 +40,19 @@ jobs:
         name: Run linting with ruff
         run: |
           poetry run ruff . --fix
-      # - 
-      #   name: Run tests
-      #   run: |
-      #     poetry run pytest
+      - 
+        name: Run tests
+        run: |
+        poetry run coverage report -m
+      - 
+        name: Export coverage HTML
+        run: poetry run coverage html -d coverage_html
+      - 
+        name: Upload coverage HTML artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: coverage_html
       -  
         name: Extract version from pyproject.toml
         id: extract_version
