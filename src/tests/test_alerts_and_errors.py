@@ -7,14 +7,19 @@ from slotbooker.alerts_and_errors import (
     error_is_present,
     evaluate_error,
     AlertTypes,
-    continue_bookings,
-    stop_booking_process
+    continue_booking_process,
+    stop_booking_process,
 )
+
 
 def test_alert_is_present_no_alert(mocker):
     driver = MagicMock()
-    mocker.patch("selenium.webdriver.support.ui.WebDriverWait.until", side_effect=TimeoutException)
+    mocker.patch(
+        "selenium.webdriver.support.ui.WebDriverWait.until",
+        side_effect=TimeoutException,
+    )
     assert alert_is_present(driver) is None
+
 
 def test_alert_is_present_with_alert(mocker):
     driver = MagicMock()
@@ -23,12 +28,16 @@ def test_alert_is_present_with_alert(mocker):
     mocker.patch("selenium.webdriver.support.ui.WebDriverWait.until", return_value=True)
     assert alert_is_present(driver) == mock_alert
 
-@pytest.mark.parametrize("alert_text, prioritize_waiting_list, expected", [
-    ("waiting list", True, stop_booking_process()),
-    ("waiting list", False, continue_bookings()),
-    ("wirklich stornieren?", False, continue_bookings()),
-    ("unexpected alert text", False, continue_bookings()),
-])
+
+@pytest.mark.parametrize(
+    "alert_text, prioritize_waiting_list, expected",
+    [
+        ("waiting list", True, stop_booking_process()),
+        ("waiting list", False, continue_booking_process()),
+        ("wirklich stornieren?", False, continue_booking_process()),
+        ("unexpected alert text", False, continue_booking_process()),
+    ],
+)
 def test_evaluate_alert(alert_text, prioritize_waiting_list, expected, mocker):
     alert_obj = MagicMock()
     alert_obj.text = alert_text
@@ -38,15 +47,17 @@ def test_evaluate_alert(alert_text, prioritize_waiting_list, expected, mocker):
     elif alert_text == "wirklich stornieren?":
         mocker.patch("your_module._handle_cancel_slot", return_value=expected)
     else:
-        mocker.patch("your_module.continue_bookings", return_value=expected)
+        mocker.patch("your_module.continue_booking_process", return_value=expected)
 
     result = evaluate_alert(alert_obj, prioritize_waiting_list)
     assert result == expected
+
 
 def test_error_is_present_no_error(mocker):
     driver = MagicMock()
     mocker.patch.object(driver, "find_element", side_effect=NoSuchElementException)
     assert error_is_present(driver) is None
+
 
 def test_error_is_present_with_error():
     driver = MagicMock()
@@ -56,11 +67,15 @@ def test_error_is_present_with_error():
     driver.find_element.return_value = mock_element
     assert error_is_present(driver) == error_text
 
-@pytest.mark.parametrize("error_text, expected", [
-    (AlertTypes.MaxBookings.value, True),
-    (AlertTypes.CannotBookInAdvance.value, True),
-    (AlertTypes.ClassFull.value, False),
-    ("Some unexpected error", False),
-])
+
+@pytest.mark.parametrize(
+    "error_text, expected",
+    [
+        (AlertTypes.MaxBookings.value, True),
+        (AlertTypes.CannotBookInAdvance.value, True),
+        (AlertTypes.ClassFull.value, False),
+        ("Some unexpected error", False),
+    ],
+)
 def test_evaluate_error(error_text, expected):
     assert evaluate_error(error_text) == expected

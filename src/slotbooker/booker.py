@@ -57,7 +57,8 @@ def main(retry: int = 3):
         password = "if-this-would-be-the-password"
 
         result = booker.login(username=user, password=password)
-        if not result:
+        if result:
+            logging.info("! Login failed as expected")
             print("TEST OK")
         exit()
 
@@ -80,7 +81,6 @@ def main(retry: int = 3):
         logging.info("USERNAME and PASSWORD not set")
         set_credentials()  # Call the function to set credentials if not already set
     else:
-        logging.info("USERNAME and PASSWORD prevalent")
         logging.info(f"USER: {user}")
 
         count = 0
@@ -95,7 +95,7 @@ def main(retry: int = 3):
                     execution_booking_time=execution_booking_time,
                 )
 
-                _ = booker.login(username=user, password=password)
+                booker.login(username=user, password=password)
                 booker.switch_day()
                 booker.book_class(
                     class_dict=classes.get("class_dict"),

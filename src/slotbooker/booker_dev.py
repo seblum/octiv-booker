@@ -4,6 +4,7 @@ import yaml
 
 from .utils.driver import close_driver, get_driver
 from .ui_interaction import Booker
+
 # from .utils.logging import start_logging, stop_logging
 from .utils.settings import set_credentials
 
@@ -16,7 +17,6 @@ classes = yaml.safe_load(open(classes_path))
 
 
 def main(retry: int = 3):
-
     # start writing output to logfile
     #  file, orig_stdout, dir_log_file = start_logging()
 
@@ -40,18 +40,17 @@ def main(retry: int = 3):
         logging.info("USERNAME and PASSWORD not set")
         set_credentials()  # Call the function to set credentials if not already set
     else:
-        logging.info("USERNAME and PASSWORD prevalent")
         logging.info(f"USER: {user}")
 
     count = 0
     while count < retry:
-        driver = get_driver(chromedriver=config.get("chromedriver"),env="dev")
+        driver = get_driver(chromedriver=config.get("chromedriver"), env="dev")
 
         booker = Booker(
             driver=driver,
             days_before_bookable=days_before_bookable,
             base_url=config.get("base_url"),
-            execution_booking_time=execution_booking_time
+            execution_booking_time=execution_booking_time,
         )
 
         booker.login(username=user, password=password)

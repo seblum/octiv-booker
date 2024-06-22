@@ -5,25 +5,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as exco
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
-import time
 
-from .helper_functions import (
-    get_booking_slot,
-    get_day,
-    get_day_button,
-    get_xpath_booking_head,
-    get_xpath_login_password_head,
-    get_xpath_login_username_head,
-    stop_booking_process,
-)
+from .alerts_and_errors import WarningPromptHelper
 
-from .alerts_and_errors import (
-    alert_is_present,
-    evaluate_alert,
-    error_is_present,
-    evaluate_error,
-    AlertTypes,
-)
+from .helper_functions import XPathHelper, BookingHelper
 
 
 class Booker:
@@ -62,59 +47,69 @@ class Booker:
         self.class_dict = None
         self.booking_action = None
         self.day = None
+        self.xpath_helper = XPathHelper()
+        self.booking_helper = BookingHelper()
+        self.warning_prompt_helper = WarningPromptHelper(self.driver)
 
     def login(self, username: str, password: str) -> bool:
         """Login to the booking website using the provided credentials."""
-        self.driver.get(self.base_url)
+        try:
+            self.driver.get(self.base_url)
 
-        # username field
-        self._input_text(f"{get_xpath_login_username_head()}/div[1]/input", username)
-        self._click_button(f"{get_xpath_login_username_head()}/button")
-        logging.info("| submit user name successful")
+            self._input_text(
+                self.xpath_helper.get_xpath_login_username_head() + "/div[1]/input",
+                username,
+            )
+            self._click_button(
+                self.xpath_helper.get_xpath_login_username_head() + "/button"
+            )
+            logging.info("| Username submitted successfully")
 
-        # password field
-
-        self._input_text(f"{get_xpath_login_password_head()}/div[2]/input", password)
-        self._click_button(
-            f"{get_xpath_login_password_head()}/div[3]/div/div/div[1]/div/i"
-        )
-        self._click_button(f"{get_xpath_login_password_head()}/button")
+            self._input_text(
+                self.xpath_helper.get_xpath_login_password_head() + "/div[2]/input",
+                password,
+            )
+            self._click_button(
+                self.xpath_helper.get_xpath_login_password_head()
+                + "/div[3]/div/div/div[1]/div/i"
+            )
+            self._click_button(
+                self.xpath_helper.get_xpath_login_password_head() + "/button"
+            )
+        except Exception as e:
+            logging.error(f"! Error during login attempt: {e}")
 
         try:
-            time.sleep(1)
-            alert_div = WebDriverWait(self.driver, 10).until(
-                exco.presence_of_element_located(
-                    (By.XPATH, "/html/body/div/div[2]/div/div")
-                )
-            )
-            print("Alert message is present.")
-            alert_text = alert_div.text
-            if any(
+            alert_text = self._check_login_alert()
+            if alert_text and any(
                 keyword.lower() in alert_text.lower()
                 for keyword in ["credentials", "Fehler"]
             ):
-                print(f"! Credentials wrong {alert_text}")
-                logging.info(f"! Credentials wrong {alert_text}")
-                return False
+                logging.info(f"! Incorrect credentials: {alert_text}")
+                return self.booking_helper.stop_booking_process
+        except Exception:
+            pass
 
-        except NoSuchElementException:
-            print("Alert message is not present.")
-
-        logging.info("| login successful")
-        return True
+        logging.info("| Login successful")
+        return self.booking_helper.continue_booking_process
 
     def switch_day(self) -> str:
         """Switch to the desired day for booking slots."""
-        future_date, diff_week = get_day(self.days_before_bookable)
+        future_date, diff_week = self.booking_helper.get_day(self.days_before_bookable)
         self.day = future_date.strftime("%A")
 
-        for _ in range(diff_week):
-            self._click_button(f"{get_xpath_booking_head()}[3]/div[9]/div/div/i")
-            logging.info("| switched to following week")
+        try:
+            for _ in range(diff_week):
+                self._click_button(
+                    self.xpath_helper.get_xpath_booking_head() + "[3]/div[9]/div/div/i"
+                )
+                logging.info("| Switched to following week")
 
-        day_button = get_day_button(self.day)
-        self._click_button(day_button)
-        logging.info(f"| switched to day: {self.day}, {future_date}")
+            day_button = self.booking_helper.get_day_button(self.day, self.xpath_helper)
+            self._click_button(day_button)
+            logging.info(f"| Switched to day: {self.day}, {future_date}")
+        except Exception as e:
+            logging.error(f"! Error during day switch: {e}")
 
     def book_class(self, class_dict: dict, booking_action: bool = True) -> None:
         """Book classes based on provided booking information."""
@@ -167,44 +162,50 @@ class Booker:
         """Load and transform the input class_dict into a list of unique class entries."""
         return list({entry.get("class") for entry in self.class_dict})
 
-    def _get_all_bounding_boxes_in_window(self) -> object:
+    def _get_all_bounding_boxes_in_window(self) -> list:
         """Get all bounding boxes containing booking slots present in the current window."""
         WebDriverWait(self.driver, 20).until(
-            exco.element_to_be_clickable((By.XPATH, get_xpath_booking_head()))
+            exco.element_to_be_clickable(
+                (By.XPATH, self.xpath_helper.get_xpath_booking_head())
+            )
         )
-        return self.driver.find_elements(By.XPATH, get_xpath_booking_head())
+        return self.driver.find_elements(
+            By.XPATH, self.xpath_helper.get_xpath_booking_head()
+        )
 
     def _get_all_bounding_boxes_by_class_name(
         self, class_entry_list: list, all_slots_bounding_boxes: list
     ) -> dict:
         """Get all possible booking slots for specified class entries and bounding boxes."""
-        logging.info(f"? possible classes for '{class_entry_list}'")
+        logging.info(f"? Possible classes: {class_entry_list}")
 
         bounding_box_number_by_action = 1 if self.booking_action else 2
         all_possible_booking_slots_dict = defaultdict(list)
 
-        for slot_index in range(len(all_slots_bounding_boxes)):
-            slot_index += 1
-            xpath_test = f"{get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
+        for slot_index, box in enumerate(all_slots_bounding_boxes, start=1):
+            xpath_test = f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
             try:
                 textfield = self.driver.find_element(By.XPATH, xpath_test).text
                 if textfield in class_entry_list:
-                    xpath_time_slot = f"{get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
-                    time_slot = self.driver.find_element(By.XPATH, xpath_time_slot).text
-                    logging.info(f"- time: {time_slot} - class: {textfield}")
+                    time_slot = self.driver.find_element(
+                        By.XPATH,
+                        f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]",
+                    ).text
+                    logging.info(f"- Time: {time_slot} - Class: {textfield}")
 
-                    xpath_button_book = get_booking_slot(
+                    xpath_button_book = self.xpath_helper.get_xpath_booking_slot(
                         booking_slot=slot_index, book_action=self.booking_action
                     )
-                    tmp_dict = {
-                        time_slot: {
-                            "textfield": textfield,
-                            "time_slot": time_slot,
-                            "slot_index": slot_index,
-                            "xpath": xpath_button_book,
+                    all_possible_booking_slots_dict[textfield].append(
+                        {
+                            time_slot: {
+                                "textfield": textfield,
+                                "time_slot": time_slot,
+                                "slot_index": slot_index,
+                                "xpath": xpath_button_book,
+                            }
                         }
-                    }
-                    all_possible_booking_slots_dict[textfield].append(tmp_dict)
+                    )
             except NoSuchElementException:
                 continue
         return all_possible_booking_slots_dict
@@ -216,17 +217,17 @@ class Booker:
         try:
             all_possible_booking_slots_dict_flatten = {
                 k: v
-                for d in all_possible_booking_slots_dict.get(class_slot)
+                for d in all_possible_booking_slots_dict.get(class_slot, [])
                 for k, v in d.items()
             }
-            button_xpath = all_possible_booking_slots_dict_flatten.get(time_slot).get(
-                "xpath"
-            )
+            button_xpath = all_possible_booking_slots_dict_flatten.get(
+                time_slot, {}
+            ).get("xpath")
             logging.info(f"? Checking {class_slot} at {time_slot}...")
             return button_xpath
         except (AttributeError, TypeError):
             logging.info(
-                f"! No class of type {class_slot} is present on {self.day} at {time_slot} (results in NoneType)"
+                f"! No class of type {class_slot} is present on {self.day} at {time_slot}"
             )
             return None
 
@@ -242,35 +243,44 @@ class Booker:
 
         self._click_book_button(button_xpath)
 
-        alert_obj = alert_is_present(self.driver)
-        if alert_obj is None:
-            logging.info(f"| {AlertTypes.NotAlert.value}")
-        else:
-            return evaluate_alert(alert_obj, prioritize_waiting_list)
+        alert_obj = self.warning_prompt_helper.alert_is_present(self.driver)
+        if alert_obj:
+            return self.warning_prompt_helper.evaluate_alert(
+                alert_obj, prioritize_waiting_list
+            )
 
-        error_text = error_is_present(self.driver)
-        if error_text is None:
-            logging.info(f"| {AlertTypes.NotError.value}")
-        else:
-            return evaluate_error(error_text)  # returns False to continue bookings
+        error_text = self.warning_prompt_helper.evaluate_alert(self.driver)
+        if error_text:
+            return self.warning_prompt_helper.evaluate_alert(error_text)
 
         logging.info("! Class booked")
-        return stop_booking_process()
+        return self.booking_helper.stop_booking_process()
 
     def _click_book_button(self, xpath_button_book: str) -> None:
         """Click the book button using JavaScript execution."""
         element = self.driver.find_element(By.XPATH, xpath_button_book)
         while True:
-            if (
-                datetime.now().time().strftime("%H:%M:%S.%f")
-                >= self.execution_booking_time
-            ):
+            current_time = datetime.now().time().strftime("%H:%M:%S.%f")
+            if current_time >= self.execution_booking_time:
                 start_time = datetime.now()
-                logging.info(f"| Start execution at {datetime.now().time()}")
+                logging.info(f"| Start execution at {current_time}")
                 self.driver.execute_script("arguments[0].click();", element)
                 end_time = datetime.now()
                 logging.info(f"| Executed at {end_time.time()}")
-                logging.info(
-                    f"| Took {(end_time - start_time)}s - Ideal start time: {(end_time - (end_time - start_time)).time()}"
-                )
+                logging.info(f"| Took {(end_time - start_time).total_seconds()}s")
                 break
+
+    def _check_login_alert(self) -> str:
+        """Check for alert messages after login."""
+        try:
+            alert_div = WebDriverWait(self.driver, 10).until(
+                exco.presence_of_element_located(
+                    (
+                        By.XPATH,
+                        self.xpath_helper.get_xpath_login_error_window(),
+                    )  #  "/html/body/div/div[2]/div/div"
+                )
+            )
+            return alert_div.text
+        except NoSuchElementException:
+            return ""
