@@ -32,7 +32,7 @@ jobs:
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
       - 
         name: Display version
-        run: echo "The package version is ${{ env.PACKAGE_VERSION }}"
+        run: echo "The package version is ${{ steps.extract_version.outputs.PACKAGE_VERSION }}"
 
   docker:
     name: "Build & Push : ${{ matrix.tags }}"
