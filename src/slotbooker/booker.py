@@ -9,26 +9,27 @@ from .ui_interaction import Booker
 from .utils.gmail import send_logs_to_mail
 from .utils.settings import set_credentials
 
-# Load config yaml
+# Load configuration files
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
-config = yaml.safe_load(open(config_path))
+with open(config_path, "r") as file:
+    config = yaml.safe_load(file)
 
 classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
-classes = yaml.safe_load(open(classes_path))
+with open(classes_path, "r") as file:
+    classes = yaml.safe_load(file)
 
 
 def main(retry: int = 3):
     """Slotbooker Main Function.
 
     This function represents the main flow of the Slotbooker application. It performs the following steps:
-    - Starts writing output to a logfile using 'start_logging' function.
+    - Starts writing output to a logfile using 'setup_log_dir'.
     - Retrieves environment variables 'OCTIV_USERNAME' and 'OCTIV_PASSWORD'.
     - If the required environment variables are not set, it informs the user to set them.
     - If the environment variables are set, it initializes a web driver and logs into the website.
     - Switches to the desired day and books a slot according to the configuration.
     - Closes the web driver after completing the booking process.
-    - Stops logging and restores the original stdout using 'stop_logging' function.
-    - Sends the log file to an email address using 'send_logs_to_mail' function.
+    - Sends the log file to an email address using 'send_logs_to_mail'.
 
     Returns:
         None: This function does not return anything.
@@ -38,7 +39,6 @@ def main(retry: int = 3):
 
         >>> main()
     """
-
     # start writing output to logfile
     # file, orig_stdout, dir_log_file = start_logging()
 
@@ -53,11 +53,11 @@ def main(retry: int = 3):
             base_url=config.get("base_url"),
             execution_booking_time="00:00:00.00",
         )
-        user = "sebast.blum@gmail.com"  # os.environ.get("OCTIV_USERNAME")
+        user = os.environ.get("OCTIV_USERNAME")
         password = "if-this-would-be-the-password"
 
-        result = booker.login(username=user, password=password)
-        if result:
+        login_failed = booker.login(username=user, password=password)
+        if login_failed:
             logging.info("! Login failed as expected")
             print("TEST OK")
         exit()
@@ -70,21 +70,21 @@ def main(retry: int = 3):
         format="%(asctime)s %(message)s",
         level=logging.INFO,
     )
-    # get env variables
+
+    # Retrieve environment variables
     user = os.environ.get("OCTIV_USERNAME")
     password = os.environ.get("OCTIV_PASSWORD")
-    days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE"))
+    days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
     execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
 
-    # check whether env variables are set or None
-    if user is None or password is None:
+    # Ensure credentials are set
+    if not user or not password:
         logging.info("USERNAME and PASSWORD not set")
-        set_credentials()  # Call the function to set credentials if not already set
+        set_credentials()
     else:
         logging.info(f"USER: {user}")
 
-        count = 0
-        while count < retry:
+        for attempt in range(retry):
             try:
                 driver = get_driver(chromedriver=config.get("chromedriver"))
 
@@ -103,24 +103,15 @@ def main(retry: int = 3):
                 )
 
                 close_driver(driver)
-                logging.info(f"| [{count+1}] OctivBooker succeeded")
-                count = 3
-            except SessionNotCreatedException as e:
-                logging.info(f"| [{count+1}] OctivBooker failed")
-                logging.info("! SessionNotCreatedException")
-                logging.info(e)
-                count += 1
-                continue
-            except NoSuchDriverException as e:
-                logging.info(f"| [{count+1}] OctivBooker failed")
-                logging.info("! NoSuchDriverException")
-                logging.info(e)
-                count += 1
+                logging.info(f"| [{attempt + 1}] OctivBooker succeeded")
+                break
+            except (SessionNotCreatedException, NoSuchDriverException) as e:
+                logging.info(f"| [{attempt + 1}] OctivBooker failed")
+                logging.error(e, exc_info=True)
                 continue
             except Exception as e:
-                logging.info(f"| [{count+1}] OctivBooker failed")
-                logging.info(e)
-                count += 1
+                logging.info(f"| [{attempt + 1}] OctivBooker failed")
+                logging.error(e, exc_info=True)
                 continue
 
         # stop_logging(file, orig_stdout)
