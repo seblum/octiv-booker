@@ -28,6 +28,7 @@ jobs:
         run: |
           pwd
           VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' ./pyproject.toml)
+          echo "PACKAGE_VERSION=$VERSION"
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
       - 
         name: Display version
