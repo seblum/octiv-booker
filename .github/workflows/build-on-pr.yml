@@ -43,10 +43,11 @@ jobs:
       - 
         name: Run tests
         run: |
-        poetry run coverage report -m
+          poetry run coverage report -m
       - 
         name: Export coverage HTML
-        run: poetry run coverage html -d coverage_html
+        run: |
+          poetry run coverage html -d coverage_html
       - 
         name: Upload coverage HTML artifact
         uses: actions/upload-artifact@v2
