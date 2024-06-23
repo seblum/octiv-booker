@@ -15,3 +15,10 @@ changelog:
       labels:
         - Semver-Minor
         - enhancement
+    - title: Bug fixes 🐛
+      labels:
+        - Semver-Patch
+        - bug 
+    - title: Other Changes 📝
+      labels:
+        - “*”
