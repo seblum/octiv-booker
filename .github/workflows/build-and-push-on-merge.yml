@@ -7,8 +7,10 @@ env:
 on:
   push:
     branches: master
-  # tags: 
-  #   - v[12].[0-9]+.[0-9]+
+    paths:
+      - src/**
+      - poetry.Dockerfile
+      - pyproject.toml
   workflow_dispatch:
 
 jobs:
