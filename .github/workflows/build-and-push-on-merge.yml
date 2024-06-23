@@ -11,8 +11,6 @@ on:
       - src/**
       - poetry.Dockerfile
       - pyproject.toml
-    tags: 
-      - v[12].[0-9]+.[0-9]+
   workflow_dispatch:
 
 jobs:
