@@ -11,7 +11,7 @@ changelog:
       labels:
         - Semver-Major
         - breaking-change
-    - title: Exciting New Features 🎉
+    - title: New Features 🎉
       labels:
         - Semver-Minor
         - enhancement
@@ -19,6 +19,9 @@ changelog:
       labels:
         - Semver-Patch
         - bug 
+    - title: Dependency updates 🔒
+      labels:
+        - dependencies
     - title: Other Changes 📝
       labels:
         - “*”
