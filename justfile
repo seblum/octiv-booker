@@ -57,7 +57,7 @@ test:
 # Format code using Poetry and black
 fmt:
     poetry run black .
-    poetry run ruff
+    poetry run ruff check . --fix
 
 # Clean up generated files
 @clean:

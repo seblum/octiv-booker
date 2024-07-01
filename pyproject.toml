@@ -17,7 +17,7 @@ coverage = "^7.5.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.0"
-ruff = "^0.0.250"
+ruff = "^0.5.0"
 
 
 [tool.poetry.scripts]
