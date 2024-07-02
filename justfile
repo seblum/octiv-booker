@@ -37,6 +37,25 @@ docker-run:
     --volume $(pwd)/octiv-booker/src/slotbooker/data/:/app/slotbooker/data/ \
     slotbookertest:${poetry_version}
 
+docker-run-env:
+    poetry_version=$(poetry version | awk '{print $2}')
+    OCTIV_USERNAME=$(printenv OCTIV_USERNAME)
+    OCTIV_PASSWORD=$(printenv OCTIV_PASSWORD)
+    EMAIL_SENDER=$(printenv EMAIL_SENDER)
+    EMAIL_PASSWORD=$(printenv EMAIL_PASSWORD)
+    EMAIL_RECEIVER=$(printenv EMAIL_RECEIVER)
+    DAYS_BEFORE_BOOKABLE=$(printenv DAYS_BEFORE_BOOKABLE)
+    EXECUTION_BOOKING_TIME=$(printenv EXECUTION_BOOKING_TIME)
+    docker run -it -e OCTIV_USERNAME=${OCTIV_USERNAME} \
+    -e OCTIV_PASSWORD=${OCTIV_PASSWORD} \
+    -e EMAIL_SENDER=${EMAIL_SENDER} \
+    -e EMAIL_PASSWORD=${EMAIL_PASSWORD} \
+    -e EMAIL_RECEIVER=${EMAIL_RECEIVER} \
+    -e DAYS_BEFORE_BOOKABLE=${DAYS_BEFORE_BOOKABLE} \
+    -e EXECUTION_BOOKING_TIME=${EXECUTION_BOOKING_TIME} \
+    --volume $(pwd)/octiv-booker/src/slotbooker/data/:/app/slotbooker/data/ \
+    slotbookertest:${poetry_version}
+
 # Build and run Docker container
 docker-full:
     just docker-build
