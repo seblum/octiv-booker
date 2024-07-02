@@ -16,8 +16,8 @@ poetry-plugin-dotenv = "^2.1.6"
 coverage = "^7.5.3"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.0.0"
-ruff = "^0.0.250"
+pytest = "^8.2.2"
+ruff = "^0.5.0"
 
 
 [tool.poetry.scripts]
