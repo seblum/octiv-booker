@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "slotBooker"
-version = "2.2.0"
+version = "2.2.1"
 description = ""
 authors = ["Sebastian Blum <hello@seblum.com>"]
 packages = [{include = "slotbooker", from = "src"}]
@@ -32,8 +32,8 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-select = ["E", "F", "W", "C", "N", "Q"]
-ignore = ["E501"]  # ignore line length for example
+lint.select = ["E", "F", "W", "C", "N", "Q"]
+lint.ignore = ["E501"]  # ignore line length for example
 line-length = 88
 
 # Exclude some directories from linting
