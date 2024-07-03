@@ -91,6 +91,7 @@ fmt:
     find . -type d -name ".tox" -exec rm -rf {} +
     find . -type d -name "_build" -path "*/docs/_build" -exec rm -rf {} +
     find . -type d -name "logs" -exec rm -rf {} +
+    find . -type d -name ".ruff_cache" -exec rm -rf {} +
 
 # Remove the installed virtual environment
 clean-venv: 

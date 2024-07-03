@@ -24,9 +24,8 @@ env_vars_to_check = [
     "EXECUTION_BOOKING_TIME",
 ]
 # Create an instance of ClassVarHelper
-helper = ClassVarHelper(env_vars_to_check)
-
-helper.check_vars()
+# helper = ClassVarHelper(env_vars_to_check)
+# helper.check_vars()
 
 
 def main(retry: int = 3):
