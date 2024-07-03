@@ -28,14 +28,14 @@ run-dev:
 # Build Docker image
 docker-build:
     poetry_version=$(poetry version | awk '{print $2}')
-    docker build -t slotbookertest:${poetry_version} -f poetry.Dockerfile .
+    docker build -t slotbookertest:v${poetry_version} -f poetry.Dockerfile .
 
 # Run Docker container
 docker-run:
     poetry_version=$(poetry version | awk '{print $2}')
     docker run -it --env-file .env \
     --volume $(pwd)/octiv-booker/src/slotbooker/data/:/app/slotbooker/data/ \
-    slotbookertest:${poetry_version}
+    slotbookertest:v${poetry_version}
 
 # Build and run Docker container
 docker-full:
