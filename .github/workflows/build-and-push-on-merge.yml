@@ -31,7 +31,7 @@ jobs:
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
 
   docker:
-    name: "Build & Push : ${{ matrix.tags }}"
+    name: "📦 Build & Push : ${{ matrix.tags }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -73,7 +73,7 @@ jobs:
     steps:
       - 
         uses: googleapis/release-please-action@v4
-        name: 📦 Release
+        name: Release
         id: release
         with:
           release-type: "python"
