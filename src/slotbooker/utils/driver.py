@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 
 
-def get_driver(chromedriver: str,env:str="prd") -> object:
+def get_driver(chromedriver: str, env: str = "prd") -> object:
     """Sets the Google ChromeDriver with headless support enabled
 
     Args:
@@ -19,7 +19,7 @@ def get_driver(chromedriver: str,env:str="prd") -> object:
     options.add_experimental_option("detach", True)
     if env != "dev":
         options.add_argument("--headless")  # needs to be set to run in docker image
-    
+
     # added for lambda | if run locally not working.
     # options.add_argument("--window-size=1280x1696")
     # options.add_argument("--single-process")

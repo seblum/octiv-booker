@@ -62,10 +62,10 @@ def format_to_html(body) -> str:
         info_match = regex_info.search(line)
         warning_match = regex_warning.search(line)
         error_match = regex_error.search(line)
-        
+
         if timestamp_match:
             timestamp = timestamp_match.group(1)
-            
+
             if info_match:
                 log_type = "Info"
                 message = info_match.group(1)
@@ -78,8 +78,10 @@ def format_to_html(body) -> str:
             else:
                 log_type = "Unknown"
                 message = ""
-            
-            html_rows += f"<tr><td>{timestamp}</td><td>{log_type}</td><td>{message}</td></tr>"
+
+            html_rows += (
+                f"<tr><td>{timestamp}</td><td>{log_type}</td><td>{message}</td></tr>"
+            )
 
     # Complete HTML content
     html_content = html_template.format(html_rows)
