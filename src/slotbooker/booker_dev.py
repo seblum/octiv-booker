@@ -52,7 +52,7 @@ def main(retry: int = 3):
         response = "SUCCESS"
 
         close_driver(driver)
-        logging.info(f"| [{count+1}] OctivBooker succeeded")
+        logging.info(f"[{count+1}] OctivBooker succeeded")
         count = 3
 
         html_file = log_hander.convert_logs_to_html()

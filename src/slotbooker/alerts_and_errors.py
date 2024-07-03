@@ -69,16 +69,16 @@ class WarningPromptHelper:
     ) -> bool:
         """Handle booking waiting list option in the alert."""
         if prioritize_waiting_list:
-            logging.info("! Booking waiting list...")
+            logging.info("Booking waiting list...")
             alert_obj.accept()
-            logging.info("| Waiting list booked")
+            logging.info("Waiting list booked")
             return self.booking_helper.stop_booking_process()
         else:
             logging.info(
                 f"! Parameter 'wl' is set to {prioritize_waiting_list} > Skipping waiting list"
             )
             alert_obj.dismiss()
-            logging.info("> Looking for further slots...")
+            logging.info("Looking for further slots...")
             return self.booking_helper.continue_booking_process()
 
     def _handle_cancel_slot(self, alert_obj: object) -> bool:

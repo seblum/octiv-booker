@@ -13,12 +13,14 @@ LOG_FILE_TEMPLATE = "log_{timestamp}.log"
 HTML_FILE_TEMPLATE = "log_{timestamp}.html"
 EMAIL_SMTP_SERVER = "smtp.gmail.com"
 EMAIL_SMTP_PORT = 465
-LOG_LEVELS: Dict[str, List[str]] = {
-    "user": ["USER:"],
-    "debug": ["DEBUG"],
-    "info": ["INFO"],
-    "success": ["Login successful", "Booking", "OctivBooker succeeded"],
-    "error": ["ERROR"],
+
+LOG_LEVELS: Dict[str, str] = {
+    "INFO": "info",
+    "DEBUG": "debug",
+    "WARNING": "warning",
+    "ERROR": "error",
+    "SUCCESS": "success",
+    "USER": "user",
 }
 
 
@@ -37,6 +39,16 @@ class LogHandler:
             level=logging.INFO,
         )
 
+        custom_logger = logging.getLogger(__name__)
+        # set success level
+        logging.SUCCESS = 25  # between WARNING and INFO
+        logging.addLevelName(logging.SUCCESS, "SUCCESS")
+        setattr(
+            custom_logger,
+            "success",
+            lambda message, *args: custom_logger._log(logging.SUCCESS, message, args),
+        )
+
     def _setup_log_dir(self) -> str:
         """
         Creates a directory for logs if it doesn't exist and generates a log file path based on the current date and time.
@@ -51,7 +63,6 @@ class LogHandler:
 
     def start_logging(self) -> None:
         """Start logging by redirecting stdout to a log file."""
-        self.setup_log_dir()
         self.file = open(self.log_file_path, "a+")
         sys.stdout = self.file
         print(f"----- {datetime.now()} -----")
@@ -142,10 +153,12 @@ class LogHandler:
             </tr>
         """
         for line in lines:
-            match = re.match(r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})(.*)", line)
+            match = re.match(
+                r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) (\w+) (.*)", line
+            )
             if match:
-                timestamp, message = match.groups()
-                log_class = self._get_log_level_and_class(message)
+                timestamp, log_level, message = match.groups()
+                log_class = LOG_LEVELS.get(log_level, "info")
                 html_content += f"""
                 <tr>
                     <td>{timestamp.strip()}</td>
@@ -158,21 +171,6 @@ class LogHandler:
         </html>
         """
         return html_content
-
-    def _get_log_level_and_class(self, message: str) -> str:
-        """
-        Determines the log level and corresponding CSS class for a log message.
-
-        Args:
-            message (str): The log message.
-
-        Returns:
-            str: The CSS class corresponding to the log level.
-        """
-        for level, keywords in LOG_LEVELS.items():
-            if any(keyword in message for keyword in keywords):
-                return level
-        return "info"
 
     def send_logs_to_mail(
         self, filename: str, response: str, format: str = "plain"
@@ -243,3 +241,13 @@ class LogHandler:
             smtp.sendmail(sender, receivers, em.as_string())
 
         print("email_sent")
+
+
+# Example usage:
+# log_handler = LogHandler()
+# log_handler.start_logging()
+# logging.info("This is an info message.")
+# logging.error("This is an error message.")
+# log_handler.stop_logging()
+# html_file = log_handler.convert_logs_to_html()
+# log_handler.send_logs_to_mail(html_file, "Success", "html")

@@ -63,7 +63,7 @@ class Booker:
             self._click_button(
                 self.xpath_helper.get_xpath_login_username_head() + "/button"
             )
-            logging.info("| Username submitted successfully")
+            logging.debug("Username submitted successfully")
 
             self._input_text(
                 self.xpath_helper.get_xpath_login_password_head() + "/div[2]/input",
@@ -90,7 +90,18 @@ class Booker:
         except Exception:
             pass
 
-        logging.info("| Login successful")
+        custom_logger = logging.getLogger(__name__)
+        # set success level
+        logging.SUCCESS = 25  # between WARNING and INFO
+        logging.addLevelName(logging.SUCCESS, "SUCCESS")
+        setattr(
+            custom_logger,
+            "success",
+            lambda message, *args: custom_logger._log(logging.SUCCESS, message, args),
+        )
+        custom_logger.success("Login successful")
+
+        logging.info("Login successful")
         return self.booking_helper.continue_booking_process
 
     def switch_day(self) -> str:
@@ -103,11 +114,11 @@ class Booker:
                 self._click_button(
                     self.xpath_helper.get_xpath_booking_head() + "[3]/div[9]/div/div/i"
                 )
-                logging.info("| Switched to following week")
+                logging.debug("Switched to following week")
 
             day_button = self.booking_helper.get_day_button(self.day, self.xpath_helper)
             self._click_button(day_button)
-            logging.info(f"| Switched to day: {self.day}, {future_date}")
+            logging.info(f"Booking on {self.day}, {future_date}")
         except Exception as e:
             logging.error(f"! Error during day switch: {e}")
 
@@ -177,7 +188,7 @@ class Booker:
         self, class_entry_list: list, all_slots_bounding_boxes: list
     ) -> dict:
         """Get all possible booking slots for specified class entries and bounding boxes."""
-        logging.info(f"? Possible classes: {class_entry_list}")
+        logging.debug(f"? Possible classes: {class_entry_list}")
 
         bounding_box_number_by_action = 1 if self.booking_action else 2
         all_possible_booking_slots_dict = defaultdict(list)
@@ -191,7 +202,7 @@ class Booker:
                         By.XPATH,
                         f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]",
                     ).text
-                    logging.info(f"- Time: {time_slot} - Class: {textfield}")
+                    logging.debug(f"- Time: {time_slot} - Class: {textfield}")
 
                     xpath_button_book = self.xpath_helper.get_xpath_booking_slot(
                         slot=slot_index, book_action=self.booking_action
@@ -223,7 +234,7 @@ class Booker:
             button_xpath = all_possible_booking_slots_dict_flatten.get(
                 time_slot, {}
             ).get("xpath")
-            logging.info(f"? Checking {class_slot} at {time_slot}...")
+            logging.debug(f"? Checking {class_slot} at {time_slot}...")
             return button_xpath
         except (AttributeError, TypeError):
             logging.info(
@@ -239,7 +250,7 @@ class Booker:
         prioritize_waiting_list: bool,
     ) -> bool:
         """Book a specific class slot."""
-        logging.info(f"| Booking {class_slot} at {time_slot}")
+        logging.info(f"> Booking {class_slot} at {time_slot}")
 
         self._click_book_button(button_xpath)
 
@@ -263,11 +274,11 @@ class Booker:
             current_time = datetime.now().time().strftime("%H:%M:%S.%f")
             if current_time >= self.execution_booking_time:
                 start_time = datetime.now()
-                logging.info(f"| Start execution at {current_time}")
+                logging.info(f"Start execution at {current_time}")
                 self.driver.execute_script("arguments[0].click();", element)
                 end_time = datetime.now()
-                logging.info(f"| Executed at {end_time.time()}")
-                logging.info(f"| Took {(end_time - start_time).total_seconds()}s")
+                logging.info(f"Executed at {end_time.time()}")
+                logging.info(f"Took {(end_time - start_time).total_seconds()}s")
                 break
 
     def _check_login_alert(self) -> str:

@@ -102,16 +102,16 @@ def main(retry: int = 3):
                 )
 
                 close_driver(driver)
-                logging.info(f"| [{attempt + 1}] OctivBooker succeeded")
+                logging.info(f"[{attempt + 1}] OctivBooker succeeded")
                 response = "SUCCESS"
                 break
             except (SessionNotCreatedException, NoSuchDriverException) as e:
-                logging.info(f"| [{attempt + 1}] OctivBooker failed")
+                logging.info(f"[{attempt + 1}] OctivBooker failed")
                 logging.error(e, exc_info=True)
                 response = "FAILED"
                 continue
             except Exception as e:
-                logging.info(f"| [{attempt + 1}] OctivBooker failed")
+                logging.info(f"[{attempt + 1}] OctivBooker failed")
                 logging.error(e, exc_info=True)
                 response = "FAILED"
                 continue
