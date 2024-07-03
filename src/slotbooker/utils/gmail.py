@@ -5,7 +5,7 @@ import ssl
 import smtplib
 
 
-def send_logs_to_mail(filename: str,response:str) -> None:
+def send_logs_to_mail(filename: str, response: str) -> None:
     """Send an email with the content of the specified file as the email body.
 
     Args:
