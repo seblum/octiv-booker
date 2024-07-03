@@ -5,13 +5,11 @@ env:
 
 
 on:
-  push:
-    branches: master
-    paths:
-      - src/**
-      - poetry.Dockerfile
-      - pyproject.toml
   workflow_dispatch:
+  push:
+    branches:
+      - master
+
 
 jobs:
   get-tag:
