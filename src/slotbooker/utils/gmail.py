@@ -4,6 +4,7 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 
+
 def send_logs_to_mail(filename: str) -> None:
     """Send an email with the content of the specified file as the email body.
 
@@ -31,17 +32,20 @@ def send_logs_to_mail(filename: str) -> None:
     email_password = os.getenv("EMAIL_PASSWORD")
     email_receiver = os.getenv("EMAIL_RECEIVER")
 
+    # Convert the string to a list
+    email_receiver_list = email_receiver.split(";")
+
     # read email body from logs
     subject = "OctivBooker report"
     with open(filename) as fp:
         body = fp.read()
 
     # body = format_to_html(body)
-        
+
     # build email
     em = EmailMessage()
     em["From"] = email_sender
-    em["To"] = email_receiver
+    em["To"] = " .".join(email_receiver_list)
     em["Subject"] = subject
     em.set_content(body, "plain")
 
@@ -50,6 +54,6 @@ def send_logs_to_mail(filename: str) -> None:
     # send email
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
         smtp.login(email_sender, email_password)
-        smtp.sendmail(email_sender, email_receiver, em.as_string())
+        smtp.sendmail(email_sender, email_receiver_list, em.as_string())
 
     print("email_sent")
