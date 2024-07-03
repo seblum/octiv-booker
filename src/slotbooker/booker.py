@@ -6,7 +6,6 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverE
 from .utils.driver import close_driver, get_driver
 from .utils.logging import LogHandler
 from .ui_interaction import Booker
-from .utils.gmail import send_logs_to_mail
 from .utils.settings import set_credentials
 
 # Load configuration files
@@ -120,8 +119,8 @@ def main(retry: int = 3):
 
         html_file = log_hander.convert_logs_to_html()
         # stop_logging(file, orig_stdout)
-        # send_logs_to_mail(dir_log_file,response)
-        send_logs_to_mail(html_file,response,format="html")
+        # log_hander.send_logs_to_mail(dir_log_file,response)
+        log_hander.send_logs_to_mail(html_file,response,format="html")
 
 
 if __name__ == "__main__":
