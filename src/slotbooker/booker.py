@@ -6,7 +6,6 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverE
 from .utils.driver import close_driver, get_driver
 from .utils.custom_logger import LogHandler
 from .ui_interaction import Booker
-from .helper_functions import ClassVarHelper
 
 # Load configuration files
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
