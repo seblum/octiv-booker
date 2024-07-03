@@ -104,18 +104,21 @@ def main(retry: int = 3):
 
                 close_driver(driver)
                 logging.info(f"| [{attempt + 1}] OctivBooker succeeded")
+                response = "SUCCESS"
                 break
             except (SessionNotCreatedException, NoSuchDriverException) as e:
                 logging.info(f"| [{attempt + 1}] OctivBooker failed")
                 logging.error(e, exc_info=True)
+                response = "FAILED"
                 continue
             except Exception as e:
                 logging.info(f"| [{attempt + 1}] OctivBooker failed")
                 logging.error(e, exc_info=True)
+                response = "FAILED"
                 continue
 
         # stop_logging(file, orig_stdout)
-        send_logs_to_mail(dir_log_file)
+        send_logs_to_mail(dir_log_file,response)
 
 
 if __name__ == "__main__":

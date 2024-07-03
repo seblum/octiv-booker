@@ -28,14 +28,14 @@ run-dev:
 # Build Docker image
 docker-build:
     poetry_version=$(poetry version | awk '{print $2}')
-    docker build -t slotbookertest:v${poetry_version} -f poetry.Dockerfile .
+    docker build -t slotbookertest:$(poetry version | awk '{print $2}') -f poetry.Dockerfile .
 
 # Run Docker container
 docker-run:
     poetry_version=$(poetry version | awk '{print $2}')
     docker run -it --env-file .env \
     --volume $(pwd)/octiv-booker/src/slotbooker/data/:/app/slotbooker/data/ \
-    slotbookertest:v${poetry_version}
+    slotbookertest:$(poetry version | awk '{print $2}')
 
 # Build and run Docker container
 docker-full:
@@ -57,7 +57,7 @@ test:
 # Format code using Poetry and black
 fmt:
     poetry run black .
-    poetry run ruff check . --fix
+    poetry run ruff
 
 # Clean up generated files
 @clean:

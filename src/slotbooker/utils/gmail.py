@@ -5,7 +5,7 @@ import ssl
 import smtplib
 
 
-def send_logs_to_mail(filename: str) -> None:
+def send_logs_to_mail(filename: str,response:str) -> None:
     """Send an email with the content of the specified file as the email body.
 
     Args:
@@ -36,7 +36,7 @@ def send_logs_to_mail(filename: str) -> None:
     email_receiver_list = email_receiver.split(";")
 
     # read email body from logs
-    subject = "OctivBooker report"
+    subject = f"[{response}] OctivBooker report"
     with open(filename) as fp:
         body = fp.read()
 

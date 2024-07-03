@@ -1,6 +1,6 @@
 # TODO: Comment fully for local development
 # Use second for docker image
 # chromedriver: '/usr/local/bin/chromedriver'
-chromedriver: '/usr/local/bin/chromedriver-linux64/chromedriver'
+# chromedriver: '/usr/local/bin/chromedriver-linux64/chromedriver'
 
 base_url: 'https://app.octivfitness.com/login'
