@@ -48,9 +48,6 @@ def main(retry: int = 3):
 
         >>> main()
     """
-    # start writing output to logfile
-    # file, orig_stdout, dir_log_file = start_logging()
-
     log_hander = LogHandler()
     driver = get_driver(chromedriver=config.get("chromedriver"))
 
@@ -67,7 +64,7 @@ def main(retry: int = 3):
 
         login_failed = booker.login(username=user, password=password)
         if login_failed:
-            logging.success(message="OK Login failed as expected")
+            logging.success(message="TEST OK | Login failed as expected")
 
         exit()
 
@@ -77,7 +74,7 @@ def main(retry: int = 3):
     days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
     execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
 
-    logging.info(f"Log In as: {user}")
+    logging.info(f"Log in as: {user}")
 
     for attempt in range(1, retry + 1):
         try:
@@ -113,7 +110,6 @@ def main(retry: int = 3):
             response = "FAILED"
 
     html_file = log_hander.convert_logs_to_html()
-    # stop_logging(file, orig_stdout)
     # log_hander.send_logs_to_mail(dir_log_file,response)
     log_hander.send_logs_to_mail(html_file, response, format="html")
 

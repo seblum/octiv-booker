@@ -42,7 +42,7 @@ class WarningPromptHelper:
             error_message="Timed out waiting for alert to appear.",
         )
         if alert:
-            logging.warning("! Alert present")
+            logging.warning("Alert present")
             return self.driver.switch_to.alert
         return None
 
@@ -50,7 +50,7 @@ class WarningPromptHelper:
         """Determines the type of alert based on its text."""
         alert_text = alert_obj.text
         if self._contains_keywords(alert_text, ["waiting list", "Warteliste"]):
-            logging.warning("! Class full")
+            logging.warning("Class full")
             return self._handle_waiting_list_booking(prioritize_waiting_list, alert_obj)
         elif self._contains_keywords(
             alert_text, ["wirklich", "stornieren", "stornieren?"]
@@ -74,7 +74,7 @@ class WarningPromptHelper:
             return self.booking_helper.stop_booking_process()
         else:
             logging.info(
-                f"! Parameter 'wl' is set to {prioritize_waiting_list} > Skipping waiting list"
+                f"Parameter 'wl' is set to {prioritize_waiting_list} > Skipping waiting list"
             )
             alert_obj.dismiss()
             logging.info("Looking for further slots...")
@@ -82,9 +82,9 @@ class WarningPromptHelper:
 
     def _handle_cancel_slot(self, alert_obj: object) -> bool:
         """Handle aborting the canceling of a slot."""
-        logging.info("! Aborted canceling slot...")
+        logging.warning("Aborted canceling slot...")
         alert_obj.dismiss()
-        logging.info("> Looking for further slots...")
+        logging.info("Looking for further slots...")
         return self.booking_helper.continue_booking_process()
 
     def error_is_present(self) -> Optional[str]:

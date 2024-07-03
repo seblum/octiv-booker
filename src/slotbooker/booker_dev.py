@@ -22,11 +22,11 @@ def main(retry: int = 3):
     # get env variables
     user = os.environ.get("OCTIV_USERNAME")
     password = os.environ.get("OCTIV_PASSWORD")
-    days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE"))
+    days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
     execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
 
     # check whether env variables are set or None
-    logging.info(f"Log In as: {user}")
+    logging.info(f"Log in as: {user}")
 
     for attempt in range(1, retry + 1):
         booker = Booker(
@@ -48,7 +48,7 @@ def main(retry: int = 3):
         response = "SUCCESS"
 
         html_file = log_hander.convert_logs_to_html()
-        # stop_logging(file, orig_stdout)
+
         # log_hander.send_logs_to_mail(dir_log_file,response)
         log_hander.send_logs_to_mail(html_file, response, format="html")
 
