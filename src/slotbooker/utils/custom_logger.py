@@ -8,6 +8,7 @@ import smtplib
 from typing import Dict, List
 import logging
 
+# Constants for logging configuration
 LOG_DIR = "logs"
 LOG_FILE_TEMPLATE = "log_{timestamp}.log"
 HTML_FILE_TEMPLATE = "log_{timestamp}.html"
@@ -31,22 +32,16 @@ class LogHandler:
         self.log_file_path: str = self._setup_log_dir()
         self.orig_stdout = sys.stdout
 
+        # Set up custom logger
+        logging.setLoggerClass(CustomLogger)
+        self.logger = logging.getLogger(__name__)
+
         logging.basicConfig(
             filename=self.log_file_path,
             filemode="w",
             encoding="utf-8",
             format="%(asctime)s %(levelname)s %(message)s",
             level=logging.INFO,
-        )
-
-        custom_logger = logging.getLogger(__name__)
-        # set success level
-        logging.SUCCESS = 25  # between WARNING and INFO
-        logging.addLevelName(logging.SUCCESS, "SUCCESS")
-        setattr(
-            custom_logger,
-            "success",
-            lambda message, *args: custom_logger._log(logging.SUCCESS, message, args),
         )
 
     def _setup_log_dir(self) -> str:
@@ -243,11 +238,16 @@ class LogHandler:
         print("email_sent")
 
 
-# Example usage:
-# log_handler = LogHandler()
-# log_handler.start_logging()
-# logging.info("This is an info message.")
-# logging.error("This is an error message.")
-# log_handler.stop_logging()
-# html_file = log_handler.convert_logs_to_html()
-# log_handler.send_logs_to_mail(html_file, "Success", "html")
+class CustomLogger(logging.Logger):
+    def __init__(self, name, level=logging.NOTSET):
+        super().__init__(name, level)
+        # Define the custom log level
+        self.SUCCESS = 25
+        logging.addLevelName(self.SUCCESS, "SUCCESS")
+
+        logging.success = self.success
+        logging.Logger.success = self.success
+
+    def success(self, message, *args, **kwargs):
+        if self.isEnabledFor(self.SUCCESS):
+            self._log(self.SUCCESS, message, args, **kwargs)

@@ -85,23 +85,12 @@ class Booker:
                 keyword.lower() in alert_text.lower()
                 for keyword in ["credentials", "Fehler"]
             ):
-                logging.info(f"! Incorrect credentials: {alert_text}")
+                logging.error(f"Incorrect credentials: {alert_text}")
                 return self.booking_helper.stop_booking_process
         except Exception:
             pass
 
-        custom_logger = logging.getLogger(__name__)
-        # set success level
-        logging.SUCCESS = 25  # between WARNING and INFO
-        logging.addLevelName(logging.SUCCESS, "SUCCESS")
-        setattr(
-            custom_logger,
-            "success",
-            lambda message, *args: custom_logger._log(logging.SUCCESS, message, args),
-        )
-        custom_logger.success("Login successful")
-
-        logging.info("Login successful")
+        logging.success("Login successful")
         return self.booking_helper.continue_booking_process
 
     def switch_day(self) -> str:
@@ -264,7 +253,7 @@ class Booker:
         if error_text:
             return self.warning_prompt_helper.evaluate_error(error_text)
 
-        logging.info("! Class booked")
+        logging.success("Class booked")
         return self.booking_helper.stop_booking_process()
 
     def _click_book_button(self, xpath_button_book: str) -> None:
