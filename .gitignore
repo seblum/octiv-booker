@@ -165,6 +165,7 @@ cython_debug/
 *.lock
 *.pem
 .env
+**.html
 
 .terraform
 .terraform.lock.hcl

@@ -194,7 +194,7 @@ class Booker:
                     logging.info(f"- Time: {time_slot} - Class: {textfield}")
 
                     xpath_button_book = self.xpath_helper.get_xpath_booking_slot(
-                        booking_slot=slot_index, book_action=self.booking_action
+                        slot=slot_index, book_action=self.booking_action
                     )
                     all_possible_booking_slots_dict[textfield].append(
                         {
@@ -243,15 +243,15 @@ class Booker:
 
         self._click_book_button(button_xpath)
 
-        alert_obj = self.warning_prompt_helper.alert_is_present(self.driver)
+        alert_obj = self.warning_prompt_helper.alert_is_present()
         if alert_obj:
             return self.warning_prompt_helper.evaluate_alert(
                 alert_obj, prioritize_waiting_list
             )
 
-        error_text = self.warning_prompt_helper.evaluate_alert(self.driver)
+        error_text = self.warning_prompt_helper.error_is_present()
         if error_text:
-            return self.warning_prompt_helper.evaluate_alert(error_text)
+            return self.warning_prompt_helper.evaluate_error(error_text)
 
         logging.info("! Class booked")
         return self.booking_helper.stop_booking_process()
