@@ -7,9 +7,12 @@ env:
 on:
   workflow_dispatch:
   push:
-    branches:
-      - master
-
+    branches: master
+    paths:
+      - src/**
+      - poetry.Dockerfile
+      - pyproject.toml
+      - CHANGELOG.md
 
 jobs:
   get-tag:

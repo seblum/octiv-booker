@@ -5,7 +5,7 @@ import yaml
 from .utils.driver import close_driver, get_driver
 from .ui_interaction import Booker
 
-# from .utils.logging import start_logging, stop_logging
+from .utils.logging import LogHandler
 from .utils.settings import set_credentials
 
 # Load config yaml
@@ -17,17 +17,7 @@ classes = yaml.safe_load(open(classes_path))
 
 
 def main(retry: int = 3):
-    # start writing output to logfile
-    #  file, orig_stdout, dir_log_file = start_logging()
-
-    # dir_log_file = setup_log_dir()
-    logging.basicConfig(
-        # filename=dir_log_file,
-        filemode="w",
-        encoding="utf-8",
-        format="%(asctime)s %(message)s",
-        level=logging.INFO,
-    )
+    log_hander = LogHandler()
 
     # get env variables
     user = os.environ.get("OCTIV_USERNAME")
@@ -55,17 +45,20 @@ def main(retry: int = 3):
 
         booker.login(username=user, password=password)
         booker.switch_day()
-        booker.book_class(
-            class_dict=classes.get("class_dict"),
-            booking_action=classes.get("book_class"),
-        )
+        # booker.book_class(
+        #     class_dict=classes.get("class_dict"),
+        #     booking_action=classes.get("book_class"),
+        # )
+        response = "SUCCESS"
 
         close_driver(driver)
         logging.info(f"| [{count+1}] OctivBooker succeeded")
         count = 3
 
+        html_file = log_hander.convert_logs_to_html()
         # stop_logging(file, orig_stdout)
-        # send_logs_to_mail(dir_log_file)
+        # log_hander.send_logs_to_mail(dir_log_file,response)
+        log_hander.send_logs_to_mail(html_file, response, format="html")
 
 
 if __name__ == "__main__":

@@ -5,7 +5,8 @@ import re
 from email.message import EmailMessage
 import ssl
 import smtplib
-from typing import Dict, List, Tuple
+from typing import Dict, List
+import logging
 
 LOG_DIR = "logs"
 LOG_FILE_TEMPLATE = "log_{timestamp}.log"
@@ -14,19 +15,29 @@ EMAIL_SMTP_SERVER = "smtp.gmail.com"
 EMAIL_SMTP_PORT = 465
 LOG_LEVELS: Dict[str, List[str]] = {
     "user": ["USER:"],
-    "info": ["|", "Possible classes:", "Switched to", "Time:"],
+    "debug": ["DEBUG"],
+    "info": ["INFO"],
     "success": ["Login successful", "Booking", "OctivBooker succeeded"],
-    "error": ["Error", "Could not identify Error", "Error message:"],
-    "debug": ["Checking", "Start execution", "Executed", "Took"],
+    "error": ["ERROR"],
 }
+
 
 class LogHandler:
     def __init__(self) -> None:
+        self.timestamp: str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.log_dir = LOG_DIR
-        self.log_file_path: str = ""
+        self.log_file_path: str = self._setup_log_dir()
         self.orig_stdout = sys.stdout
 
-    def setup_log_dir(self) -> str:
+        logging.basicConfig(
+            filename=self.log_file_path,
+            filemode="w",
+            encoding="utf-8",
+            format="%(asctime)s %(levelname)s %(message)s",
+            level=logging.INFO,
+        )
+
+    def _setup_log_dir(self) -> str:
         """
         Creates a directory for logs if it doesn't exist and generates a log file path based on the current date and time.
 
@@ -34,9 +45,9 @@ class LogHandler:
             str: Path to the generated log file.
         """
         os.makedirs(self.log_dir, exist_ok=True)
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.log_file_path = os.path.join(self.log_dir, LOG_FILE_TEMPLATE.format(timestamp=timestamp))
-        return self.log_file_path
+        return os.path.join(
+            self.log_dir, LOG_FILE_TEMPLATE.format(timestamp=self.timestamp)
+        )
 
     def start_logging(self) -> None:
         """Start logging by redirecting stdout to a log file."""
@@ -163,7 +174,9 @@ class LogHandler:
                 return level
         return "info"
 
-    def send_logs_to_mail(self, filename: str, response: str, format: str = "plain") -> None:
+    def send_logs_to_mail(
+        self, filename: str, response: str, format: str = "plain"
+    ) -> None:
         """
         Send an email with the content of the specified file as the email body.
 
@@ -180,7 +193,9 @@ class LogHandler:
         email_receiver = os.getenv("EMAIL_RECEIVER")
 
         if not all([email_sender, email_password, email_receiver]):
-            raise ValueError("Email sender, password, and receiver must be set as environment variables")
+            raise ValueError(
+                "Email sender, password, and receiver must be set as environment variables"
+            )
 
         email_receiver_list = email_receiver.split(";")
         subject = f"[{response}] OctivBooker report"
@@ -188,9 +203,19 @@ class LogHandler:
         with open(filename, "r") as file:
             body = file.read()
 
-        self._send_email(email_sender, email_password, email_receiver_list, subject, body, format)
+        self._send_email(
+            email_sender, email_password, email_receiver_list, subject, body, format
+        )
 
-    def _send_email(self, sender: str, password: str, receivers: List[str], subject: str, body: str, format: str) -> None:
+    def _send_email(
+        self,
+        sender: str,
+        password: str,
+        receivers: List[str],
+        subject: str,
+        body: str,
+        format: str,
+    ) -> None:
         """
         Sends an email with the specified parameters.
 
@@ -211,7 +236,9 @@ class LogHandler:
 
         context = ssl.create_default_context()
 
-        with smtplib.SMTP_SSL(EMAIL_SMTP_SERVER, EMAIL_SMTP_PORT, context=context) as smtp:
+        with smtplib.SMTP_SSL(
+            EMAIL_SMTP_SERVER, EMAIL_SMTP_PORT, context=context
+        ) as smtp:
             smtp.login(sender, password)
             smtp.sendmail(sender, receivers, em.as_string())
 

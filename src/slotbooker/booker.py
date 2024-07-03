@@ -41,10 +41,12 @@ def main(retry: int = 3):
     # start writing output to logfile
     # file, orig_stdout, dir_log_file = start_logging()
 
+    log_hander = LogHandler()
+    driver = get_driver(chromedriver=config.get("chromedriver"))
+
     if os.environ.get("IS_TEST"):
         logging.info("! Test env")
         print("! Test env")
-        driver = get_driver(chromedriver=config.get("chromedriver"))
 
         booker = Booker(
             driver=driver,
@@ -61,15 +63,14 @@ def main(retry: int = 3):
             print("TEST OK")
         exit()
 
-    log_hander = LogHandler()
-    dir_log_file = log_hander.setup_log_dir()
-    logging.basicConfig(
-        filename=dir_log_file,
-        filemode="w",
-        encoding="utf-8",
-        format="%(asctime)s %(message)s",
-        level=logging.INFO,
-    )
+    # dir_log_file = log_hander.setup_log_dir()
+    # logging.basicConfig(
+    #     filename=dir_log_file,
+    #     filemode="w",
+    #     encoding="utf-8",
+    #     format="%(asctime)s %(message)s",
+    #     level=logging.INFO,
+    # )
 
     # Retrieve environment variables
     user = os.environ.get("OCTIV_USERNAME")
@@ -86,8 +87,6 @@ def main(retry: int = 3):
 
         for attempt in range(retry):
             try:
-                driver = get_driver(chromedriver=config.get("chromedriver"))
-
                 booker = Booker(
                     driver=driver,
                     days_before_bookable=days_before_bookable,
@@ -120,7 +119,7 @@ def main(retry: int = 3):
         html_file = log_hander.convert_logs_to_html()
         # stop_logging(file, orig_stdout)
         # log_hander.send_logs_to_mail(dir_log_file,response)
-        log_hander.send_logs_to_mail(html_file,response,format="html")
+        log_hander.send_logs_to_mail(html_file, response, format="html")
 
 
 if __name__ == "__main__":
