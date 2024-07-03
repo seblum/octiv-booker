@@ -5,7 +5,7 @@ import ssl
 import smtplib
 
 
-def send_logs_to_mail(filename: str, response: str) -> None:
+def send_logs_to_mail(filename: str, response: str, format:str="plain") -> None:
     """Send an email with the content of the specified file as the email body.
 
     Args:
@@ -47,7 +47,7 @@ def send_logs_to_mail(filename: str, response: str) -> None:
     em["From"] = email_sender
     em["To"] = " .".join(email_receiver_list)
     em["Subject"] = subject
-    em.set_content(body, "plain")
+    em.set_content(body, format)
 
     context = ssl.create_default_context()
 

@@ -1,69 +1,149 @@
 import os
 import sys
 from datetime import datetime
+import re
 
+class LogHandler:
+    def __init__(self):
+        self.log_dir = "logs"
+        self.log_file_path = None
+        self.orig_stdout = sys.stdout
 
-def setup_log_dir() -> str:
-    """
-    Creates a directory for logs if it doesn't exist and generates a log file path based on the current date and time.
+    def setup_log_dir(self) -> str:
+        """
+        Creates a directory for logs if it doesn't exist and generates a log file path based on the current date and time.
 
-    Returns:
-        str: Path to the generated log file.
-    """
-    log_dir = "logs"
-    if not os.path.exists(log_dir):
-        os.mkdir(log_dir)
-    exact_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    dir_log_file = f"{log_dir}/logs_{exact_datetime}.log"
-    return dir_log_file
+        Returns:
+            str: Path to the generated log file.
+        """
+        if not os.path.exists(self.log_dir):
+            os.mkdir(self.log_dir)
+        exact_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        self.log_file_path = f"{self.log_dir}/log_{exact_datetime}.log"
+        return self.log_file_path
 
+    def start_logging(self) -> None:
+        """Start logging by redirecting stdout to a log file.
 
-def start_logging() -> tuple[object, object]:
-    """Start logging by redirecting stdout to a log file.
+        This function creates a log directory named 'logs' if it doesn't exist and sets up
+        logging to a new log file with a filename containing the current date and time.
 
-    This function creates a log directory named 'logs' if it doesn't exist and sets up
-    logging to a new log file with a filename containing the current date and time.
+        Returns:
+            None
+        """
+        self.setup_log_dir()
+        self.file = open(self.log_file_path, "a+")
+        sys.stdout = self.file
+        print("-" * 5, datetime.now(), "-" * 5)
+        print("\n<>")
 
-    Returns:
-        tuple: A tuple containing three objects: the log file object, the original stdout object,
-        and the path of the created log file.
+    def stop_logging(self) -> None:
+        """Stop logging and restore the original stdout.
 
-    Example:
-        To start logging, call the function and capture the returned objects:
+        This function closes the log file and restores the original stdout so that subsequent
+        print statements are displayed in the console as usual.
 
-        >>> log_file, original_stdout, log_file_path = start_logging()
-        >>> print("This message will be written to the log file.")
-        >>> log_file.close()
-        >>> sys.stdout = original_stdout  # Restore the original stdout after logging is done.
-    """
-    dir_log_file = setup_log_dir()
-    orig_stdout = sys.stdout
-    file = open(dir_log_file, "a+")
-    sys.stdout = file
-    print("-" * 5, datetime.now(), "-" * 5)
-    print("\n<>")
-    return file, orig_stdout, dir_log_file
+        Returns:
+            None
+        """
+        print("<>")
+        sys.stdout = self.orig_stdout
+        self.file.close()
 
+    def convert_logs_to_html(self) -> str:
+        """
+        Converts the log file to an HTML report.
 
-def stop_logging(file: object, orig_stdout: object) -> None:
-    """Stop logging and restore the original stdout.
+        Returns:
+            str
+        """
+        log_levels = {
+            "user": ["USER:"],
+            "info": ["|", "Possible classes:", "Switched to", "Time:"],
+            "success": ["Login successful", "Booking", "OctivBooker succeeded"],
+            "error": ["Error", "Could not identify Error", "Error message:"],
+            "debug": ["Checking", "Start execution", "Executed", "Took"],
+        }
 
-    This function closes the log file and restores the original stdout so that subsequent
-    print statements are displayed in the console as usual.
+        def get_log_level_and_class(line):
+            for level, keywords in log_levels.items():
+                if any(keyword in line for keyword in keywords):
+                    return level
+            return "info"
 
-    Args:
-        file (object): The log file object that was returned from 'start_logging'.
-        orig_stdout (object): The original stdout object that was returned from 'start_logging'.
+        with open(self.log_file_path, "r") as file:
+            lines = file.readlines()
 
-    Returns:
-        None: This function does not return anything.
+        html_content = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                }
+                .log-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                .log-table th, .log-table td {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                }
+                .log-table th {
+                    background-color: #f2f2f2;
+                    text-align: left;
+                }
+                .user {
+                    font-weight: bold;
+                }
+                .info {
+                    color: blue;
+                }
+                .success {
+                    color: green;
+                }
+                .warning {
+                    color: orange;
+                }
+                .error {
+                    color: red;
+                }
+                .debug {
+                    color: purple;
+                }
+            </style>
+        </head>
+        <body>
+        <h2>Log Report</h2>
+        <table class="log-table">
+            <tr>
+                <th>Timestamp</th>
+                <th>Message</th>
+            </tr>
+        """
 
-    Example:
-        To stop logging and restore the original stdout, call the function with the log file object
-        and the original stdout object obtained from 'start_logging':
+        for line in lines:
+            match = re.match(r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})(.*)", line)
+            if match:
+                timestamp, message = match.groups()
+                log_class = get_log_level_and_class(message)
+                html_content += f"""
+                <tr>
+                    <td>{timestamp.strip()}</td>
+                    <td class="{log_class}">{message.strip()}</td>
+                </tr>
+                """
 
-        >>> stop_logging(log_file, original_stdout)
-    """
-    print("<>")
-    sys.stdout = orig_stdout
-    file.close()
+        html_content += """
+        </table>
+        </body>
+        </html>
+        """
+        html_file_name = self.log_file_path.replace(".log", ".html")
+        with open(html_file_name, "w") as file:
+            file.write(html_content)
+
+        return self.log_file_path.replace(".log", ".html")

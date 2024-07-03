@@ -4,7 +4,7 @@ import yaml
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
 
 from .utils.driver import close_driver, get_driver
-from .utils.logging import setup_log_dir
+from .utils.logging import LogHandler
 from .ui_interaction import Booker
 from .utils.gmail import send_logs_to_mail
 from .utils.settings import set_credentials
@@ -62,7 +62,8 @@ def main(retry: int = 3):
             print("TEST OK")
         exit()
 
-    dir_log_file = setup_log_dir()
+    log_hander = LogHandler()
+    dir_log_file = log_hander.setup_log_dir()
     logging.basicConfig(
         filename=dir_log_file,
         filemode="w",
@@ -117,8 +118,10 @@ def main(retry: int = 3):
                 response = "FAILED"
                 continue
 
+        html_file = log_hander.convert_logs_to_html()
         # stop_logging(file, orig_stdout)
-        send_logs_to_mail(dir_log_file,response)
+        # send_logs_to_mail(dir_log_file,response)
+        send_logs_to_mail(html_file,response,format="html")
 
 
 if __name__ == "__main__":
