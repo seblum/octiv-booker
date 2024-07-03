@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tags: ["latest","${{ needs.get-tag.outputs.PACKAGE_VERSION }}"]
+        tags: ["latest","v${{ needs.get-tag.outputs.PACKAGE_VERSION }}"]
     needs: get-tag
     steps:
       - 
