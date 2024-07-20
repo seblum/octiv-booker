@@ -38,10 +38,11 @@ def main(retry: int = 3):
 
         booker.login(username=user, password=password)
         booker.switch_day()
-        booker.book_class(
+        booked_successful, class_slot, time_slot = booker.book_class(
             class_dict=classes.get("class_dict"),
             booking_action=classes.get("book_class"),
         )
+        logging.success(f"Attempt {class_slot}: OctivBooker succeeded")
 
         close_driver(driver)
         logging.success(f"Attempt {attempt}: OctivBooker succeeded")
@@ -52,6 +53,13 @@ def main(retry: int = 3):
         MailHandler(format="html").send_logs_to_mail(
             filename=html_file, response=response
         )
+        mail_handler = MailHandler(format="html")
+        if booked_successful:
+            mail_handler.send_successful_booking_email(
+                time_slot, class_slot
+            )
+        else:
+            mail_handler.send_unsuccessful_booking_email()
 
 
 if __name__ == "__main__":

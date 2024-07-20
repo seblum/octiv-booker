@@ -73,6 +73,7 @@ def main(retry: int = 3):
     password = os.environ.get("OCTIV_PASSWORD")
     days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
     execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
+    booked_successful = False
 
     logging.info(f"Log in as: {user}")
 
@@ -87,7 +88,7 @@ def main(retry: int = 3):
 
             booker.login(username=user, password=password)
             booker.switch_day()
-            booker.book_class(
+            booked_successful, class_slot, time_slot = booker.book_class(
                 class_dict=classes.get("class_dict"),
                 booking_action=classes.get("book_class"),
             )
@@ -101,21 +102,24 @@ def main(retry: int = 3):
                 f"Attempt {attempt}: OctivBooker failed due to driver issue"
             )
             logging.error(e, exc_info=True)
-            response = "FAILED"
         except Exception as e:
             logging.warning(
                 f"Attempt {attempt}: OctivBooker failed due to unexpected error"
             )
             logging.error(e, exc_info=True)
-            response = "FAILED"
 
     html_file = log_hander.convert_logs_to_html()
 
     mail_handler = MailHandler(format="html")
-    mail_handler.send_logs_to_mail(filename=html_file, response=response)
-    mail_handler.send_successful_booking_email(
-        "2024-07-21 15:00", "Yoga Session", "John Doe"
-    )
+    if booked_successful == True:
+        response = "Success"
+        mail_handler.send_logs_to_mail(filename=html_file, response=response)
+    if booked_successful:
+        mail_handler.send_successful_booking_email(
+            time_slot, class_slot
+        )
+    else:
+        mail_handler.send_unsuccessful_booking_email()
 
 
 if __name__ == "__main__":

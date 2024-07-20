@@ -4,14 +4,21 @@ import ssl
 import smtplib
 from typing import List
 from datetime import datetime
+from string import Template
 
 EMAIL_SMTP_SERVER = "smtp.gmail.com"
 EMAIL_SMTP_PORT = 465
 
 
 class MailHandler:
+
+    html_templates_path = "html/"
+
     def __init__(self, format: str = "plain") -> None:
         self.format = format
+        self.email_sender = os.getenv("EMAIL_SENDER")
+        self.email_password = os.getenv("EMAIL_PASSWORD")
+        self.email_receiver = os.getenv("EMAIL_RECEIVER")
 
     def send_logs_to_mail(
         self,
@@ -28,29 +35,24 @@ class MailHandler:
         Raises:
             OSError: If the specified file cannot be opened or read.
         """
-        email_sender = os.getenv("EMAIL_SENDER")
-        email_password = os.getenv("EMAIL_PASSWORD")
-        email_receiver = os.getenv("EMAIL_RECEIVER")
 
-        if not all([email_sender, email_password, email_receiver]):
+        if not all([self.email_sender, self.email_password, self.email_receiver]):
             raise ValueError(
                 "Email sender, password, and receiver must be set as environment variables"
             )
 
-        email_receiver_list = email_receiver.split(";")
+        email_receiver_list = self.email_receiver.split(";")
         subject = f"[{response}] OctivBooker report"
 
         with open(filename, "r") as file:
             body = file.read()
 
         self._send_email(
-            email_sender,
-            email_password,
-            email_receiver_list,
-            subject,
-            body,
-            self.format,
-        )
+            sender=self.email_sender,
+            password=self.email_password,
+            receivers=email_receiver_list,
+            subject=subject,
+            body=body        )
 
     def _send_email(
         self,
@@ -89,7 +91,7 @@ class MailHandler:
         print("email_sent")
 
     def send_successful_booking_email(
-        self, booking_time: str, booking_name: str, receiver_name: str
+        self, booking_time: str, booking_name: str
     ) -> None:
         """
         Send a beautifully formatted HTML email announcing a successful booking.
@@ -98,78 +100,36 @@ class MailHandler:
             booking_time (str): The time of the booking.
             booking_name (str): The name of the booking.
             receiver_name (str): The name of the receiver.
-            receiver_email (str): The email address of the receiver.
         """
-        email_sender = os.getenv("EMAIL_SENDER")
-        email_password = os.getenv("EMAIL_PASSWORD")
-        email_receiver = os.getenv("EMAIL_RECEIVER")
+        email_receiver_name = os.getenv("EMAIL_RECEIVER_NAME")
 
-        if not all([email_sender, email_password, email_receiver]):
+        if not all([self.email_sender, self.email_password, self.email_receiver]):
             raise ValueError("Email sender, password, and receiver email must be set.")
 
+        if email_receiver_name is None:
+            email_receiver_name = self.email_receiver.split("@")[0]
+
         subject = "Booking Confirmation"
-        body = f"""
-        <html>
-        <head>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    margin: 0;
-                    padding: 0;
-                    background-color: #f4f4f4;
-                }}
-                .container {{
-                    max-width: 600px;
-                    margin: 0 auto;
-                    background-color: #ffffff;
-                    padding: 20px;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }}
-                .header {{
-                    background-color: #4CAF50;
-                    color: white;
-                    padding: 10px 0;
-                    text-align: center;
-                    border-radius: 8px 8px 0 0;
-                }}
-                .content {{
-                    padding: 20px;
-                    text-align: center;
-                }}
-                .footer {{
-                    margin-top: 20px;
-                    font-size: 12px;
-                    color: #888888;
-                    text-align: center;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Booking Confirmed!</h1>
-                </div>
-                <div class="content">
-                    <p>Dear {receiver_name},</p>
-                    <p>We are pleased to inform you that your booking for <strong>{booking_name}</strong> has been successfully confirmed.</p>
-                    <p><strong>Booking Time:</strong> {booking_time}</p>
-                    <p>Thank you for choosing our service. We look forward to seeing you!</p>
-                    <p>Best Regards,</p>
-                    <p><strong>Your Company Name</strong></p>
-                </div>
-                <div class="footer">
-                    <p>If you have any questions, please contact us at support@yourcompany.com</p>
-                    <p>&copy; {datetime.now().year} Your Company Name. All rights reserved.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
+
+        # Get the current working directory and construct the file path
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        template_path = os.path.join(current_path, f"{self.html_templates_path}template_successful_booking.html")
+
+        # Read the HTML template from the file
+        with open(template_path, "r") as file:
+            template = Template(file.read())
+
+        # Customize the template with actual values
+        body = template.safe_substitute(
+            receiver_name=email_receiver_name,
+            booking_name=booking_name,
+            booking_time=booking_time,
+            current_year=datetime.now().year
+        )
 
         em = EmailMessage()
-        em["From"] = email_sender
-        em["To"] = email_receiver
+        em["From"] = self.email_sender
+        em["To"] = self.email_receiver
         em["Subject"] = subject
         em.set_content(body, subtype="html")
 
@@ -178,7 +138,59 @@ class MailHandler:
         with smtplib.SMTP_SSL(
             EMAIL_SMTP_SERVER, EMAIL_SMTP_PORT, context=context
         ) as smtp:
-            smtp.login(email_sender, email_password)
-            smtp.sendmail(email_sender, email_receiver, em.as_string())
+            smtp.login(self.email_sender, self.email_password)
+            smtp.sendmail(self.email_sender, self.email_receiver, em.as_string())
 
         print("Email sent successfully!")
+
+
+    def send_unsuccessful_booking_email(
+            self
+        ) -> None:
+            """
+            Send a beautifully formatted HTML email announcing an unsuccessful booking.
+
+            Args:
+                receiver_name (str): The name of the receiver.
+            """
+
+            email_receiver_name = os.getenv("EMAIL_RECEIVER_NAME")
+
+            if not all([self.email_sender, self.email_password, self.email_receiver]):
+                raise ValueError("Email sender, password, and receiver email must be set.")
+
+            if email_receiver_name is None:
+                email_receiver_name = self.email_receiver.split("@")[0]
+
+
+            subject = "Booking Not Successful"
+
+            # Get the current working directory and construct the file path
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            template_path = os.path.join(current_path, f"{self.html_templates_path}template_unsuccessful_booking.html")
+
+            # Read the HTML template from the file
+            with open(template_path, "r") as file:
+                template = Template(file.read())
+
+            # Customize the template with actual values
+            body = template.safe_substitute(
+                receiver_name=email_receiver_name,
+                current_year=datetime.now().year
+            )
+
+            em = EmailMessage()
+            em["From"] = self.email_sender
+            em["To"] = self.email_receiver
+            em["Subject"] = subject
+            em.set_content(body, subtype="html")
+
+            context = ssl.create_default_context()
+
+            with smtplib.SMTP_SSL(
+                EMAIL_SMTP_SERVER, EMAIL_SMTP_PORT, context=context
+            ) as smtp:
+                smtp.login(self.email_sender, self.email_password)
+                smtp.sendmail(self.email_sender, self.email_receiver, em.as_string())
+
+            print("Email sent successfully!")

@@ -54,6 +54,9 @@ class Booker:
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
         self.warning_prompt_helper = WarningPromptHelper(self.driver)
+        self.booked_class_slot = None
+        self.booked_time_slot = None
+        self.booked_successful = False
 
     def login(self, username: str, password: str) -> bool:
         """Login to the booking website using the provided credentials."""
@@ -115,7 +118,7 @@ class Booker:
         except Exception as e:
             logging.error(f"! Error during day switch: {e}")
 
-    def book_class(self, class_dict: dict, booking_action: bool = True) -> None:
+    def book_class(self, class_dict: dict, booking_action: bool = True) -> (bool,str,str):
         """Book classes based on provided booking information."""
         self.booking_action = booking_action
         self.class_dict = class_dict.get(self.day)
@@ -150,7 +153,12 @@ class Booker:
             if self._book_class_slot(
                 button_xpath, class_slot, time_slot, prioritize_waiting_list
             ):
-                break
+                print(self.booked_class_slot)
+                print(self.booked_time_slot)
+                return self.booked_successful,self.booked_class_slot, self.booked_time_slot
+
+            return self.booked_successful,self.booked_class_slot, self.booked_time_slot
+
 
     def _input_text(self, xpath: str, text: str) -> None:
         WebDriverWait(self.driver, 20).until(
@@ -258,6 +266,9 @@ class Booker:
             return self.warning_prompt_helper.evaluate_error(error_text)
 
         logging.success("Class booked")
+        self.booked_class_slot = class_slot
+        self.booked_time_slot = time_slot
+        self.booked_successful = True
         return self.booking_helper.stop_booking_process()
 
     def _click_book_button(self, xpath_button_book: str) -> None:
