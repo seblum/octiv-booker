@@ -111,15 +111,16 @@ def main(retry: int = 3):
     html_file = log_hander.convert_logs_to_html()
 
     mail_handler = MailHandler(format="html")
-    if booked_successful == True:
+    if booked_successful:
         response = "Success"
         mail_handler.send_logs_to_mail(filename=html_file, response=response)
-    if booked_successful:
         mail_handler.send_successful_booking_email(
             time_slot, class_slot
         )
     else:
         mail_handler.send_unsuccessful_booking_email()
+        response = "Failed"
+        mail_handler.send_logs_to_mail(filename=html_file, response=response)
 
 
 if __name__ == "__main__":
