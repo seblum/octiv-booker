@@ -22,18 +22,6 @@ class TestBooker(unittest.TestCase):
         self.booker.class_dict = self.class_dict
 
     # @patch('selenium.webdriver.support.ui.WebDriverWait.until')
-    # def test_login_successful(self, mock_wait_until):
-    #     self.booker.login(self.username, self.password)
-    #     calls = [
-    #         call((By.XPATH, self.booker.xpath_helper.get_xpath_login_username_head() + "/div[1]/input")),
-    #         call((By.XPATH, self.booker.xpath_helper.get_xpath_login_username_head() + "/button")),
-    #         call((By.XPATH, self.booker.xpath_helper.get_xpath_login_password_head() + "/div[2]/input")),
-    #         call((By.XPATH, self.booker.xpath_helper.get_xpath_login_password_head() + "/div[3]/div/div/div[1]/div/i")),
-    #         call((By.XPATH, self.booker.xpath_helper.get_xpath_login_password_head() + "/button"))
-    #     ]
-    #     mock_wait_until.assert_has_calls(calls, any_order=True)
-
-    # @patch('selenium.webdriver.support.ui.WebDriverWait.until')
     # def test_switch_day(self, mock_wait_until):
     #     self.booker.switch_day()
     #     calls = [

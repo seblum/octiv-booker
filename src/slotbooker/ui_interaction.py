@@ -7,8 +7,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 
 from .alerts_and_errors import WarningPromptHelper
-
 from .helper_functions import XPathHelper, BookingHelper
+from .utils.custom_logger import CustomLogger
+
+# Set up custom logger
+logging.setLoggerClass(CustomLogger)
+logger = logging.getLogger(__name__)
 
 
 class Booker:
