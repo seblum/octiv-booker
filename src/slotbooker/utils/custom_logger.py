@@ -1,19 +1,13 @@
 import os
 import sys
 from datetime import datetime
-import re
-from email.message import EmailMessage
-import ssl
-import smtplib
-from typing import Dict, List
 import logging
+import re
+from typing import Dict, List
 
 # Constants for logging configuration
 LOG_DIR = "logs"
 LOG_FILE_TEMPLATE = "log_{timestamp}.log"
-HTML_FILE_TEMPLATE = "log_{timestamp}.html"
-EMAIL_SMTP_SERVER = "smtp.gmail.com"
-EMAIL_SMTP_PORT = 465
 
 LOG_LEVELS: Dict[str, str] = {
     "INFO": "info",
@@ -166,76 +160,6 @@ class LogHandler:
         </html>
         """
         return html_content
-
-    def send_logs_to_mail(
-        self, filename: str, response: str, format: str = "plain"
-    ) -> None:
-        """
-        Send an email with the content of the specified file as the email body.
-
-        Args:
-            filename (str): The name of the file whose content will be used as the email body.
-            response (str): The response status to be included in the email subject.
-            format (str): The format of the email body (default is "plain").
-
-        Raises:
-            OSError: If the specified file cannot be opened or read.
-        """
-        email_sender = os.getenv("EMAIL_SENDER")
-        email_password = os.getenv("EMAIL_PASSWORD")
-        email_receiver = os.getenv("EMAIL_RECEIVER")
-
-        if not all([email_sender, email_password, email_receiver]):
-            raise ValueError(
-                "Email sender, password, and receiver must be set as environment variables"
-            )
-
-        email_receiver_list = email_receiver.split(";")
-        subject = f"[{response}] OctivBooker report"
-
-        with open(filename, "r") as file:
-            body = file.read()
-
-        self._send_email(
-            email_sender, email_password, email_receiver_list, subject, body, format
-        )
-
-    def _send_email(
-        self,
-        sender: str,
-        password: str,
-        receivers: List[str],
-        subject: str,
-        body: str,
-        format: str,
-    ) -> None:
-        """
-        Sends an email with the specified parameters.
-
-        Args:
-            sender (str): The email address of the sender.
-            password (str): The password of the sender's email account.
-            receivers (List[str]): A list of receiver email addresses.
-            subject (str): The subject of the email.
-            body (str): The body of the email.
-            format (str): The format of the email body.
-
-        """
-        em = EmailMessage()
-        em["From"] = sender
-        em["To"] = ", ".join(receivers)
-        em["Subject"] = subject
-        em.set_content(body, format)
-
-        context = ssl.create_default_context()
-
-        with smtplib.SMTP_SSL(
-            EMAIL_SMTP_SERVER, EMAIL_SMTP_PORT, context=context
-        ) as smtp:
-            smtp.login(sender, password)
-            smtp.sendmail(sender, receivers, em.as_string())
-
-        print("email_sent")
 
 
 class CustomLogger(logging.Logger):

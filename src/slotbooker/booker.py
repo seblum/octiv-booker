@@ -5,6 +5,7 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverE
 
 from .utils.driver import close_driver, get_driver
 from .utils.custom_logger import LogHandler
+from .utils.mailhandler import MailHandler
 from .ui_interaction import Booker
 
 # Load configuration files
@@ -109,8 +110,12 @@ def main(retry: int = 3):
             response = "FAILED"
 
     html_file = log_hander.convert_logs_to_html()
-    # log_hander.send_logs_to_mail(dir_log_file,response)
-    log_hander.send_logs_to_mail(html_file, response, format="html")
+
+    mail_handler = MailHandler(format="html")
+    mail_handler.send_logs_to_mail(filename=html_file, response=response)
+    mail_handler.send_successful_booking_email(
+        "2024-07-21 15:00", "Yoga Session", "John Doe"
+    )
 
 
 if __name__ == "__main__":

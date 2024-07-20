@@ -4,7 +4,7 @@ import yaml
 
 from .utils.driver import close_driver, get_driver
 from .ui_interaction import Booker
-
+from .utils.mailhandler import MailHandler
 from .utils.custom_logger import LogHandler
 
 # Load config yaml
@@ -49,8 +49,9 @@ def main(retry: int = 3):
 
         html_file = log_hander.convert_logs_to_html()
 
-        # log_hander.send_logs_to_mail(dir_log_file,response)
-        log_hander.send_logs_to_mail(html_file, response, format="html")
+        MailHandler(format="html").send_logs_to_mail(
+            filename=html_file, response=response
+        )
 
 
 if __name__ == "__main__":
