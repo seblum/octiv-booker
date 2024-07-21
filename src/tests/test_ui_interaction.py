@@ -123,9 +123,7 @@ class TestBooker(unittest.TestCase):
                 }
             ]
         }
-        result = self.booker._get_button_xpath(
-            all_possible_booking_slots_dict, "10:00", "Yoga"
-        )
+        result = self.booker._get_button_xpath(all_possible_booking_slots_dict)
         self.assertEqual(result, "/some/xpath")
 
     # @patch('selenium.webdriver.remote.webdriver.WebDriver.find_element')
