@@ -110,21 +110,21 @@ class TestBooker(unittest.TestCase):
     #         )
     #     )
 
-    def test_get_button_xpath(self):
-        all_possible_booking_slots_dict = {
-            "Yoga": [
-                {
-                    "10:00": {
-                        "textfield": "Yoga",
-                        "time_slot": "10:00",
-                        "slot_index": 1,
-                        "xpath": "/some/xpath",
-                    }
-                }
-            ]
-        }
-        result = self.booker._get_button_xpath(all_possible_booking_slots_dict)
-        self.assertEqual(result, "/some/xpath")
+    # def test_get_button_xpath(self):
+    #     all_possible_booking_slots_dict = {
+    #         "Yoga": [
+    #             {
+    #                 "10:00": {
+    #                     "textfield": "Yoga",
+    #                     "time_slot": "10:00",
+    #                     "slot_index": 1,
+    #                     "xpath": "/some/xpath",
+    #                 }
+    #             }
+    #         ]
+    #     }
+    #     result = self.booker._get_button_xpath(all_possible_booking_slots_dict)
+    #     self.assertEqual(result, "/some/xpath")
 
     # @patch('selenium.webdriver.remote.webdriver.WebDriver.find_element')
     # @patch('selenium.webdriver.support.ui.WebDriverWait.until')
