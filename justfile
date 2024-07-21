@@ -34,7 +34,7 @@ docker-build:
 docker-run:
     poetry_version=$(poetry version | awk '{print $2}')
     docker run -it --env-file .env \
-    --volume $(pwd)/octiv-booker/src/slotbooker/data/:/app/slotbooker/data/ \
+    --volume $(pwd)/src/slotbooker/data/:/app/src/slotbooker/data/ \
     slotbookertest:$(poetry version | awk '{print $2}')
 
 docker-run-env:
