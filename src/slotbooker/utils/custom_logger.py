@@ -38,6 +38,9 @@ class LogHandler:
             level=logging.INFO,
         )
 
+    def get_log_file_path(self) -> str:
+        return self.log_file_path
+
     def _setup_log_dir(self) -> str:
         """
         Creates a directory for logs if it doesn't exist and generates a log file path based on the current date and time.

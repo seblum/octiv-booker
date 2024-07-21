@@ -40,5 +40,5 @@ class_dict:
     - time: None
       class: None
   Sunday:
-    - time: None
-      class: None
+    - time: "19:00"
+      class: "Open Gym"
