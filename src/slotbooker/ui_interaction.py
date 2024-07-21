@@ -100,7 +100,7 @@ class Booker:
         logging.success("Login successful")
         return self.booking_helper.continue_booking_process
 
-    def switch_day(self) -> (str,str):
+    def switch_day(self) -> (str, str):
         """Switch to the desired day for booking slots."""
         future_date, diff_week = self.booking_helper.get_day(self.days_before_bookable)
         self.day = future_date.strftime("%A")
@@ -120,7 +120,9 @@ class Booker:
 
         return self.day, future_date.strftime("%d/%m/%Y")
 
-    def book_class(self, class_dict: dict, booking_action: bool = True) -> (bool,str,str):
+    def book_class(
+        self, class_dict: dict, booking_action: bool = True
+    ) -> (bool, str, str):
         """Book classes based on provided booking information."""
         self.booking_action = booking_action
         self.class_dict = class_dict.get(self.day)
@@ -134,7 +136,11 @@ class Booker:
         for entry in self.class_dict:
             if entry.get("class") == "None":
                 logging.info("! No class set for this day.")
-                return self.booking_successful,self.booking_class_slot, self.booking_time_slot
+                return (
+                    self.booking_successful,
+                    self.booking_class_slot,
+                    self.booking_time_slot,
+                )
 
             self.booking_time_slot, self.booking_class_slot, prioritize_waiting_list = (
                 entry.get("time"),
@@ -144,19 +150,18 @@ class Booker:
             if not all_possible_booking_slots_dict:
                 logging.info("! No class found for this day.")
                 break
-            button_xpath = self._get_button_xpath(
-                all_possible_booking_slots_dict
-            )
+            button_xpath = self._get_button_xpath(all_possible_booking_slots_dict)
             if not button_xpath:
                 continue
 
-            if self._book_class_slot(
-                button_xpath, prioritize_waiting_list
-            ):
-                return self.booking_successful,self.booking_class_slot, self.booking_time_slot
+            if self._book_class_slot(button_xpath, prioritize_waiting_list):
+                return (
+                    self.booking_successful,
+                    self.booking_class_slot,
+                    self.booking_time_slot,
+                )
 
-        return self.booking_successful,self.booking_class_slot, self.booking_time_slot
-
+        return self.booking_successful, self.booking_class_slot, self.booking_time_slot
 
     def _input_text(self, xpath: str, text: str) -> None:
         WebDriverWait(self.driver, 20).until(
@@ -220,20 +225,22 @@ class Booker:
                 continue
         return all_possible_booking_slots_dict
 
-    def _get_button_xpath(
-        self, all_possible_booking_slots_dict: dict
-    ) -> str:
+    def _get_button_xpath(self, all_possible_booking_slots_dict: dict) -> str:
         """Get the XPath of the button for booking a class slot."""
         try:
             all_possible_booking_slots_dict_flatten = {
                 k: v
-                for d in all_possible_booking_slots_dict.get(self.booking_class_slot, [])
+                for d in all_possible_booking_slots_dict.get(
+                    self.booking_class_slot, []
+                )
                 for k, v in d.items()
             }
             button_xpath = all_possible_booking_slots_dict_flatten.get(
                 self.booking_time_slot, {}
             ).get("xpath")
-            logging.debug(f"? Checking {self.booking_class_slot} at {self.booking_time_slot}...")
+            logging.debug(
+                f"? Checking {self.booking_class_slot} at {self.booking_time_slot}..."
+            )
             return button_xpath
         except (AttributeError, TypeError):
             logging.info(

@@ -11,7 +11,6 @@ EMAIL_SMTP_PORT = 465
 
 
 class MailHandler:
-
     html_templates_path = "html/"
 
     def __init__(self, format: str = "plain") -> None:
@@ -52,8 +51,8 @@ class MailHandler:
             password=self.email_password,
             receivers=email_receiver_list,
             subject=subject,
-            body=body
-            )
+            body=body,
+        )
 
     def _send_email(
         self,
@@ -104,7 +103,11 @@ class MailHandler:
         print("Email sent successfully!")
 
     def send_successful_booking_email(
-        self,  booking_date:str, booking_time: str, booking_name: str, attachment_path: str = None
+        self,
+        booking_date: str,
+        booking_time: str,
+        booking_name: str,
+        attachment_path: str = None,
     ) -> None:
         """
         Send a beautifully formatted HTML email announcing a successful booking.
@@ -126,7 +129,9 @@ class MailHandler:
 
         # Get the current working directory and construct the file path
         current_path = os.path.dirname(os.path.abspath(__file__))
-        template_path = os.path.join(current_path, f"{self.html_templates_path}template_successful_booking.html")
+        template_path = os.path.join(
+            current_path, f"{self.html_templates_path}template_successful_booking.html"
+        )
 
         # Read the HTML template from the file
         with open(template_path, "r") as file:
@@ -138,20 +143,24 @@ class MailHandler:
             booking_name=booking_name,
             booking_time=booking_time,
             booking_date=booking_date,
-            current_year=datetime.now().year
+            current_year=datetime.now().year,
         )
 
-        self._send_email(sender=self.email_sender,
+        self._send_email(
+            sender=self.email_sender,
             password=self.email_password,
             receivers=[self.email_receiver],
             subject=subject,
             body=body,
-            attachment_path=attachment_path
+            attachment_path=attachment_path,
         )
 
-
     def send_unsuccessful_booking_email(
-        self, booking_date:str, booking_time: str, booking_name: str, attachment_path: str = None
+        self,
+        booking_date: str,
+        booking_time: str,
+        booking_name: str,
+        attachment_path: str = None,
     ) -> None:
         """
         Send a beautifully formatted HTML email announcing an unsuccessful booking.
@@ -159,7 +168,7 @@ class MailHandler:
         Args:
             receiver_name (str): The name of the receiver.
             attachment_path (str): The path to the file to be attached (default is None).
-    """
+        """
         email_receiver_name = os.getenv("EMAIL_RECEIVER_NAME")
 
         if not all([self.email_sender, self.email_password, self.email_receiver]):
@@ -172,7 +181,10 @@ class MailHandler:
 
         # Get the current working directory and construct the file path
         current_path = os.path.dirname(os.path.abspath(__file__))
-        template_path = os.path.join(current_path, f"{self.html_templates_path}template_unsuccessful_booking.html")
+        template_path = os.path.join(
+            current_path,
+            f"{self.html_templates_path}template_unsuccessful_booking.html",
+        )
 
         # Read the HTML template from the file
         with open(template_path, "r") as file:
@@ -184,21 +196,20 @@ class MailHandler:
             booking_name=booking_name,
             booking_time=booking_time,
             booking_date=booking_date,
-            current_year=datetime.now().year
+            current_year=datetime.now().year,
         )
 
-        self._send_email(sender=self.email_sender,
+        self._send_email(
+            sender=self.email_sender,
             password=self.email_password,
             receivers=[self.email_receiver],
             subject=subject,
             body=body,
-            attachment_path=attachment_path
+            attachment_path=attachment_path,
         )
 
-
-
     def send_no_classes_email(
-        self, booking_date:str, attachment_path: str = None
+        self, booking_date: str, attachment_path: str = None
     ) -> None:
         """
         Send a beautifully formatted HTML email announcing that no classes were found.
@@ -219,7 +230,9 @@ class MailHandler:
 
         # Get the current working directory and construct the file path
         current_path = os.path.dirname(os.path.abspath(__file__))
-        template_path = os.path.join(current_path, f"{self.html_templates_path}template_neutral_booking.html")
+        template_path = os.path.join(
+            current_path, f"{self.html_templates_path}template_neutral_booking.html"
+        )
 
         # Read the HTML template from the file
         with open(template_path, "r") as file:
@@ -229,13 +242,14 @@ class MailHandler:
         body = template.safe_substitute(
             receiver_name=email_receiver_name,
             booking_date=booking_date,
-            current_year=datetime.now().year
+            current_year=datetime.now().year,
         )
 
-        self._send_email(sender=self.email_sender,
+        self._send_email(
+            sender=self.email_sender,
             password=self.email_password,
             receivers=[self.email_receiver],
             subject=subject,
             body=body,
-            attachment_path=attachment_path
+            attachment_path=attachment_path,
         )
