@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+import os
 
 
 class XPathHelper:
@@ -122,3 +123,34 @@ class BookingHelper:
             bool: True if further bookings should be stopped, False if new bookings can continue.
         """
         return True
+
+
+class EnvVarNotSetError(Exception):
+    """Custom exception to be raised when an environment variable is not set."""
+
+    pass
+
+
+class ClassVarHelper:
+    def __init__(self, var_names):
+        """
+        Initialize the helper with a list of environment variable names to check.
+
+        :param var_names: List of environment variable names.
+        """
+        self.var_names = var_names
+
+    def check_vars(self):
+        """
+        Check if the environment variables are set. Raises an exception if any are not set.
+
+        :raises EnvVarNotSetError: If any environment variable is not set.
+        """
+        for var_name in self.var_names:
+            if var_name in os.environ:
+                print(f"The environment variable '{var_name}' is set.")
+            else:
+                print(f"The environment variable '{var_name}' is not set.")
+                raise EnvVarNotSetError(
+                    f"Required environment variable '{var_name}' is not set."
+                )

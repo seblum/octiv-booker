@@ -42,7 +42,7 @@ class WarningPromptHelper:
             error_message="Timed out waiting for alert to appear.",
         )
         if alert:
-            logging.info("! Alert present")
+            logging.warning("Alert present")
             return self.driver.switch_to.alert
         return None
 
@@ -50,15 +50,14 @@ class WarningPromptHelper:
         """Determines the type of alert based on its text."""
         alert_text = alert_obj.text
         if self._contains_keywords(alert_text, ["waiting list", "Warteliste"]):
-            logging.info("! Class full")
+            logging.warning("Class full")
             return self._handle_waiting_list_booking(prioritize_waiting_list, alert_obj)
         elif self._contains_keywords(
             alert_text, ["wirklich", "stornieren", "stornieren?"]
         ):
             return self._handle_cancel_slot(alert_obj)
         else:
-            logging.info(AlertTypes.NotIdentifyAlert.value)
-            logging.info(f"! Alert message: {alert_text}")
+            logging.warning(f"{AlertTypes.NotIdentifyAlert.value}: {alert_text}")
             return self.booking_helper.continue_booking_process()
 
     def _contains_keywords(self, text: str, keywords: list) -> bool:
@@ -69,23 +68,23 @@ class WarningPromptHelper:
     ) -> bool:
         """Handle booking waiting list option in the alert."""
         if prioritize_waiting_list:
-            logging.info("! Booking waiting list...")
+            logging.info("Booking waiting list...")
             alert_obj.accept()
-            logging.info("| Waiting list booked")
+            logging.info("Waiting list booked")
             return self.booking_helper.stop_booking_process()
         else:
             logging.info(
-                f"! Parameter 'wl' is set to {prioritize_waiting_list} > Skipping waiting list"
+                f"Parameter 'wl' is set to {prioritize_waiting_list} > Skipping waiting list"
             )
             alert_obj.dismiss()
-            logging.info("> Looking for further slots...")
+            logging.info("Looking for further slots...")
             return self.booking_helper.continue_booking_process()
 
     def _handle_cancel_slot(self, alert_obj: object) -> bool:
         """Handle aborting the canceling of a slot."""
-        logging.info("! Aborted canceling slot...")
+        logging.warning("Aborted canceling slot...")
         alert_obj.dismiss()
-        logging.info("> Looking for further slots...")
+        logging.info("Looking for further slots...")
         return self.booking_helper.continue_booking_process()
 
     def error_is_present(self) -> Optional[str]:
@@ -96,7 +95,7 @@ class WarningPromptHelper:
             )
         )
         if error_window:
-            logging.info("! Error !")
+            # logging.error("! Error !")
             error_text = self.driver.find_element(
                 By.XPATH, self.xpath_helper.get_xpath_error_text_window()
             ).text
@@ -112,10 +111,9 @@ class WarningPromptHelper:
         }
         result = error_map.get(error_text, False)
         if result is False:
-            logging.info(f"! {AlertTypes.NotIdentifyError.value}")
-            logging.info(f"! Error message: {error_text}")
+            logging.error(f"{AlertTypes.NotIdentifyError.value}: {error_text}")
         else:
-            logging.info(f"! {error_text}")
+            logging.error(f"Another Error occured: {error_text}")
         return result
 
     def login_error_is_present(self):
@@ -126,12 +124,8 @@ class WarningPromptHelper:
         )
         if alert_div:
             alert_text = alert_div.text
-            print(alert_div)
-            print(alert_text)
-            print("Alert message is present.")
             if self._contains_keywords(alert_text, ["credentials", "Fehler"]):
-                print(f"! Credentials wrong {alert_text}")
-                logging.info(f"! Credentials wrong {alert_text}")
+                logging.error(f"Credentials wrong {alert_text}")
                 return True
         else:
             print("Alert message is not present.")
