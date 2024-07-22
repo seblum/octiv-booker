@@ -11,7 +11,7 @@ EMAIL_SMTP_PORT = 465
 
 
 class MailHandler:
-    html_templates_path = "html/"
+    html_templates_path = "html-templates/"
 
     def __init__(self, format: str = "plain") -> None:
         self.format = format

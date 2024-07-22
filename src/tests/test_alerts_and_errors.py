@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from selenium.common.exceptions import TimeoutException
-from slotbooker.alerts_and_errors import WarningPromptHelper, AlertTypes
+from slotbooker.warning_prompt_helper import WarningPromptHelper, AlertTypes
 
 
 class TestWarningPromptHelper(unittest.TestCase):

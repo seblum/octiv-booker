@@ -2,9 +2,9 @@ import os
 import logging
 import yaml
 
-from .ui_interaction import Booker
-from .utils.mailhandler import MailHandler
-from .utils.custom_logger import LogHandler
+from .booking_handler import Booker
+# from .utils.mail_handler import MailHandler
+from .utils.log_handler import LogHandler
 
 # Load config yaml
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")

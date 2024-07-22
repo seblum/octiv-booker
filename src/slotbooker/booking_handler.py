@@ -5,12 +5,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as exco
 from selenium.common.exceptions import NoSuchElementException
 
-from .alerts_and_errors import WarningPromptHelper
+from .warning_prompt_helper import WarningPromptHelper
 from .helper_functions import XPathHelper, BookingHelper
-from .utils.custom_logger import CustomLogger
-from .utils.webdriver import WebDriverManager
-from .utils.mailhandler import MailHandler  # Assuming MailHandler is in this module
-from .utils.seleniumhandler import SeleniumManager
+from .utils.log_handler import CustomLogger
+from .utils.webdriver_manager import WebDriverManager
+from .utils.mail_handler import MailHandler  # Assuming MailHandler is in this module
+from .utils.selenium_manager import SeleniumManager
 
 # Set up custom logger
 logging.setLoggerClass(CustomLogger)

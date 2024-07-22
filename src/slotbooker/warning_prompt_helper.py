@@ -4,7 +4,7 @@ from typing import Any, Optional
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from .helper_functions import XPathHelper, BookingHelper
-from .utils.seleniumhandler import SeleniumManager
+from .utils.selenium_manager import SeleniumManager
 
 class AlertTypes(Enum):
     """Enumeration of possible alert types that can be encountered."""

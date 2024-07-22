@@ -3,10 +3,10 @@ import logging
 import yaml
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
 
-from .utils.webdriver import close_driver, get_driver
-from .utils.custom_logger import LogHandler
-from .utils.mailhandler import MailHandler
-from .ui_interaction import Booker
+from .utils.webdriver_manager import close_driver, get_driver
+from .utils.log_handler import LogHandler
+from .utils.mail_handler import MailHandler
+from .booking_handler import Booker
 
 
 # Load configuration files

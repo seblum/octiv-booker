@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as exco
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
-from .webdriver import WebDriverManager
+from .webdriver_manager import WebDriverManager
 
 class SeleniumManager(WebDriverManager):
 
