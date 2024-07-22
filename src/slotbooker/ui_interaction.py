@@ -3,7 +3,6 @@ from collections import defaultdict
 from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as exco
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 
 from .alerts_and_errors import WarningPromptHelper
@@ -11,12 +10,13 @@ from .helper_functions import XPathHelper, BookingHelper
 from .utils.custom_logger import CustomLogger
 from .utils.webdriver import WebDriverManager
 from .utils.mailhandler import MailHandler  # Assuming MailHandler is in this module
+from .utils.seleniumhandler import SeleniumManager
 
 # Set up custom logger
 logging.setLoggerClass(CustomLogger)
 logger = logging.getLogger(__name__)
 
-class Booker(WebDriverManager, MailHandler):
+class Booker(SeleniumManager):
     """
     A class representing a booking agent for Octiv.
 
@@ -49,9 +49,9 @@ class Booker(WebDriverManager, MailHandler):
         env: str = "prd",
         email_format: str = "plain"
     ):
-        WebDriverManager.__init__(self, chromedriver, env)  # Initialize WebDriverManager
-        MailHandler.__init__(self, email_format)  # Initialize MailHandler
-        self.driver = self.get_driver()  # Initialize the driver
+        super().__init__(chromedriver=chromedriver,env=env)
+        # self.selenium_manager = SeleniumManager(chromedriver, env)
+        # self.driver = self.selenium_manager.get_driver()  # Initialize the driver
         self.base_url = base_url
         self.days_before_bookable = days_before_bookable
         self.execution_booking_time = execution_booking_time
@@ -60,7 +60,8 @@ class Booker(WebDriverManager, MailHandler):
         self.day = None
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
-        self.warning_prompt_helper = WarningPromptHelper(self.driver)
+        self.mail_handler = MailHandler()
+        self.warning_prompt_helper = WarningPromptHelper(chromedriver=chromedriver,env=env)  # Pass selenium_manager instead of driver
         self.booking_class_slot = None
         self.booking_time_slot = None
         self.booking_successful = False
@@ -69,26 +70,26 @@ class Booker(WebDriverManager, MailHandler):
     def login(self, username: str, password: str) -> bool:
         """Login to the booking website using the provided credentials."""
         try:
-            self.driver.get(self.base_url)
+            self.get_page(base_url=self.base_url)
 
-            self._input_text(
+            self.input_text(
                 self.xpath_helper.get_xpath_login_username_head() + "/div[1]/input",
                 username,
             )
-            self._click_button(
+            self.click_button(
                 self.xpath_helper.get_xpath_login_username_head() + "/button"
             )
             logging.debug("Username submitted successfully")
 
-            self._input_text(
+            self.input_text(
                 self.xpath_helper.get_xpath_login_password_head() + "/div[2]/input",
                 password,
             )
-            self._click_button(
+            self.click_button(
                 self.xpath_helper.get_xpath_login_password_head()
                 + "/div[3]/div/div/div[1]/div/i"
             )
-            self._click_button(
+            self.click_button(
                 self.xpath_helper.get_xpath_login_password_head() + "/button"
             )
         except Exception as e:
@@ -101,12 +102,12 @@ class Booker(WebDriverManager, MailHandler):
                 for keyword in ["credentials", "Fehler"]
             ):
                 logging.error(f"Incorrect credentials: {alert_text}")
-                return self.booking_helper.stop_booking_process
+                return self.booking_helper.stop_booking_process()
         except Exception:
             pass
 
         logging.success("Login successful")
-        return self.booking_helper.continue_booking_process
+        return self.booking_helper.continue_booking_process()
 
     def switch_day(self) -> (str, str):
         """Switch to the desired day for booking slots."""
@@ -115,13 +116,13 @@ class Booker(WebDriverManager, MailHandler):
 
         try:
             for _ in range(diff_week):
-                self._click_button(
+                self.click_button(
                     self.xpath_helper.get_xpath_booking_head() + "[3]/div[9]/div/div/i"
                 )
                 logging.debug("Switched to following week")
 
             day_button = self.booking_helper.get_day_button(self.day, self.xpath_helper)
-            self._click_button(day_button)
+            self.click_button(day_button)
             logging.info(f"Booking on {self.day}, {future_date}")
         except Exception as e:
             logging.error(f"! Error during day switch: {e}")
@@ -144,7 +145,7 @@ class Booker(WebDriverManager, MailHandler):
         for entry in self.class_dict:
             if entry.get("class") == "None":
                 logging.info("! No class set for this day.")
-                self.send_no_classes_email(self.day)
+                # self.mail_handler.send_no_classes_email(self.day)
                 return (
                     self.booking_successful,
                     self.booking_class_slot,
@@ -158,44 +159,34 @@ class Booker(WebDriverManager, MailHandler):
             )
             if not all_possible_booking_slots_dict:
                 logging.info("! No class found for this day.")
-                if self.mail_result:
-                    self.send_no_classes_email(self.day)
+                # if self.mail_result:
+                #     self.mail_handler.send_no_classes_email(self.day)
                 break
             button_xpath = self._get_button_xpath(all_possible_booking_slots_dict)
             if not button_xpath:
                 continue
 
             if self._book_class_slot(button_xpath, prioritize_waiting_list):
-                if self.mail_result:
-                    if self.booking_successful:
-                        self.send_successful_booking_email(
-                            self.day, self.booking_time_slot, self.booking_class_slot
-                        )
-                    else:
-                        self.send_unsuccessful_booking_email(
-                            self.day, self.booking_time_slot, self.booking_class_slot
-                        )
+                # if self.mail_result:
+                #     if self.booking_successful:
+                #         self.mail_handler.send_successful_booking_email(
+                #             self.day, self.booking_time_slot, self.booking_class_slot
+                #         )
+                #     else:
+                #         self.mail_handler.send_unsuccessful_booking_email(
+                #             self.day, self.booking_time_slot, self.booking_class_slot
+                #         )
                 return (
                     self.booking_successful,
                     self.booking_class_slot,
                     self.booking_time_slot,
                 )
 
-        if self.mail_result:
-            self.send_unsuccessful_booking_email(
-                self.day, self.booking_time_slot, self.booking_class_slot
-            )
+        # if self.mail_result:
+        #     self.mail_handler.send_unsuccessful_booking_email(
+        #         self.day, self.booking_time_slot, self.booking_class_slot
+        #     )
         return self.booking_successful, self.booking_class_slot, self.booking_time_slot
-
-    def _input_text(self, xpath: str, text: str) -> None:
-        WebDriverWait(self.driver, 20).until(
-            exco.element_to_be_clickable((By.XPATH, xpath))
-        ).send_keys(text)
-
-    def _click_button(self, xpath: str) -> None:
-        WebDriverWait(self.driver, 20).until(
-            exco.element_to_be_clickable((By.XPATH, xpath))
-        ).click()
 
     def _load_and_transform_input_class_dict(self) -> list:
         """Load and transform the input class_dict into a list of unique class entries."""
@@ -203,13 +194,11 @@ class Booker(WebDriverManager, MailHandler):
 
     def _get_all_bounding_boxes_in_window(self) -> list:
         """Get all bounding boxes containing booking slots present in the current window."""
-        WebDriverWait(self.driver, 20).until(
-            exco.element_to_be_clickable(
-                (By.XPATH, self.xpath_helper.get_xpath_booking_head())
-            )
+        self.wait_for_element_to_be_clickable_by_xpath(
+            xpath=self.xpath_helper.get_xpath_booking_head()
         )
-        return self.driver.find_elements(
-            By.XPATH, self.xpath_helper.get_xpath_booking_head()
+        return self.find_elements_by_xpath(
+            xpath=self.xpath_helper.get_xpath_booking_head()
         )
 
     def _get_all_bounding_boxes_by_class_name(
@@ -224,12 +213,11 @@ class Booker(WebDriverManager, MailHandler):
         for slot_index, box in enumerate(all_slots_bounding_boxes, start=1):
             xpath_test = f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
             try:
-                textfield = self.driver.find_element(By.XPATH, xpath_test).text
+                textfield = self.get_element_text_by_xpath(xpath_test)
                 if textfield in class_entry_list:
-                    time_slot = self.driver.find_element(
-                        By.XPATH,
-                        f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]",
-                    ).text
+                    time_slot = self.get_element_text_by_xpath(
+                        f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
+                    )
                     logging.debug(f"- Time: {time_slot} - Class: {textfield}")
 
                     xpath_button_book = self.xpath_helper.get_xpath_booking_slot(
@@ -297,13 +285,13 @@ class Booker(WebDriverManager, MailHandler):
 
     def _click_book_button(self, xpath_button_book: str) -> None:
         """Click the book button using JavaScript execution."""
-        element = self.driver.find_element(By.XPATH, xpath_button_book)
+        element = self.find_element_by_xpath(xpath_button_book)
         while True:
             current_time = datetime.now().time().strftime("%H:%M:%S.%f")
             if current_time >= self.execution_booking_time:
                 start_time = datetime.now()
                 logging.info(f"Start execution at {current_time}")
-                self.driver.execute_script("arguments[0].click();", element)
+                self.execute_script(script="arguments[0].click();", element=element)
                 end_time = datetime.now()
                 logging.info(f"Executed at {end_time.time()}")
                 logging.info(f"Took {(end_time - start_time).total_seconds()}s")
@@ -312,13 +300,8 @@ class Booker(WebDriverManager, MailHandler):
     def _check_login_alert(self) -> str:
         """Check for alert messages after login."""
         try:
-            alert_div = WebDriverWait(self.driver, 10).until(
-                exco.presence_of_element_located(
-                    (
-                        By.XPATH,
-                        self.xpath_helper.get_xpath_login_error_window(),
-                    )  #  "/html/body/div/div[2]/div/div"
-                )
+            alert_div = self.wait_for_element(
+                By.XPATH, self.xpath_helper.get_xpath_login_error_window(), timeout=10
             )
             return alert_div.text
         except NoSuchElementException:

@@ -1,12 +1,10 @@
-from enum import Enum
 import logging
+from enum import Enum
 from typing import Any, Optional
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from .helper_functions import XPathHelper, BookingHelper
-
+from .utils.seleniumhandler import SeleniumManager
 
 class AlertTypes(Enum):
     """Enumeration of possible alert types that can be encountered."""
@@ -23,27 +21,21 @@ class AlertTypes(Enum):
     LoginCredentials = "The user credentials were incorrect."
 
 
-class WarningPromptHelper:
-    def __init__(self, driver):
-        self.driver = driver
+class WarningPromptHelper(SeleniumManager):
+    def __init__(self,chromedriver,env):
+        super().__init__(chromedriver=chromedriver,env=env)
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
 
-    def _wait_for_element(self, condition, timeout=3, error_message=""):
-        try:
-            return WebDriverWait(self.driver, timeout).until(condition, error_message)
-        except (TimeoutException, NoSuchElementException):
-            return None
-
     def alert_is_present(self) -> Optional[object]:
         """Checks if an alert is present and returns the alert object."""
-        alert = self._wait_for_element(
+        alert = self.wait_for_element(
             ec.alert_is_present(),
             error_message="Timed out waiting for alert to appear.",
         )
         if alert:
             logging.warning("Alert present")
-            return self.driver.switch_to.alert
+            return self.switch_to_alert()
         return None
 
     def evaluate_alert(self, alert_obj: object, prioritize_waiting_list: Any) -> Enum:
@@ -89,16 +81,15 @@ class WarningPromptHelper:
 
     def error_is_present(self) -> Optional[str]:
         """Checks if an error is present and returns the error text."""
-        error_window = self._wait_for_element(
+        error_window = self.wait_for_element(
             ec.presence_of_element_located(
                 (By.XPATH, self.xpath_helper.get_xpath_error_window())
             )
         )
         if error_window:
-            # logging.error("! Error !")
-            error_text = self.driver.find_element(
-                By.XPATH, self.xpath_helper.get_xpath_error_text_window()
-            ).text
+            error_text = self.get_element_text_by_xpath(
+                self.xpath_helper.get_xpath_error_text_window()
+            )
             return error_text
         return None
 
@@ -113,11 +104,11 @@ class WarningPromptHelper:
         if result is False:
             logging.error(f"{AlertTypes.NotIdentifyError.value}: {error_text}")
         else:
-            logging.error(f"Another Error occured: {error_text}")
+            logging.error(f"Another Error occurred: {error_text}")
         return result
 
     def login_error_is_present(self):
-        alert_div = self._wait_for_element(
+        alert_div = self.wait_for_element(
             ec.presence_of_element_located(
                 (By.XPATH, self.xpath_helper.get_xpath_login_error_window())
             )
@@ -128,4 +119,4 @@ class WarningPromptHelper:
                 logging.error(f"Credentials wrong {alert_text}")
                 return True
         else:
-            print("Alert message is not present.")
+            logging.info("Alert message is not present.")
