@@ -2,11 +2,13 @@ import os
 import logging
 import yaml
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
+import logging
 
 from .utils.driver import close_driver, get_driver
 from .utils.custom_logger import LogHandler
 from .utils.mailhandler import MailHandler
 from .ui_interaction import Booker
+
 
 # Load configuration files
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
@@ -16,16 +18,6 @@ with open(config_path, "r") as file:
 classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
 with open(classes_path, "r") as file:
     classes = yaml.safe_load(file)
-
-env_vars_to_check = [
-    "OCTIV_USERNAME",
-    "OCTIV_PASSWORD",
-    "DAYS_BEFORE_BOOKABLE",
-    "EXECUTION_BOOKING_TIME",
-]
-# Create an instance of ClassVarHelper
-# helper = ClassVarHelper(env_vars_to_check)
-# helper.check_vars()
 
 
 def main(retry: int = 3):
@@ -48,7 +40,7 @@ def main(retry: int = 3):
 
         >>> main()
     """
-    log_hander = LogHandler()
+    log_hander = LogHandler(log_level=logging.debug)
     driver = get_driver(chromedriver=config.get("chromedriver"))
 
     if os.environ.get("IS_TEST"):
