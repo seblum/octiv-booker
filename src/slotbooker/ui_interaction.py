@@ -9,13 +9,14 @@ from selenium.common.exceptions import NoSuchElementException
 from .alerts_and_errors import WarningPromptHelper
 from .helper_functions import XPathHelper, BookingHelper
 from .utils.custom_logger import CustomLogger
+from .utils.webdriver import WebDriverManager
+from .utils.mailhandler import MailHandler  # Assuming MailHandler is in this module
 
 # Set up custom logger
 logging.setLoggerClass(CustomLogger)
 logger = logging.getLogger(__name__)
 
-
-class Booker:
+class Booker(WebDriverManager, MailHandler):
     """
     A class representing a booking agent for Octiv.
 
@@ -35,16 +36,22 @@ class Booker:
             Switch to the desired day for booking slots.
         book_class(class_dict: dict, booking_action: bool = True) -> None:
             Book classes based on provided booking information.
+        close() -> None:
+            Close the WebDriver.
     """
 
     def __init__(
         self,
-        driver: object,
+        chromedriver: str,
         base_url: str,
         days_before_bookable: int,
         execution_booking_time: str,
+        env: str = "prd",
+        email_format: str = "plain"
     ):
-        self.driver = driver
+        WebDriverManager.__init__(self, chromedriver, env)  # Initialize WebDriverManager
+        MailHandler.__init__(self, email_format)  # Initialize MailHandler
+        self.driver = self.get_driver()  # Initialize the driver
         self.base_url = base_url
         self.days_before_bookable = days_before_bookable
         self.execution_booking_time = execution_booking_time
@@ -57,6 +64,7 @@ class Booker:
         self.booking_class_slot = None
         self.booking_time_slot = None
         self.booking_successful = False
+        self.mail_result = False
 
     def login(self, username: str, password: str) -> bool:
         """Login to the booking website using the provided credentials."""
@@ -136,6 +144,7 @@ class Booker:
         for entry in self.class_dict:
             if entry.get("class") == "None":
                 logging.info("! No class set for this day.")
+                self.send_no_classes_email(self.day)
                 return (
                     self.booking_successful,
                     self.booking_class_slot,
@@ -149,18 +158,33 @@ class Booker:
             )
             if not all_possible_booking_slots_dict:
                 logging.info("! No class found for this day.")
+                if self.mail_result:
+                    self.send_no_classes_email(self.day)
                 break
             button_xpath = self._get_button_xpath(all_possible_booking_slots_dict)
             if not button_xpath:
                 continue
 
             if self._book_class_slot(button_xpath, prioritize_waiting_list):
+                if self.mail_result:
+                    if self.booking_successful:
+                        self.send_successful_booking_email(
+                            self.day, self.booking_time_slot, self.booking_class_slot
+                        )
+                    else:
+                        self.send_unsuccessful_booking_email(
+                            self.day, self.booking_time_slot, self.booking_class_slot
+                        )
                 return (
                     self.booking_successful,
                     self.booking_class_slot,
                     self.booking_time_slot,
                 )
 
+        if self.mail_result:
+            self.send_unsuccessful_booking_email(
+                self.day, self.booking_time_slot, self.booking_class_slot
+            )
         return self.booking_successful, self.booking_class_slot, self.booking_time_slot
 
     def _input_text(self, xpath: str, text: str) -> None:
@@ -214,15 +238,13 @@ class Booker:
                     all_possible_booking_slots_dict[textfield].append(
                         {
                             time_slot: {
-                                "textfield": textfield,
-                                "time_slot": time_slot,
-                                "slot_index": slot_index,
                                 "xpath": xpath_button_book,
                             }
                         }
                     )
-            except NoSuchElementException:
+            except Exception:
                 continue
+
         return all_possible_booking_slots_dict
 
     def _get_button_xpath(self, all_possible_booking_slots_dict: dict) -> str:
@@ -235,6 +257,7 @@ class Booker:
                 )
                 for k, v in d.items()
             }
+
             button_xpath = all_possible_booking_slots_dict_flatten.get(
                 self.booking_time_slot, {}
             ).get("xpath")
@@ -300,3 +323,25 @@ class Booker:
             return alert_div.text
         except NoSuchElementException:
             return ""
+
+    def close(self):
+        """Closes the WebDriver."""
+        self.close_driver()
+
+    def set_mailing(
+        self, sender: str, password: str, receiver: str, format: str = "plain", mail_result: bool = True
+    ) -> None:
+        """
+        Configure email settings for sending notifications.
+
+        Args:
+            sender (str): The email address of the sender.
+            password (str): The password of the sender's email account.
+            receiver (str): The email address of the receiver.
+            format (str): The format of the email body ("plain" or "html").
+        """
+        self.mail_result = mail_result
+        self.email_sender = sender
+        self.email_password = password
+        self.email_receiver = receiver
+        self.format = format

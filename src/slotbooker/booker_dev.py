@@ -2,7 +2,6 @@ import os
 import logging
 import yaml
 
-from .utils.driver import close_driver, get_driver
 from .ui_interaction import Booker
 from .utils.mailhandler import MailHandler
 from .utils.custom_logger import LogHandler
@@ -16,8 +15,7 @@ classes = yaml.safe_load(open(classes_path))
 
 
 def main(retry: int = 3):
-    log_hander = LogHandler()
-    driver = get_driver(chromedriver=config.get("chromedriver"), env="dev")
+    log_hander = LogHandler(log_level=logging.INFO)
 
     # get env variables
     user = os.environ.get("OCTIV_USERNAME")
@@ -30,11 +28,20 @@ def main(retry: int = 3):
 
     for attempt in range(1, retry + 1):
         booker = Booker(
-            driver=driver,
+            chromedriver=config.get("chromedriver"), 
             days_before_bookable=days_before_bookable,
             base_url=config.get("base_url"),
-            execution_booking_time=execution_booking_time,
-        )
+            execution_booking_time=execution_booking_time, 
+            env="dev"
+            )
+
+        # Configure mailing settings
+        booker.set_mailing(
+            sender = os.getenv("EMAIL_SENDER"),
+            password = os.getenv("EMAIL_PASSWORD"),
+            receiver = os.getenv("EMAIL_RECEIVER"),
+            format="html"
+            )
 
         booker.login(username=user, password=password)
         booking_day, booking_date = booker.switch_day()
@@ -45,7 +52,8 @@ def main(retry: int = 3):
             booking_action=classes.get("book_class"),
         )
         logging.success(f"Attempt {class_slot}: OctivBooker succeeded")
-        close_driver(driver)
+
+        booker.close()
         logging.success(f"Attempt {attempt}: OctivBooker succeeded")
         # response = "SUCCESS"
 
@@ -55,26 +63,25 @@ def main(retry: int = 3):
         #     filename=html_file, response=response
         # )
 
-        mail_handler = MailHandler(format="html")
-        if booked_successful:
-            mail_handler.send_successful_booking_email(
-                booking_date=booking_date,
-                booking_time=time_slot,
-                booking_name=class_slot,
-                attachment_path=log_hander.get_log_file_path(),
-            )
-        elif not booked_successful and class_slot is None and time_slot is None:
-            mail_handler.send_no_classes_email(
-                booking_date=booking_date,
-                attachment_path=log_hander.get_log_file_path(),
-            )
-        else:
-            mail_handler.send_unsuccessful_booking_email(
-                booking_date=booking_date,
-                booking_time=time_slot,
-                booking_name=class_slot,
-                attachment_path=log_hander.get_log_file_path(),
-            )
+        # if booked_successful:
+        #     mail_handler.send_successful_booking_email(
+        #         booking_date=booking_date,
+        #         booking_time=time_slot,
+        #         booking_name=class_slot,
+        #         attachment_path=log_hander.get_log_file_path(),
+        #     )
+        # elif not booked_successful and class_slot is None and time_slot is None:
+        #     mail_handler.send_no_classes_email(
+        #         booking_date=booking_date,
+        #         attachment_path=log_hander.get_log_file_path(),
+        #     )
+        # else:
+        #     mail_handler.send_unsuccessful_booking_email(
+        #         booking_date=booking_date,
+        #         booking_time=time_slot,
+        #         booking_name=class_slot,
+        #         attachment_path=log_hander.get_log_file_path(),
+        #     )
 
 
 if __name__ == "__main__":

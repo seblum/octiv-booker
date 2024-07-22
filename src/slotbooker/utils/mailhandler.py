@@ -15,9 +15,9 @@ class MailHandler:
 
     def __init__(self, format: str = "plain") -> None:
         self.format = format
-        self.email_sender = os.getenv("EMAIL_SENDER")
-        self.email_password = os.getenv("EMAIL_PASSWORD")
-        self.email_receiver = os.getenv("EMAIL_RECEIVER")
+        self.email_sender = None
+        self.email_password = None
+        self.email_receiver = None
 
     def send_logs_to_mail(
         self,
