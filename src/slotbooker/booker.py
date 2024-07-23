@@ -4,8 +4,6 @@ import yaml
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
 
 from .utils.webdriver_manager import close_driver, get_driver
-from .utils.log_handler import LogHandler
-from .utils.mail_handler import MailHandler
 from .booking_handler import Booker
 
 
@@ -39,7 +37,7 @@ def main(retry: int = 3):
 
         >>> main()
     """
-    log_hander = LogHandler(log_level=logging.debug)
+    # LogHandler(log_level=logging.debug)
     driver = get_driver(chromedriver=config.get("chromedriver"))
 
     if os.environ.get("IS_TEST"):
@@ -100,25 +98,25 @@ def main(retry: int = 3):
             )
             logging.error(e, exc_info=True)
 
-    mail_handler = MailHandler(format="html")
-    if booked_successful:
-        mail_handler.send_successful_booking_email(
-            booking_date=booking_date,
-            booking_time=time_slot,
-            booking_name=class_slot,
-            attachment_path=log_hander.get_log_file_path(),
-        )
-    elif not booked_successful and class_slot is None and time_slot is None:
-        mail_handler.send_no_classes_email(
-            booking_date=booking_date, attachment_path=log_hander.get_log_file_path()
-        )
-    else:
-        mail_handler.send_unsuccessful_booking_email(
-            booking_date=booking_date,
-            booking_time=time_slot,
-            booking_name=class_slot,
-            attachment_path=log_hander.get_log_file_path(),
-        )
+    # mail_handler = MailHandler(format="html")
+    # if booked_successful:
+    #     mail_handler.send_successful_booking_email(
+    #         booking_date=booking_date,
+    #         booking_time=time_slot,
+    #         booking_name=class_slot,
+    #         attachment_path=log_hander.get_log_file_path(),
+    #     )
+    # elif not booked_successful and class_slot is None and time_slot is None:
+    #     mail_handler.send_no_classes_email(
+    #         booking_date=booking_date, attachment_path=log_hander.get_log_file_path()
+    #     )
+    # else:
+    #     mail_handler.send_unsuccessful_booking_email(
+    #         booking_date=booking_date,
+    #         booking_time=time_slot,
+    #         booking_name=class_slot,
+    #         attachment_path=log_hander.get_log_file_path(),
+    #     )
 
 
 if __name__ == "__main__":

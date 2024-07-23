@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from .helper_functions import XPathHelper, BookingHelper
 from .utils.selenium_manager import SeleniumManager
 
+
 class AlertTypes(Enum):
     """Enumeration of possible alert types that can be encountered."""
 
@@ -22,8 +23,8 @@ class AlertTypes(Enum):
 
 
 class WarningPromptHelper(SeleniumManager):
-    def __init__(self,chromedriver,env):
-        super().__init__(chromedriver=chromedriver,env=env)
+    def __init__(self, chromedriver: str, env: str):
+        super().__init__(chromedriver=chromedriver, env=env)
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
 

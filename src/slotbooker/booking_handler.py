@@ -2,19 +2,18 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as exco
 from selenium.common.exceptions import NoSuchElementException
 
 from .warning_prompt_helper import WarningPromptHelper
 from .helper_functions import XPathHelper, BookingHelper
 from .utils.log_handler import CustomLogger
-from .utils.webdriver_manager import WebDriverManager
 from .utils.mail_handler import MailHandler  # Assuming MailHandler is in this module
 from .utils.selenium_manager import SeleniumManager
 
 # Set up custom logger
 logging.setLoggerClass(CustomLogger)
 logger = logging.getLogger(__name__)
+
 
 class Booker(SeleniumManager):
     """
@@ -47,9 +46,9 @@ class Booker(SeleniumManager):
         days_before_bookable: int,
         execution_booking_time: str,
         env: str = "prd",
-        email_format: str = "plain"
+        email_format: str = "plain",
     ):
-        super().__init__(chromedriver=chromedriver,env=env)
+        super().__init__(chromedriver=chromedriver, env=env)
         # self.selenium_manager = SeleniumManager(chromedriver, env)
         # self.driver = self.selenium_manager.get_driver()  # Initialize the driver
         self.base_url = base_url
@@ -61,7 +60,9 @@ class Booker(SeleniumManager):
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
         self.mail_handler = MailHandler()
-        self.warning_prompt_helper = WarningPromptHelper(chromedriver=chromedriver,env=env)  # Pass selenium_manager instead of driver
+        self.warning_prompt_helper = WarningPromptHelper(
+            chromedriver=chromedriver, env=env
+        )  # Pass selenium_manager instead of driver
         self.booking_class_slot = None
         self.booking_time_slot = None
         self.booking_successful = False
@@ -312,7 +313,12 @@ class Booker(SeleniumManager):
         self.close_driver()
 
     def set_mailing(
-        self, sender: str, password: str, receiver: str, format: str = "plain", mail_result: bool = True
+        self,
+        sender: str,
+        password: str,
+        receiver: str,
+        format: str = "plain",
+        mail_result: bool = True,
     ) -> None:
         """
         Configure email settings for sending notifications.

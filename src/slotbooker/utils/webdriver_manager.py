@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 
+
 class WebDriverManager:
     def __init__(self, chromedriver: str, env: str = "prd"):
         """Initializes the WebDriverManager with the given ChromeDriver path and environment.
@@ -48,9 +49,8 @@ class WebDriverManager:
             self.driver.quit()
             self.driver = None
 
-    def get_page(self,base_url) -> None:
+    def get_page(self, base_url) -> None:
         self.driver.get(base_url)
-
 
     def switch_to_alert(self) -> None:
         self.driver.switch_to.alert
@@ -86,9 +86,7 @@ class WebDriverManager:
     def execute_script(self, script, element) -> None:
         self.driver.execute_script(script, element)
 
-    def wait_for_element_to_be_clickable_by_xpath(self,xpath):
+    def wait_for_element_to_be_clickable_by_xpath(self, xpath):
         WebDriverWait(self.driver, 20).until(
-                ec.element_to_be_clickable(
-                    (By.XPATH, xpath)
-                )
-            )
+            ec.element_to_be_clickable((By.XPATH, xpath))
+        )

@@ -1,12 +1,10 @@
-import logging
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as exco
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException
 from .webdriver_manager import WebDriverManager
 
-class SeleniumManager(WebDriverManager):
 
+class SeleniumManager(WebDriverManager):
     def __init__(self, chromedriver: str, env: str = "prd"):
         super().__init__(chromedriver=chromedriver, env=env)
 
