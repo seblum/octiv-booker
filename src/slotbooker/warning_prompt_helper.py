@@ -1,10 +1,7 @@
 import logging
 from enum import Enum
 from typing import Any, Optional
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as ec
 from .helper_functions import XPathHelper, BookingHelper
-from .utils.selenium_manager import SeleniumManager
 
 
 class AlertTypes(Enum):
@@ -22,18 +19,15 @@ class AlertTypes(Enum):
     LoginCredentials = "The user credentials were incorrect."
 
 
-class WarningPromptHelper(SeleniumManager):
-    def __init__(self, chromedriver: str, env: str):
-        super().__init__(chromedriver=chromedriver, env=env)
+class WarningPromptHelper():
+    def __init__(self, selenium_manager: str):
+        self.selenium_manager = selenium_manager
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
 
     def alert_is_present(self) -> Optional[object]:
         """Checks if an alert is present and returns the alert object."""
-        alert = self.wait_for_element(
-            ec.alert_is_present(),
-            error_message="Timed out waiting for alert to appear.",
-        )
+        alert = self.selenium_manager.wait_for_element_presence_alert()
         if alert:
             logging.warning("Alert present")
             return self.switch_to_alert()
@@ -82,13 +76,9 @@ class WarningPromptHelper(SeleniumManager):
 
     def error_is_present(self) -> Optional[str]:
         """Checks if an error is present and returns the error text."""
-        error_window = self.wait_for_element(
-            ec.presence_of_element_located(
-                (By.XPATH, self.xpath_helper.get_xpath_error_window())
-            )
-        )
+        error_window = self.selenium_manager.wait_for_element_presence(xpath=self.xpath_helper.get_xpath_error_window())
         if error_window:
-            error_text = self.get_element_text_by_xpath(
+            error_text = self.selenium_manager.get_element_text_by_xpath(
                 self.xpath_helper.get_xpath_error_text_window()
             )
             return error_text
@@ -109,11 +99,8 @@ class WarningPromptHelper(SeleniumManager):
         return result
 
     def login_error_is_present(self):
-        alert_div = self.wait_for_element(
-            ec.presence_of_element_located(
-                (By.XPATH, self.xpath_helper.get_xpath_login_error_window())
-            )
-        )
+        alert_div = self.selenium_manager.wait_for_element_presence(
+            self.xpath_helper.get_xpath_login_error_window())
         if alert_div:
             alert_text = alert_div.text
             if self._contains_keywords(alert_text, ["credentials", "Fehler"]):
