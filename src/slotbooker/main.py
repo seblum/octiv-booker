@@ -3,7 +3,7 @@ import logging
 import yaml
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
 
-from .utils.webdriver_manager import close_driver, get_driver
+from .utils.webdriver_manager import get_driver
 from .booking_handler import Booker
 
 
@@ -91,7 +91,7 @@ def main(retry: int = 3):
                 booking_action=classes.get("book_class"),
             )
 
-            close_driver(driver)
+            booker.close()
             logging.success(f"Attempt {attempt}: OctivBooker succeeded")
             break
         except (SessionNotCreatedException, NoSuchDriverException) as e:
