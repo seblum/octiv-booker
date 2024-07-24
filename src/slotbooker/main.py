@@ -37,7 +37,7 @@ def main(retry: int = 3):
 
         >>> main()
     """
-    # LogHandler(log_level=logging.debug)
+    # LogHandler(log_level=logging.info)
     driver = get_driver(chromedriver=config.get("chromedriver"))
 
     if os.environ.get("IS_TEST"):

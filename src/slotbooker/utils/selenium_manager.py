@@ -26,7 +26,7 @@ class SeleniumManager(WebDriverManager):
 
     def wait_for_element_alert(self):
         try:
-            return WebDriverWait(self.driver, timeout=3).until(
+            return WebDriverWait(self.driver, timeout=5).until(
                 ec.alert_is_present(), "Timed out waiting for alert to appear."
             )
         except (TimeoutException, NoSuchElementException):
@@ -61,6 +61,6 @@ class SeleniumManager(WebDriverManager):
     def switch_to_alert(self) -> None:
         self.driver.switch_to.alert
 
-    def get_element_text(self, by=By.XPATH, xpath=None) -> str:
+    def get_element_text(self, by=By.XPATH, xpath: str = None) -> str:
         element = self.find_element(by, xpath)
-        return element.text if element else ""
+        return element.text

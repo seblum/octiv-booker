@@ -63,6 +63,7 @@ class Booker:
         self.booking_class_slot = None
         self.booking_time_slot = None
         self.booking_successful = False
+        self.print_day = None
 
     def login(self, username: str, password: str) -> bool:
         """Login to the booking website using the provided credentials."""
@@ -76,7 +77,7 @@ class Booker:
             self.selenium_manager.click_button(
                 self.xpath_helper.get_xpath_login_username_head() + "/button"
             )
-            logging.debug("Username submitted successfully")
+            logging.info("Username submitted successfully")
 
             self.selenium_manager.input_text(
                 self.xpath_helper.get_xpath_login_password_head() + "/div[2]/input",
@@ -116,7 +117,7 @@ class Booker:
                 self.selenium_manager.click_button(
                     self.xpath_helper.get_xpath_booking_head() + "[3]/div[9]/div/div/i"
                 )
-                logging.debug("Switched to following week")
+                logging.info("Switched to following week")
 
             day_button = self.booking_helper.get_day_button(self.day, self.xpath_helper)
             self.selenium_manager.click_button(day_button)
@@ -124,6 +125,7 @@ class Booker:
         except Exception as e:
             logging.error(f"! Error during day switch: {e}")
 
+        self.print_day = f"{self.day}, {future_date.strftime("%d/%m/%Y")}"
         return self.day, future_date.strftime("%d/%m/%Y")
 
     def book_class(
@@ -171,6 +173,7 @@ class Booker:
                     self.booking_time_slot,
                 )
 
+        # print(self.booking_successful, self.booking_class_slot, self.booking_time_slot)
         return self.booking_successful, self.booking_class_slot, self.booking_time_slot
 
     def _load_and_transform_input_class_dict(self) -> list:
@@ -190,7 +193,7 @@ class Booker:
         self, class_entry_list: list, all_slots_bounding_boxes: list
     ) -> dict:
         """Get all possible booking slots for specified class entries and bounding boxes."""
-        logging.debug(f"? Possible classes: {class_entry_list}")
+        logging.info(f"? Possible classes: {class_entry_list}")
 
         bounding_box_number_by_action = 1 if self.booking_action else 2
         all_possible_booking_slots_dict = defaultdict(list)
@@ -203,7 +206,7 @@ class Booker:
                     time_slot = self.selenium_manager.get_element_text(
                         xpath=f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
                     )
-                    logging.debug(f"- Time: {time_slot} - Class: {textfield}")
+                    logging.info(f"- Time: {time_slot} - Class: {textfield}")
 
                     xpath_button_book = self.xpath_helper.get_xpath_booking_slot(
                         slot=slot_index, book_action=self.booking_action
@@ -234,7 +237,7 @@ class Booker:
             button_xpath = all_possible_booking_slots_dict_flatten.get(
                 self.booking_time_slot, {}
             ).get("xpath")
-            logging.debug(
+            logging.info(
                 f"? Checking {self.booking_class_slot} at {self.booking_time_slot}..."
             )
             return button_xpath
@@ -324,7 +327,7 @@ class Booker:
 
         if self.booking_successful:
             self.mail_handler.send_successful_booking_email(
-                booking_date=self.day,
+                booking_date=self.print_day,
                 booking_name=self.booking_class_slot,
                 booking_time=self.booking_time_slot,
                 attachment_path=attachment_path,
@@ -332,11 +335,11 @@ class Booker:
             logging.success(f"Booked successfully {self.booking_class_slot}")
         elif self.booking_successful is False and self.booking_class_slot is None:
             self.mail_handler.send_no_classes_email(
-                booking_date=self.day, attachment_path=attachment_path
+                booking_date=self.print_day, attachment_path=attachment_path
             )
         else:
             self.mail_handler.send_unsuccessful_booking_email(
-                booking_date=self.day,
+                booking_date=self.print_day,
                 booking_name=self.booking_class_slot,
                 booking_time=self.booking_time_slot,
                 attachment_path=attachment_path,
