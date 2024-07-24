@@ -37,7 +37,6 @@ def main(retry: int = 3):
 
         >>> main()
     """
-    # LogHandler(log_level=logging.info)
     driver = get_driver(chromedriver=config.get("chromedriver"))
 
     if os.environ.get("IS_TEST"):
@@ -53,7 +52,7 @@ def main(retry: int = 3):
 
         login_failed = booker.login(username=user, password=password)
         if login_failed:
-            logging.success(message="TEST OK | Login failed as expected")
+            logging.info(message="TEST OK | Login failed as expected")
 
         exit()
 
@@ -62,9 +61,6 @@ def main(retry: int = 3):
     password = os.environ.get("OCTIV_PASSWORD")
     days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
     execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
-    # booked_successful = False
-
-    logging.info(f"Log in as: {user}")
 
     for attempt in range(1, retry + 1):
         try:
@@ -89,7 +85,7 @@ def main(retry: int = 3):
                 password=os.getenv("EMAIL_PASSWORD"),
                 receiver=os.getenv("EMAIL_RECEIVER"),
                 format="html",
-                attachment_path=None,
+                attach_logfile=True,
             )
 
             booker.close()

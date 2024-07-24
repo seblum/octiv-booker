@@ -5,7 +5,7 @@ from datetime import datetime
 
 from .warning_prompt_helper import WarningPromptHelper
 from .helper_functions import XPathHelper, BookingHelper
-from .utils.log_handler import CustomLogger
+from .utils.log_handler import CustomLogger, LogHandler
 from .utils.mail_handler import MailHandler  # Assuming MailHandler is in this module
 from .utils.selenium_manager import SeleniumManager
 
@@ -45,7 +45,6 @@ class Booker:
         days_before_bookable: int,
         execution_booking_time: str,
         env: str = "prd",
-        email_format: str = "plain",
     ):
         self.selenium_manager = SeleniumManager(chromedriver, env)
         self.base_url = base_url
@@ -56,6 +55,7 @@ class Booker:
         self.warning_prompt_helper = WarningPromptHelper(
             driver=self.selenium_manager.get_driver()
         )
+        self.log_handler = LogHandler(log_level=logging.INFO)
         self.mail_handler = None
         self.class_dict = None
         self.booking_action = None
@@ -68,6 +68,8 @@ class Booker:
     def login(self, username: str, password: str) -> bool:
         """Login to the booking website using the provided credentials."""
         try:
+            logging.info(f"Log in as: {username}")
+
             self.selenium_manager.get_page(base_url=self.base_url)
 
             self.selenium_manager.input_text(
@@ -306,7 +308,7 @@ class Booker:
         password: str,
         receiver: str,
         format: str = "plain",
-        attachment_path=None,
+        attach_logfile=False,
     ) -> None:
         """
         Configure email settings for sending notifications.
@@ -323,6 +325,10 @@ class Booker:
             email_receiver=receiver,
             format=format,
         )
+
+        attachment_path = None
+        if attach_logfile:
+            attachment_path = self.log_handler.get_log_file_path()
 
         if self.booking_successful:
             self.mail_handler.send_successful_booking_email(
