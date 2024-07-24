@@ -63,7 +63,6 @@ class Booker:
         self.booking_class_slot = None
         self.booking_time_slot = None
         self.booking_successful = False
-        self.mail_result = False
 
     def login(self, username: str, password: str) -> bool:
         """Login to the booking website using the provided credentials."""
@@ -143,7 +142,6 @@ class Booker:
         for entry in self.class_dict:
             if entry.get("class") == "None":
                 logging.info("! No class set for this day.")
-                self.mail_handler.send_no_classes_email(self.day)
                 return (
                     self.booking_successful,
                     self.booking_class_slot,
@@ -157,36 +155,22 @@ class Booker:
             )
             if not all_possible_booking_slots_dict:
                 logging.info("! No class found for this day.")
-                if self.mail_result:
-                    self.mail_handler.send_no_classes_email(self.day)
-                break
+                return (
+                    self.booking_successful,
+                    self.booking_class_slot,
+                    self.booking_time_slot,
+                )
             button_xpath = self._get_button_xpath(all_possible_booking_slots_dict)
             if not button_xpath:
                 continue
 
             if self._book_class_slot(button_xpath, prioritize_waiting_list):
-                if self.mail_result:
-                    if self.booking_successful:
-                        self.mail_handler.send_successful_booking_email(
-                            self.day, self.booking_time_slot, self.booking_class_slot
-                        )
-                        logging.success(
-                            f"Booked successfully {self.booking_class_slot}"
-                        )
-                    else:
-                        self.mail_handler.send_unsuccessful_booking_email(
-                            self.day, self.booking_time_slot, self.booking_class_slot
-                        )
                 return (
                     self.booking_successful,
                     self.booking_class_slot,
                     self.booking_time_slot,
                 )
 
-        if self.mail_result:
-            self.mail_handler.send_unsuccessful_booking_email(
-                self.day, self.booking_time_slot, self.booking_class_slot
-            )
         return self.booking_successful, self.booking_class_slot, self.booking_time_slot
 
     def _load_and_transform_input_class_dict(self) -> list:
@@ -314,13 +298,13 @@ class Booker:
         """Closes the WebDriver."""
         self.selenium_manager.close_driver()
 
-    def set_mailing(
+    def send_result(
         self,
         sender: str,
         password: str,
         receiver: str,
         format: str = "plain",
-        mail_result: bool = True,
+        attachment_path=None,
     ) -> None:
         """
         Configure email settings for sending notifications.
@@ -337,4 +321,23 @@ class Booker:
             email_receiver=receiver,
             format=format,
         )
-        self.mail_result = mail_result
+
+        if self.booking_successful:
+            self.mail_handler.send_successful_booking_email(
+                self.day,
+                self.booking_time_slot,
+                self.booking_class_slot,
+                attachment_path=attachment_path,
+            )
+            logging.success(f"Booked successfully {self.booking_class_slot}")
+        elif self.booking_successful is False and self.booking_class_slot is None:
+            self.mail_handler.send_no_classes_email(
+                self.day, attachment_path=attachment_path
+            )
+        else:
+            self.mail_handler.send_unsuccessful_booking_email(
+                self.day,
+                self.booking_time_slot,
+                self.booking_class_slot,
+                attachment_path=attachment_path,
+            )

@@ -75,20 +75,21 @@ def main(retry: int = 3):
                 execution_booking_time=execution_booking_time,
             )
 
-            # Configure mailing settings
-            booker.set_mailing(
-                sender=os.getenv("EMAIL_SENDER"),
-                password=os.getenv("EMAIL_PASSWORD"),
-                receiver=os.getenv("EMAIL_RECEIVER"),
-                format="html",
-            )
-
             booker.login(username=user, password=password)
             booker.switch_day()
 
             booker.book_class(
                 class_dict=classes.get("class_dict"),
                 booking_action=classes.get("book_class"),
+            )
+
+            # Configure mailing settings && send mail
+            booker.send_result(
+                sender=os.getenv("EMAIL_SENDER"),
+                password=os.getenv("EMAIL_PASSWORD"),
+                receiver=os.getenv("EMAIL_RECEIVER"),
+                format="html",
+                attachment_path=None,
             )
 
             booker.close()
