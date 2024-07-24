@@ -3,7 +3,7 @@ from collections import defaultdict
 from datetime import datetime
 # from selenium.common.exceptions import NoSuchElementException
 
-from .warning_prompt_helper import WarningPromptHelper
+from .alert_error_handler import AlertErrorHandler
 from .helper_functions import XPathHelper, BookingHelper
 from .utils.log_handler import CustomLogger, LogHandler
 from .utils.mail_handler import MailHandler  # Assuming MailHandler is in this module
@@ -52,7 +52,7 @@ class Booker:
         self.execution_booking_time = execution_booking_time
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
-        self.warning_prompt_helper = WarningPromptHelper(
+        self.warning_prompt_helper = AlertErrorHandler(
             driver=self.selenium_manager.get_driver()
         )
         self.log_handler = LogHandler(log_level=logging.INFO)

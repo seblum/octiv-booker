@@ -43,7 +43,6 @@ def main():
     )
 
     booker.close()
-    # logging.success(f"Attempt {attempt}: OctivBooker succeeded")
 
 
 if __name__ == "__main__":

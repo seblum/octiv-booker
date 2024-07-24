@@ -23,7 +23,7 @@ class AlertTypes(Enum):
     LoginCredentials = "The user credentials were incorrect."
 
 
-class WarningPromptHelper:
+class AlertErrorHandler:
     def __init__(self, driver):
         self.driver = driver
         self.xpath_helper = XPathHelper()
