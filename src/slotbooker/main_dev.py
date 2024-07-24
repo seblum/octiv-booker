@@ -27,35 +27,33 @@ def main(retry: int = 2):
     # check whether env variables are set or None
     logging.info(f"Log in as: {user}")
 
-    for attempt in range(1, retry + 1):
-        booker = Booker(
-            chromedriver=config.get("chromedriver"),
-            days_before_bookable=days_before_bookable,
-            base_url=config.get("base_url"),
-            execution_booking_time=execution_booking_time,
-            env="dev",
-        )
+    booker = Booker(
+        chromedriver=config.get("chromedriver"),
+        days_before_bookable=days_before_bookable,
+        base_url=config.get("base_url"),
+        execution_booking_time=execution_booking_time,
+        env="dev",
+    )
 
-        booker.login(username=user, password=password)
-        booker.switch_day()
+    booker.login(username=user, password=password)
+    booker.switch_day()
 
-        success, _, _ = booker.book_class(
-            class_dict=classes.get("class_dict"),
-            booking_action=classes.get("book_class"),
-        )
+    success, _, _ = booker.book_class(
+        class_dict=classes.get("class_dict"),
+        booking_action=classes.get("book_class"),
+    )
 
-        # Configure mailing settings && send mail
-        booker.send_result(
-            sender=os.getenv("EMAIL_SENDER"),
-            password=os.getenv("EMAIL_PASSWORD"),
-            receiver=os.getenv("EMAIL_RECEIVER"),
-            format="html",
-            attachment_path=None,
-        )
+    # Configure mailing settings && send mail
+    booker.send_result(
+        sender=os.getenv("EMAIL_SENDER"),
+        password=os.getenv("EMAIL_PASSWORD"),
+        receiver=os.getenv("EMAIL_RECEIVER"),
+        format="html",
+        attachment_path=None,
+    )
 
-        booker.close()
-        logging.success(f"Attempt {attempt}: OctivBooker succeeded")
-
+    booker.close()
+    # logging.success(f"Attempt {attempt}: OctivBooker succeeded")
 
 if __name__ == "__main__":
     main()

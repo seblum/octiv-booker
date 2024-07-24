@@ -54,7 +54,7 @@ class Booker:
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
         self.warning_prompt_helper = WarningPromptHelper(
-            selenium_manager=self.selenium_manager
+            driver=self.selenium_manager.get_driver()
         )
         self.mail_handler = None
         self.class_dict = None
@@ -125,7 +125,7 @@ class Booker:
         except Exception as e:
             logging.error(f"! Error during day switch: {e}")
 
-        self.print_day = f"{self.day}, {future_date.strftime("%d/%m/%Y")}"
+        self.print_day = f"{self.day}, {future_date.strftime('%d/%m/%Y')}"
         return self.day, future_date.strftime("%d/%m/%Y")
 
     def book_class(
@@ -173,7 +173,6 @@ class Booker:
                     self.booking_time_slot,
                 )
 
-        # print(self.booking_successful, self.booking_class_slot, self.booking_time_slot)
         return self.booking_successful, self.booking_class_slot, self.booking_time_slot
 
     def _load_and_transform_input_class_dict(self) -> list:
