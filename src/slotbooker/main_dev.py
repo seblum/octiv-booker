@@ -13,7 +13,7 @@ classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
 classes = yaml.safe_load(open(classes_path))
 
 
-def main(retry: int = 3):
+def main(retry: int = 2):
     # get env variables
     user = os.environ.get("OCTIV_USERNAME")
     password = os.environ.get("OCTIV_PASSWORD")

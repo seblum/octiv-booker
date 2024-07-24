@@ -324,20 +324,20 @@ class Booker:
 
         if self.booking_successful:
             self.mail_handler.send_successful_booking_email(
-                self.day,
-                self.booking_time_slot,
-                self.booking_class_slot,
+                booking_date=self.day,
+                booking_name=self.booking_class_slot,
+                booking_time=self.booking_time_slot,
                 attachment_path=attachment_path,
             )
             logging.success(f"Booked successfully {self.booking_class_slot}")
         elif self.booking_successful is False and self.booking_class_slot is None:
             self.mail_handler.send_no_classes_email(
-                self.day, attachment_path=attachment_path
+                booking_date=self.day, attachment_path=attachment_path
             )
         else:
             self.mail_handler.send_unsuccessful_booking_email(
-                self.day,
-                self.booking_time_slot,
-                self.booking_class_slot,
+                booking_date=self.day,
+                booking_name=self.booking_class_slot,
+                booking_time=self.booking_time_slot,
                 attachment_path=attachment_path,
             )
