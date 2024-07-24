@@ -19,7 +19,7 @@ class AlertTypes(Enum):
     LoginCredentials = "The user credentials were incorrect."
 
 
-class WarningPromptHelper():
+class WarningPromptHelper:
     def __init__(self, selenium_manager: str):
         self.selenium_manager = selenium_manager
         self.xpath_helper = XPathHelper()
@@ -27,7 +27,7 @@ class WarningPromptHelper():
 
     def alert_is_present(self) -> Optional[object]:
         """Checks if an alert is present and returns the alert object."""
-        alert = self.selenium_manager.wait_for_element_presence_alert()
+        alert = self.selenium_manager.wait_for_element_alert()
         if alert:
             logging.warning("Alert present")
             return self.switch_to_alert()
@@ -76,10 +76,12 @@ class WarningPromptHelper():
 
     def error_is_present(self) -> Optional[str]:
         """Checks if an error is present and returns the error text."""
-        error_window = self.selenium_manager.wait_for_element_presence(xpath=self.xpath_helper.get_xpath_error_window())
+        error_window = self.selenium_manager.wait_for_element(
+            xpath=self.xpath_helper.get_xpath_error_window(), timeout=3
+        )
         if error_window:
-            error_text = self.selenium_manager.get_element_text_by_xpath(
-                self.xpath_helper.get_xpath_error_text_window()
+            error_text = self.selenium_manager.get_element_text(
+                xpath=self.xpath_helper.get_xpath_error_text_window()
             )
             return error_text
         return None
@@ -99,8 +101,9 @@ class WarningPromptHelper():
         return result
 
     def login_error_is_present(self):
-        alert_div = self.selenium_manager.wait_for_element_presence(
-            self.xpath_helper.get_xpath_login_error_window())
+        alert_div = self.selenium_manager.wait_for_element(
+            self.xpath_helper.get_xpath_login_error_window(), timeout=3
+        )
         if alert_div:
             alert_text = alert_div.text
             if self._contains_keywords(alert_text, ["credentials", "Fehler"]):

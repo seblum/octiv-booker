@@ -14,7 +14,7 @@ logging.setLoggerClass(CustomLogger)
 logger = logging.getLogger(__name__)
 
 
-class Booker():
+class Booker:
     """
     A class representing a booking agent for Octiv.
 
@@ -193,10 +193,10 @@ class Booker():
 
     def _get_all_bounding_boxes_in_window(self) -> list:
         """Get all bounding boxes containing booking slots present in the current window."""
-        self.selenium_manager.wait_for_element_to_be_clickable_by_xpath(
+        self.selenium_manager.wait_for_element(
             xpath=self.xpath_helper.get_xpath_booking_head()
         )
-        return self.selenium_manager.find_elements_by_xpath(
+        return self.selenium_manager.find_elements(
             xpath=self.xpath_helper.get_xpath_booking_head()
         )
 
@@ -212,10 +212,10 @@ class Booker():
         for slot_index, box in enumerate(all_slots_bounding_boxes, start=1):
             xpath_test = f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
             try:
-                textfield = self.selenium_manager.get_element_text_by_xpath(xpath_test)
+                textfield = self.selenium_manager.get_element_text(xpath=xpath_test)
                 if textfield in class_entry_list:
-                    time_slot = self.selenium_manager.get_element_text_by_xpath(
-                        f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
+                    time_slot = self.selenium_manager.get_element_text(
+                        xpath=f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
                     )
                     logging.debug(f"- Time: {time_slot} - Class: {textfield}")
 
@@ -284,13 +284,15 @@ class Booker():
 
     def _click_book_button(self, xpath_button_book: str) -> None:
         """Click the book button using JavaScript execution."""
-        element = self.selenium_manager.find_element_by_xpath(xpath_button_book)
+        element = self.selenium_manager.find_element(xpath=xpath_button_book)
         while True:
             current_time = datetime.now().time().strftime("%H:%M:%S.%f")
             if current_time >= self.execution_booking_time:
                 start_time = datetime.now()
                 logging.info(f"Start execution at {current_time}")
-                self.selenium_manager.execute_script(script="arguments[0].click();", element=element)
+                self.selenium_manager.execute_script(
+                    script="arguments[0].click();", element=element
+                )
                 end_time = datetime.now()
                 logging.info(f"Executed at {end_time.time()}")
                 logging.info(f"Took {(end_time - start_time).total_seconds()}s")
@@ -299,8 +301,8 @@ class Booker():
     def _check_login_alert(self) -> str:
         """Check for alert messages after login."""
         # try:
-        alert_div = self.selenium_manager.wait_for_element_by_xpath(
-            self.xpath_helper.get_xpath_login_error_window(), timeout=10
+        alert_div = self.selenium_manager.wait_for_element(
+            xpath=self.xpath_helper.get_xpath_login_error_window(), timeout=10
         )
         return alert_div.text
         # except NoSuchElementException:

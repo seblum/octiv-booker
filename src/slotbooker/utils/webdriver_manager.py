@@ -1,8 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
+
 
 class WebDriverManager:
     def __init__(self, chromedriver: str, env: str = "prd"):

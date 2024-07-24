@@ -4,56 +4,57 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from .webdriver_manager import WebDriverManager
 
+
 class SeleniumManager(WebDriverManager):
     def __init__(self, chromedriver: str, env: str = "prd"):
         super().__init__(chromedriver=chromedriver, env=env)
 
+    def wait_for_element(
+        self,
+        by=By.XPATH,
+        xpath=None,
+        timeout=20,
+        condition=ec.presence_of_element_located,
+        error_message="",
+    ):
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                condition((by, xpath)), error_message
+            )
+        except (TimeoutException, NoSuchElementException):
+            return None
+
+    def wait_for_element_alert(self):
+        # self.wait_for_element(timeout=3,condition=ec.alert_is_present(), error_message="Timed out waiting for alert to appear.")
+        try:
+            return WebDriverWait(self.driver, timeout=3).until(
+                ec.alert_is_present(), "Timed out waiting for alert to appear."
+            )
+        except (TimeoutException, NoSuchElementException):
+            return None
+
     def input_text(self, xpath: str, text: str) -> None:
-        WebDriverWait(self.driver, 20).until(
-            ec.element_to_be_clickable((By.XPATH, xpath))
-        ).send_keys(text)
+        element = self.wait_for_element(
+            xpath=xpath, condition=ec.element_to_be_clickable
+        )
+        if element:
+            element.send_keys(text)
 
     def click_button(self, xpath: str) -> None:
-        WebDriverWait(self.driver, 20).until(
-            ec.element_to_be_clickable((By.XPATH, xpath))
-        ).click()
+        element = self.wait_for_element(
+            xpath=xpath, condition=ec.element_to_be_clickable
+        )
+        if element:
+            element.click()
 
-    def find_element(self, by, value):
-        return self.driver.find_element(by, value)
+    def find_element(self, by=By.XPATH, xpath=None):
+        return self.driver.find_element(by, xpath)
 
-    def find_elements(self, by, value):
-        return self.driver.find_elements(by, value)
+    def find_elements(self, by=By.XPATH, xpath=None):
+        return self.driver.find_elements(by, xpath)
 
     def execute_script(self, script, element):
         self.driver.execute_script(script, element)
-
-    def wait_for_element(self, by: By, value: str, timeout=20):
-        condition = ec.presence_of_element_located((by, value))
-        return WebDriverWait(self.driver, timeout).until(condition)
-
-    def wait_for_element_by_xpath(self, xpath: str, timeout=20):
-        condition = ec.presence_of_element_located((By.XPATH, xpath))
-        return WebDriverWait(self.driver, timeout).until(condition)
-
-    def wait_for_element_with_message(self, condition, timeout=3, error_message=""):
-        try:
-            return WebDriverWait(self.driver, timeout).until(condition, error_message)
-        except (TimeoutException, NoSuchElementException):
-            return None
-        
-    def wait_for_element_presence(self, xpath):
-        return self.wait_for_element_with_message(condition=ec.presence_of_element_located(
-            (By.XPATH, xpath)
-        ))
-        
-    def wait_for_element_presence_alert(self):
-        return self.wait_for_element_with_message(condition=ec.alert_is_present(),
-            error_message="Timed out waiting for alert to appear.")
-    
-    def wait_for_element_to_be_clickable_by_xpath(self, xpath):
-        WebDriverWait(self.driver, 20).until(
-            ec.element_to_be_clickable((By.XPATH, xpath))
-        )
 
     def get_page(self, base_url) -> None:
         self.driver.get(base_url)
@@ -61,13 +62,6 @@ class SeleniumManager(WebDriverManager):
     def switch_to_alert(self) -> None:
         self.driver.switch_to.alert
 
-    def find_element_by_xpath(self, xpath: str):
-        return self.driver.find_element(By.XPATH, xpath)
-
-    def find_elements_by_xpath(self, xpath: str):
-        return self.driver.find_elements(By.XPATH, xpath)
-
-    def get_element_text_by_xpath(self, xpath: str) -> str:
-        element = self.find_element_by_xpath(xpath)
-        return element.text
-
+    def get_element_text(self, by=By.XPATH, xpath=None) -> str:
+        element = self.find_element(by, xpath)
+        return element.text if element else ""
