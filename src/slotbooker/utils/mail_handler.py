@@ -13,11 +13,17 @@ EMAIL_SMTP_PORT = 465
 class MailHandler:
     html_templates_path = "html-templates/"
 
-    def __init__(self, format: str = "plain") -> None:
+    def __init__(
+        self,
+        email_sender: str,
+        email_password: str,
+        email_receiver: str,
+        format: str = "plain",
+    ) -> None:
         self.format = format
-        self.email_sender = None
-        self.email_password = None
-        self.email_receiver = None
+        self.email_sender = email_sender
+        self.email_password = email_password
+        self.email_receiver = email_receiver
 
     def send_logs_to_mail(
         self,

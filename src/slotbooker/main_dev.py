@@ -41,44 +41,15 @@ def main(retry: int = 3):
         )
 
         booker.login(username=user, password=password)
-        booking_day, booking_date = booker.switch_day()
-        booking_date = f"{booking_day}, {booking_date}"
+        booker.switch_day()
 
-        booked_successful, class_slot, time_slot = booker.book_class(
+        booker.book_class(
             class_dict=classes.get("class_dict"),
             booking_action=classes.get("book_class"),
         )
-        logging.success(f"Attempt {class_slot}: OctivBooker succeeded")
 
         booker.close()
         logging.success(f"Attempt {attempt}: OctivBooker succeeded")
-        # response = "SUCCESS"
-
-        # html_file = log_hander.convert_logs_to_html()
-
-        # MailHandler(format="html").send_logs_to_mail(
-        #     filename=html_file, response=response
-        # )
-
-        # if booked_successful:
-        #     mail_handler.send_successful_booking_email(
-        #         booking_date=booking_date,
-        #         booking_time=time_slot,
-        #         booking_name=class_slot,
-        #         attachment_path=log_hander.get_log_file_path(),
-        #     )
-        # elif not booked_successful and class_slot is None and time_slot is None:
-        #     mail_handler.send_no_classes_email(
-        #         booking_date=booking_date,
-        #         attachment_path=log_hander.get_log_file_path(),
-        #     )
-        # else:
-        #     mail_handler.send_unsuccessful_booking_email(
-        #         booking_date=booking_date,
-        #         booking_time=time_slot,
-        #         booking_name=class_slot,
-        #         attachment_path=log_hander.get_log_file_path(),
-        #     )
 
 
 if __name__ == "__main__":

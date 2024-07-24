@@ -62,7 +62,7 @@ def main(retry: int = 3):
     password = os.environ.get("OCTIV_PASSWORD")
     days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
     execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
-    booked_successful = False
+    # booked_successful = False
 
     logging.info(f"Log in as: {user}")
 
@@ -75,11 +75,18 @@ def main(retry: int = 3):
                 execution_booking_time=execution_booking_time,
             )
 
-            booker.login(username=user, password=password)
-            booking_day, booking_date = booker.switch_day()
-            booking_date = f"{booking_day}, {booking_date}"
+            # Configure mailing settings
+            booker.set_mailing(
+                sender=os.getenv("EMAIL_SENDER"),
+                password=os.getenv("EMAIL_PASSWORD"),
+                receiver=os.getenv("EMAIL_RECEIVER"),
+                format="html",
+            )
 
-            booked_successful, class_slot, time_slot = booker.book_class(
+            booker.login(username=user, password=password)
+            booker.switch_day()
+
+            booker.book_class(
                 class_dict=classes.get("class_dict"),
                 booking_action=classes.get("book_class"),
             )
@@ -97,26 +104,6 @@ def main(retry: int = 3):
                 f"Attempt {attempt}: OctivBooker failed due to unexpected error"
             )
             logging.error(e, exc_info=True)
-
-    # mail_handler = MailHandler(format="html")
-    # if booked_successful:
-    #     mail_handler.send_successful_booking_email(
-    #         booking_date=booking_date,
-    #         booking_time=time_slot,
-    #         booking_name=class_slot,
-    #         attachment_path=log_hander.get_log_file_path(),
-    #     )
-    # elif not booked_successful and class_slot is None and time_slot is None:
-    #     mail_handler.send_no_classes_email(
-    #         booking_date=booking_date, attachment_path=log_hander.get_log_file_path()
-    #     )
-    # else:
-    #     mail_handler.send_unsuccessful_booking_email(
-    #         booking_date=booking_date,
-    #         booking_time=time_slot,
-    #         booking_name=class_slot,
-    #         attachment_path=log_hander.get_log_file_path(),
-    #     )
 
 
 if __name__ == "__main__":

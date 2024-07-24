@@ -25,7 +25,6 @@ class SeleniumManager(WebDriverManager):
             return None
 
     def wait_for_element_alert(self):
-        # self.wait_for_element(timeout=3,condition=ec.alert_is_present(), error_message="Timed out waiting for alert to appear.")
         try:
             return WebDriverWait(self.driver, timeout=3).until(
                 ec.alert_is_present(), "Timed out waiting for alert to appear."

@@ -47,20 +47,19 @@ class Booker:
         env: str = "prd",
         email_format: str = "plain",
     ):
-        # super().__init__(chromedriver=chromedriver, env=env)
         self.selenium_manager = SeleniumManager(chromedriver, env)
         self.base_url = base_url
         self.days_before_bookable = days_before_bookable
         self.execution_booking_time = execution_booking_time
+        self.xpath_helper = XPathHelper()
+        self.booking_helper = BookingHelper()
+        self.warning_prompt_helper = WarningPromptHelper(
+            selenium_manager=self.selenium_manager
+        )
+        self.mail_handler = None
         self.class_dict = None
         self.booking_action = None
         self.day = None
-        self.xpath_helper = XPathHelper()
-        self.booking_helper = BookingHelper()
-        self.mail_handler = MailHandler()
-        self.warning_prompt_helper = WarningPromptHelper(
-            selenium_manager=self.selenium_manager
-        )  # Pass selenium_manager instead of driver
         self.booking_class_slot = None
         self.booking_time_slot = None
         self.booking_successful = False
@@ -144,7 +143,7 @@ class Booker:
         for entry in self.class_dict:
             if entry.get("class") == "None":
                 logging.info("! No class set for this day.")
-                # self.mail_handler.send_no_classes_email(self.day)
+                self.mail_handler.send_no_classes_email(self.day)
                 return (
                     self.booking_successful,
                     self.booking_class_slot,
@@ -158,33 +157,36 @@ class Booker:
             )
             if not all_possible_booking_slots_dict:
                 logging.info("! No class found for this day.")
-                # if self.mail_result:
-                #     self.mail_handler.send_no_classes_email(self.day)
+                if self.mail_result:
+                    self.mail_handler.send_no_classes_email(self.day)
                 break
             button_xpath = self._get_button_xpath(all_possible_booking_slots_dict)
             if not button_xpath:
                 continue
 
             if self._book_class_slot(button_xpath, prioritize_waiting_list):
-                # if self.mail_result:
-                #     if self.booking_successful:
-                #         self.mail_handler.send_successful_booking_email(
-                #             self.day, self.booking_time_slot, self.booking_class_slot
-                #         )
-                #     else:
-                #         self.mail_handler.send_unsuccessful_booking_email(
-                #             self.day, self.booking_time_slot, self.booking_class_slot
-                #         )
+                if self.mail_result:
+                    if self.booking_successful:
+                        self.mail_handler.send_successful_booking_email(
+                            self.day, self.booking_time_slot, self.booking_class_slot
+                        )
+                        logging.success(
+                            f"Booked successfully {self.booking_class_slot}"
+                        )
+                    else:
+                        self.mail_handler.send_unsuccessful_booking_email(
+                            self.day, self.booking_time_slot, self.booking_class_slot
+                        )
                 return (
                     self.booking_successful,
                     self.booking_class_slot,
                     self.booking_time_slot,
                 )
 
-        # if self.mail_result:
-        #     self.mail_handler.send_unsuccessful_booking_email(
-        #         self.day, self.booking_time_slot, self.booking_class_slot
-        #     )
+        if self.mail_result:
+            self.mail_handler.send_unsuccessful_booking_email(
+                self.day, self.booking_time_slot, self.booking_class_slot
+            )
         return self.booking_successful, self.booking_class_slot, self.booking_time_slot
 
     def _load_and_transform_input_class_dict(self) -> list:
@@ -329,8 +331,10 @@ class Booker:
             receiver (str): The email address of the receiver.
             format (str): The format of the email body ("plain" or "html").
         """
+        self.mail_handler = MailHandler(
+            email_sender=sender,
+            email_password=password,
+            email_receiver=receiver,
+            format=format,
+        )
         self.mail_result = mail_result
-        self.email_sender = sender
-        self.email_password = password
-        self.email_receiver = receiver
-        self.format = format
