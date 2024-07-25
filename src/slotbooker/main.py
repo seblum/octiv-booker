@@ -3,7 +3,6 @@ import logging
 import yaml
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
 
-from .utils.webdriver_manager import get_driver
 from .booking_handler import Booker
 
 
@@ -37,12 +36,11 @@ def main(retry: int = 3):
 
         >>> main()
     """
-    driver = get_driver(chromedriver=config.get("chromedriver"))
 
     if os.environ.get("IS_TEST"):
         logging.info("Testing Docker Container")
         booker = Booker(
-            driver=driver,
+            chromedriver=config.get("chromedriver"),
             days_before_bookable=0,
             base_url=config.get("base_url"),
             execution_booking_time="00:00:00.00",
@@ -65,7 +63,7 @@ def main(retry: int = 3):
     for attempt in range(1, retry + 1):
         try:
             booker = Booker(
-                driver=driver,
+                chromedriver=config.get("chromedriver"),
                 days_before_bookable=days_before_bookable,
                 base_url=config.get("base_url"),
                 execution_booking_time=execution_booking_time,
