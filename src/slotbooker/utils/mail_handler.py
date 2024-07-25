@@ -110,9 +110,7 @@ class MailHandler:
 
     def send_successful_booking_email(
         self,
-        booking_date: str,
-        booking_time: str,
-        booking_name: str,
+        booking_information: dict,
         attachment_path: str = None,
     ) -> None:
         """
@@ -143,12 +141,27 @@ class MailHandler:
         with open(template_path, "r") as file:
             template = Template(file.read())
 
+        booking_template = Template("""
+        <p class="booking-time"><strong>${booking_class}</strong></p>
+        <p class="booking-time"><strong>${booking_date}; ${booking_time}</strong></p>
+        """)
+        booking_html = "".join(
+            [
+                booking_template.substitute(
+                    booking_class=booking["class"],
+                    booking_date=booking_information["current_date"],
+                    booking_time=booking["time"],
+                )
+                for booking in booking_information["bookings"]
+            ]
+        )
+        # booking_information_html = ''.join(
+        #     [f'<div class="booking-time"><strong>{info}</strong></div>' for info in booking_information]
+        # )
         # Customize the template with actual values
         body = template.safe_substitute(
             receiver_name=email_receiver_name,
-            booking_name=booking_name,
-            booking_time=booking_time,
-            booking_date=booking_date,
+            booking_information=booking_html,
             current_year=datetime.now().year,
         )
 
@@ -163,9 +176,7 @@ class MailHandler:
 
     def send_unsuccessful_booking_email(
         self,
-        booking_date: str,
-        booking_time: str,
-        booking_name: str,
+        booking_information: dict,
         attachment_path: str = None,
     ) -> None:
         """
@@ -196,12 +207,24 @@ class MailHandler:
         with open(template_path, "r") as file:
             template = Template(file.read())
 
+        booking_template = Template("""
+        <p class="booking-time"><strong>${booking_class}</strong></p>
+        <p class="booking-time"><strong>${booking_date}; ${booking_time}</strong></p>
+        """)
+        booking_html = "".join(
+            [
+                booking_template.substitute(
+                    booking_class=booking["class"],
+                    booking_date=booking_information["current_date"],
+                    booking_time=booking["time"],
+                )
+                for booking in booking_information["bookings"]
+            ]
+        )
         # Customize the template with actual values
         body = template.safe_substitute(
             receiver_name=email_receiver_name,
-            booking_name=booking_name,
-            booking_time=booking_time,
-            booking_date=booking_date,
+            booking_information=booking_html,
             current_year=datetime.now().year,
         )
 

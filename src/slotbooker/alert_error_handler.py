@@ -58,7 +58,7 @@ class AlertErrorHandler:
             return self._handle_cancel_slot(alert_obj)
         else:
             logging.warning(f"{AlertTypes.NotIdentifyAlert.value}: {alert_text}")
-            return self.booking_helper.continue_booking_process()
+            return not self.booking_helper.stop_booking_process()
 
     def _contains_keywords(self, text: str, keywords: list) -> bool:
         return any(keyword.lower() in text.lower() for keyword in keywords)
@@ -79,14 +79,14 @@ class AlertErrorHandler:
             alert_obj.dismiss()
             logging.info("Looking for further slots...")
             # TODO: I could send an email here.
-            return self.booking_helper.continue_booking_process()
+            return not self.booking_helper.stop_booking_process()
 
     def _handle_cancel_slot(self, alert_obj: object) -> bool:
         """Handle aborting the canceling of a slot."""
         logging.warning("Aborted canceling slot...")
         alert_obj.dismiss()
         logging.info("Looking for further slots...")
-        return self.booking_helper.continue_booking_process()
+        return not self.booking_helper.stop_booking_process()
 
     def error_is_present(self) -> Optional[str]:
         """Checks if an error is present and returns the error text."""

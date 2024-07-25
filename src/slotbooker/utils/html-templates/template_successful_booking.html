@@ -35,6 +35,7 @@
         }
         .booking-time {
             font-size: 18px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -46,13 +47,12 @@
         <div class="content">
             <p>Dear ${receiver_name},</p>
             <p>Your booking has been confirmed!</p>
-            <p class="booking-time"><strong>${booking_name}</strong></p>
-            <p class="booking-time"><strong>${booking_date}; ${booking_time}</strong></p>
+            $booking_information
             <p>Thanks for choosing us. See you soon!</p>
         </div>
         <div class="footer">
             <p>If you have any questions, please contact us at</p>
-            <p> seblumautomated@google.com</p>
+            <p>seblumautomated@google.com</p>
             <p>&copy; ${current_year} OctivBooker.</p>
         </div>
     </div>

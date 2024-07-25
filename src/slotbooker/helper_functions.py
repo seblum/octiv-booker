@@ -106,14 +106,14 @@ class BookingHelper:
         """
         return xpath_helper.get_xpath_booking_slot(booking_slot, book_action)
 
-    @staticmethod
-    def continue_booking_process() -> bool:
-        """Determine whether to continue booking other slots.
+    # @staticmethod
+    # def continue_booking_process() -> bool:
+    #     """Determine whether to continue booking other slots.
 
-        Returns:
-            bool: True if new bookings should be continued, False if further bookings should be stopped.
-        """
-        return False
+    #     Returns:
+    #         bool: True if new bookings should be continued, False if further bookings should be stopped.
+    #     """
+    #     return False
 
     @staticmethod
     def stop_booking_process() -> bool:

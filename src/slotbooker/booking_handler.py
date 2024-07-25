@@ -63,7 +63,7 @@ class Booker:
         self.booking_class_slot = None
         self.booking_time_slot = None
         self.booking_successful = False
-        self.print_day = None
+        self.booking_information = {"bookings": []}
 
     def login(self, username: str, password: str) -> bool:
         """Login to the booking website using the provided credentials."""
@@ -107,7 +107,7 @@ class Booker:
             pass
 
         logging.success("Login successful")
-        return self.booking_helper.continue_booking_process()
+        return not self.booking_helper.stop_booking_process()
 
     def switch_day(self) -> (str, str):
         """Switch to the desired day for booking slots."""
@@ -127,7 +127,9 @@ class Booker:
         except Exception as e:
             logging.error(f"! Error during day switch: {e}")
 
-        self.print_day = f"{self.day}, {future_date.strftime('%d/%m/%Y')}"
+        self.booking_information.update(
+            {"current_date": f"{self.day}, {future_date.strftime('%d/%m/%Y')}"}
+        )
         return self.day, future_date.strftime("%d/%m/%Y")
 
     def book_class(
@@ -151,12 +153,15 @@ class Booker:
                     self.booking_class_slot,
                     self.booking_time_slot,
                 )
-
             self.booking_time_slot, self.booking_class_slot, prioritize_waiting_list = (
                 entry.get("time"),
                 entry.get("class"),
                 entry.get("wl"),
             )
+            self.booking_information["bookings"].append(
+                {"time": entry.get("time"), "class": entry.get("class")}
+            )
+
             if not all_possible_booking_slots_dict:
                 logging.info("! No class found for this day.")
                 return (
@@ -174,6 +179,9 @@ class Booker:
                     self.booking_class_slot,
                     self.booking_time_slot,
                 )
+            else:
+                pass
+                # add to booking_dict
 
         return self.booking_successful, self.booking_class_slot, self.booking_time_slot
 
@@ -260,9 +268,14 @@ class Booker:
 
         alert_obj = self.warning_prompt_helper.alert_is_present()
         if alert_obj:
-            return self.warning_prompt_helper.evaluate_alert(
+            evaluate_result = self.warning_prompt_helper.evaluate_alert(
                 alert_obj, prioritize_waiting_list
             )
+            if evaluate_result is False:
+                pass
+                # switch to multiple mails
+            # else stop booking, do noting
+            return evaluate_result
 
         error_text = self.warning_prompt_helper.error_is_present()
         if error_text:
@@ -330,22 +343,25 @@ class Booker:
         if attach_logfile:
             attachment_path = self.log_handler.get_log_file_path()
 
+        # Create the formatted list
+        booking_information_list = [
+            f"{booking['class']}; {self.booking_information['current_date']}; {booking['time']}"
+            for booking in self.booking_information["bookings"]
+        ]
+        print(booking_information_list)
         if self.booking_successful:
             self.mail_handler.send_successful_booking_email(
-                booking_date=self.print_day,
-                booking_name=self.booking_class_slot,
-                booking_time=self.booking_time_slot,
+                booking_information=self.booking_information,
                 attachment_path=attachment_path,
             )
             logging.success(f"Booked successfully {self.booking_class_slot}")
         elif self.booking_successful is False and self.booking_class_slot is None:
             self.mail_handler.send_no_classes_email(
-                booking_date=self.print_day, attachment_path=attachment_path
+                booking_date=self.booking_information["current_date"],
+                attachment_path=attachment_path,
             )
         else:
             self.mail_handler.send_unsuccessful_booking_email(
-                booking_date=self.print_day,
-                booking_name=self.booking_class_slot,
-                booking_time=self.booking_time_slot,
+                booking_information=self.booking_information,
                 attachment_path=attachment_path,
             )
