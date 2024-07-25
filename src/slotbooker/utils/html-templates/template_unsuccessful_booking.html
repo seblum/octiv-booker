@@ -17,7 +17,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background-color: #4CAF50;
+            background-color: #FF0000;
             color: white;
             padding: 10px 0;
             text-align: center;
@@ -27,6 +27,23 @@
             padding: 20px;
             text-align: center;
         }
+        .booking-info {
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            /* Ensure it spans the full width of the container */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .booking-info ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .booking-info li {
+            margin-bottom: 10px;
+        }
         .footer {
             margin-top: 20px;
             font-size: 12px;
@@ -34,25 +51,30 @@
             text-align: center;
         }
         .booking-time {
-            font-size: 18px;
+            font-size: 16px;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Booking Confirmed!</h1>
+            <h1>Booking Not Successful</h1>
         </div>
         <div class="content">
             <p>Dear ${receiver_name},</p>
-            <p>Your booking has been confirmed!</p>
-            <p class="booking-time"><strong>${booking_name}</strong></p>
-            <p class="booking-time"><strong>${booking_date}, ${booking_time}</strong></p>
-            <p>Thanks for choosing us. See you soon!</p>
+            <p>Unfortunately, your booking could not be confirmed at this time.</p>
+            <div class="booking-info">
+                <p><strong>Booking Details:</strong></p>
+                <ul>
+                    $booking_information
+                </ul>
+            </div>
+            <p>We apologize for the inconvenience.</p>
         </div>
         <div class="footer">
             <p>If you have any questions, please contact us at</p>
-            <p> seblumautomated@google.com</p>
+            <p>seblumautomated@google.com</p>
             <p>&copy; ${current_year} OctivBooker.</p>
         </div>
     </div>

@@ -2,9 +2,6 @@ from enum import Enum
 import logging
 from typing import Any, Optional
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from .helper_functions import XPathHelper, BookingHelper
 
 
@@ -23,24 +20,16 @@ class AlertTypes(Enum):
     LoginCredentials = "The user credentials were incorrect."
 
 
-class WarningPromptHelper:
-    def __init__(self, driver):
+class AlertErrorHandler:
+    def __init__(self, driver, selenium_manager):
         self.driver = driver
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
-
-    def _wait_for_element(self, condition, timeout=3, error_message=""):
-        try:
-            return WebDriverWait(self.driver, timeout).until(condition, error_message)
-        except (TimeoutException, NoSuchElementException):
-            return None
+        self.selenium_manager = selenium_manager
 
     def alert_is_present(self) -> Optional[object]:
         """Checks if an alert is present and returns the alert object."""
-        alert = self._wait_for_element(
-            ec.alert_is_present(),
-            error_message="Timed out waiting for alert to appear.",
-        )
+        alert = self.selenium_manager.wait_for_element_alert()
         if alert:
             logging.warning("Alert present")
             return self.driver.switch_to.alert
@@ -58,7 +47,7 @@ class WarningPromptHelper:
             return self._handle_cancel_slot(alert_obj)
         else:
             logging.warning(f"{AlertTypes.NotIdentifyAlert.value}: {alert_text}")
-            return self.booking_helper.continue_booking_process()
+            return not self.booking_helper.stop_booking_process()
 
     def _contains_keywords(self, text: str, keywords: list) -> bool:
         return any(keyword.lower() in text.lower() for keyword in keywords)
@@ -78,21 +67,20 @@ class WarningPromptHelper:
             )
             alert_obj.dismiss()
             logging.info("Looking for further slots...")
-            return self.booking_helper.continue_booking_process()
+            # TODO: I could send an email here.
+            return not self.booking_helper.stop_booking_process()
 
     def _handle_cancel_slot(self, alert_obj: object) -> bool:
         """Handle aborting the canceling of a slot."""
         logging.warning("Aborted canceling slot...")
         alert_obj.dismiss()
         logging.info("Looking for further slots...")
-        return self.booking_helper.continue_booking_process()
+        return not self.booking_helper.stop_booking_process()
 
     def error_is_present(self) -> Optional[str]:
         """Checks if an error is present and returns the error text."""
-        error_window = self._wait_for_element(
-            ec.presence_of_element_located(
-                (By.XPATH, self.xpath_helper.get_xpath_error_window())
-            )
+        error_window = self.selenium_manager.wait_for_element(
+            xpath=self.xpath_helper.get_xpath_error_window(), timeout=3
         )
         if error_window:
             # logging.error("! Error !")
@@ -117,10 +105,8 @@ class WarningPromptHelper:
         return result
 
     def login_error_is_present(self):
-        alert_div = self._wait_for_element(
-            ec.presence_of_element_located(
-                (By.XPATH, self.xpath_helper.get_xpath_login_error_window())
-            )
+        alert_div = self.selenium_manager.wait_for_element(
+            xpath=self.xpath_helper.get_xpath_login_error_window(), timeout=3
         )
         if alert_div:
             alert_text = alert_div.text
