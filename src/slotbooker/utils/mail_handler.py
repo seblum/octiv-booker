@@ -208,8 +208,7 @@ class MailHandler:
             template = Template(file.read())
 
         booking_template = Template("""
-        <p class="booking-time"><strong>${booking_class}</strong></p>
-        <p class="booking-time"><strong>${booking_date}; ${booking_time}</strong></p>
+            <li class="booking-time"><strong>${booking_class}</strong> on <strong>${booking_date}</strong> at <strong>${booking_time}</strong></li>
         """)
         booking_html = "".join(
             [

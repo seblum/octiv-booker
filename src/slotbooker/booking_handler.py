@@ -281,6 +281,7 @@ class Booker:
 
         error_text = self.warning_prompt_helper.error_is_present()
         if error_text:
+            # TODO: Remove sleep
             time.sleep(3)
             return self.warning_prompt_helper.evaluate_error(error_text)
 
