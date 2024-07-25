@@ -54,7 +54,8 @@ class Booker:
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
         self.warning_prompt_helper = AlertErrorHandler(
-            driver=self.selenium_manager.get_driver()
+            driver=self.selenium_manager.get_driver(),
+            selenium_manager=self.selenium_manager,
         )
         self.log_handler = LogHandler(log_level=logging.INFO)
         self.mail_handler = None

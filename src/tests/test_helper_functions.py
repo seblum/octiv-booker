@@ -95,9 +95,6 @@ class TestBookingHelper(unittest.TestCase):
             "/html/body/div/div[6]/div/div[1]/div/div[2]/div[3]/button",
         )
 
-    # def test_continue_booking_process(self):
-    #     self.assertFalse(BookingHelper.continue_booking_process())
-
     def test_stop_booking_process(self):
         self.assertTrue(BookingHelper.stop_booking_process())
 

@@ -12,10 +12,10 @@ class SeleniumManager(WebDriverManager):
     def wait_for_element(
         self,
         by=By.XPATH,
-        xpath=None,
-        timeout=20,
+        xpath: str = None,
+        timeout: int = 20,
         condition=ec.presence_of_element_located,
-        error_message="",
+        error_message: str = "",
     ):
         try:
             return WebDriverWait(self.driver, timeout).until(
@@ -24,9 +24,9 @@ class SeleniumManager(WebDriverManager):
         except (TimeoutException, NoSuchElementException):
             return None
 
-    def wait_for_element_alert(self):
+    def wait_for_element_alert(self, timeout: int = 3):
         try:
-            return WebDriverWait(self.driver, timeout=5).until(
+            return WebDriverWait(self.driver, timeout=timeout).until(
                 ec.alert_is_present(), "Timed out waiting for alert to appear."
             )
         except (TimeoutException, NoSuchElementException):

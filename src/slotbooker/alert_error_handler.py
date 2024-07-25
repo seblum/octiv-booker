@@ -2,9 +2,6 @@ from enum import Enum
 import logging
 from typing import Any, Optional
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from .helper_functions import XPathHelper, BookingHelper
 
 
@@ -24,23 +21,15 @@ class AlertTypes(Enum):
 
 
 class AlertErrorHandler:
-    def __init__(self, driver):
+    def __init__(self, driver, selenium_manager):
         self.driver = driver
         self.xpath_helper = XPathHelper()
         self.booking_helper = BookingHelper()
-
-    def _wait_for_element(self, condition, timeout=3, error_message=""):
-        try:
-            return WebDriverWait(self.driver, timeout).until(condition, error_message)
-        except (TimeoutException, NoSuchElementException):
-            return None
+        self.selenium_manager = selenium_manager
 
     def alert_is_present(self) -> Optional[object]:
         """Checks if an alert is present and returns the alert object."""
-        alert = self._wait_for_element(
-            ec.alert_is_present(),
-            error_message="Timed out waiting for alert to appear.",
-        )
+        alert = self.selenium_manager.wait_for_element_alert()
         if alert:
             logging.warning("Alert present")
             return self.driver.switch_to.alert
@@ -90,11 +79,8 @@ class AlertErrorHandler:
 
     def error_is_present(self) -> Optional[str]:
         """Checks if an error is present and returns the error text."""
-        error_window = self._wait_for_element(
-            ec.presence_of_element_located(
-                (By.XPATH, self.xpath_helper.get_xpath_error_window())
-            ),
-            timeout=3,
+        error_window = self.selenium_manager.wait_for_element(
+            xpath=self.xpath_helper.get_xpath_error_window(), timeout=3
         )
         if error_window:
             # logging.error("! Error !")
@@ -119,10 +105,8 @@ class AlertErrorHandler:
         return result
 
     def login_error_is_present(self):
-        alert_div = self._wait_for_element(
-            ec.presence_of_element_located(
-                (By.XPATH, self.xpath_helper.get_xpath_login_error_window())
-            )
+        alert_div = self.selenium_manager.wait_for_element(
+            xpath=self.xpath_helper.get_xpath_login_error_window(), timeout=3
         )
         if alert_div:
             alert_text = alert_div.text
