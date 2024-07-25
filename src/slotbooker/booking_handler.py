@@ -1,6 +1,7 @@
 import logging
 from collections import defaultdict
 from datetime import datetime
+
 # from selenium.common.exceptions import NoSuchElementException
 import time
 from .alert_error_handler import AlertErrorHandler
@@ -161,7 +162,7 @@ class Booker:
             self.booking_information["bookings"].append(
                 {"time": entry.get("time"), "class": entry.get("class")}
             )
-            
+
             if not all_possible_booking_slots_dict:
                 logging.info("! No classes found overall for this day.")
                 return (
@@ -171,13 +172,14 @@ class Booker:
                 )
             button_xpath = self._get_button_xpath(all_possible_booking_slots_dict)
             if not button_xpath:
-                logging.info(f"! No class {self.booking_class_slot} found for this day.")
+                logging.info(
+                    f"! No class {self.booking_class_slot} found for this day."
+                )
                 return (
                     self.booking_successful,
                     self.booking_class_slot,
                     self.booking_time_slot,
                 )
-
 
             if self._book_class_slot(button_xpath, prioritize_waiting_list):
                 return (

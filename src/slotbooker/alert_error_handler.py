@@ -94,7 +94,7 @@ class AlertErrorHandler:
             ec.presence_of_element_located(
                 (By.XPATH, self.xpath_helper.get_xpath_error_window())
             ),
-            timeout=3
+            timeout=3,
         )
         if error_window:
             # logging.error("! Error !")
