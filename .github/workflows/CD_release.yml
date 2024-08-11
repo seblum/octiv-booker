@@ -68,9 +68,12 @@ jobs:
           echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
           echo $TAG_VERSION
       - 
-        name: Update pyproject.toml version
+        name: Update Version in pyproject.toml
         run: |
-          sed -i '' "s/^version = \".*\"/version = \"$TAG_VERSION\"/" $(pwd)/pyproject.toml
+          sed -i "s/^version = \".*\"/version = \"$TAG_VERSION\"/" ./pyproject.toml
+      - 
+        name: Verify Update
+        run: cat ./pyproject.toml
       - 
         name: Commit changes
         run: |
