@@ -64,16 +64,13 @@ jobs:
         name: Extract tag version
         id: extract_version
         run: |
-          echo "Current directory: $(pwd)"
-          echo "Listing all tags:"
-          git tag -l
           TAG_VERSION=$(git describe --match "v*.*.*" --tags --abbrev=0)
           echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
           echo $TAG_VERSION
       - 
         name: Update pyproject.toml version
         run: |
-          sed -i '' "s/^version = \".*\"/version = \"$TAG_VERSION\"/" pyproject.toml
+          sed -i '' "s/^version = \".*\"/version = \"$TAG_VERSION\"/" ./pyproject.toml
       - 
         name: Commit changes
         run: |
