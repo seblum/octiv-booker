@@ -20,13 +20,12 @@ LOG_LEVELS: Dict[str, str] = {
 
 
 class LogHandler:
-    def __init__(self, log_level=logging.INFO) -> None:
+    def __init__(self) -> None:
         self.timestamp: str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.log_dir = LOG_DIR
         self.log_file_path: str = self._setup_log_dir()
         self.orig_stdout = sys.stdout
 
-        self.log_level = log_level
         # Set up custom logger
         logging.setLoggerClass(CustomLogger)
         self.logger = logging.getLogger(__name__)
@@ -36,7 +35,7 @@ class LogHandler:
             filemode="w",
             encoding="utf-8",
             format="%(asctime)s %(levelname)s %(message)s",
-            level=self.log_level,
+            level=logging.INFO,
         )
 
     def get_log_file_path(self) -> str:

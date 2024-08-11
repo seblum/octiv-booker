@@ -11,19 +11,13 @@ EMAIL_SMTP_PORT = 465
 
 
 class MailHandler:
-    html_templates_path = "html-templates/"
+    html_templates_path = "html/"
 
-    def __init__(
-        self,
-        email_sender: str,
-        email_password: str,
-        email_receiver: str,
-        format: str = "plain",
-    ) -> None:
+    def __init__(self, format: str = "plain") -> None:
         self.format = format
-        self.email_sender = email_sender
-        self.email_password = email_password
-        self.email_receiver = email_receiver
+        self.email_sender = os.getenv("EMAIL_SENDER")
+        self.email_password = os.getenv("EMAIL_PASSWORD")
+        self.email_receiver = os.getenv("EMAIL_RECEIVER")
 
     def send_logs_to_mail(
         self,
@@ -110,7 +104,9 @@ class MailHandler:
 
     def send_successful_booking_email(
         self,
-        booking_information: dict,
+        booking_date: str,
+        booking_time: str,
+        booking_name: str,
         attachment_path: str = None,
     ) -> None:
         """
@@ -141,27 +137,12 @@ class MailHandler:
         with open(template_path, "r") as file:
             template = Template(file.read())
 
-        booking_template = Template("""
-        <p class="booking-time"><strong>${booking_class}</strong></p>
-        <p class="booking-time"><strong>${booking_date}; ${booking_time}</strong></p>
-        """)
-        booking_html = "".join(
-            [
-                booking_template.substitute(
-                    booking_class=booking["class"],
-                    booking_date=booking_information["current_date"],
-                    booking_time=booking["time"],
-                )
-                for booking in booking_information["bookings"]
-            ]
-        )
-        # booking_information_html = ''.join(
-        #     [f'<div class="booking-time"><strong>{info}</strong></div>' for info in booking_information]
-        # )
         # Customize the template with actual values
         body = template.safe_substitute(
             receiver_name=email_receiver_name,
-            booking_information=booking_html,
+            booking_name=booking_name,
+            booking_time=booking_time,
+            booking_date=booking_date,
             current_year=datetime.now().year,
         )
 
@@ -176,7 +157,9 @@ class MailHandler:
 
     def send_unsuccessful_booking_email(
         self,
-        booking_information: dict,
+        booking_date: str,
+        booking_time: str,
+        booking_name: str,
         attachment_path: str = None,
     ) -> None:
         """
@@ -207,23 +190,12 @@ class MailHandler:
         with open(template_path, "r") as file:
             template = Template(file.read())
 
-        booking_template = Template("""
-            <li class="booking-time"><strong>${booking_class}</strong> on <strong>${booking_date}</strong> at <strong>${booking_time}</strong></li>
-        """)
-        booking_html = "".join(
-            [
-                booking_template.substitute(
-                    booking_class=booking["class"],
-                    booking_date=booking_information["current_date"],
-                    booking_time=booking["time"],
-                )
-                for booking in booking_information["bookings"]
-            ]
-        )
         # Customize the template with actual values
         body = template.safe_substitute(
             receiver_name=email_receiver_name,
-            booking_information=booking_html,
+            booking_name=booking_name,
+            booking_time=booking_time,
+            booking_date=booking_date,
             current_year=datetime.now().year,
         )
 
