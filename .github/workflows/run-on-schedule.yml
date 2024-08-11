@@ -2,7 +2,7 @@ name: Run OctivBookerBot on Schedule
 
 on:
     schedule:
-        - cron: "55 20 * * *" # “At 20:55 every day.”
+        - cron: "54 20 * * *" # “At 20:55 every day.”
     pull_request:
         branches: [ master ]
     workflow_dispatch:
@@ -20,9 +20,9 @@ jobs:
             - 
                 name: Checkout code
                 uses: actions/checkout@v4
-            - 
-                name: Pull Docker Image
-                run: docker pull seblum/${{ENV.DOCKER_IMAGE}}
+            # - 
+            #     name: Pull Docker Image
+            #     run: docker pull seblum/${{ENV.DOCKER_IMAGE}}
             - 
                 name: List environment subdirectories
                 id: get_envdirs
@@ -32,6 +32,7 @@ jobs:
                     ENV_SUBDIR_LIST=$(echo "$ENV_SUBDIRS" | jq -R -s -c 'split("\n")[:-1]')
 
                     echo "environment_dir_list=$ENV_SUBDIR_LIST" >> $GITHUB_OUTPUT
+                    echo $ENV_SUBDIR_LIST
 
     # Step 2: Run MailingBot for each subdirectory
     run-mailingbot:
@@ -50,9 +51,9 @@ jobs:
             - 
                 name: Run MailingBot Docker Container
                 run: |
-                    docker run --rm --volume $(pwd)/src/data/${{ matrix.environment }}:/src/data/ \
-                    -e OCTIV_USERNAME="${{ SECRETS[matrix.environment].OCTIV_USERNAME }}" \
-                    -e OCTIV_PASSWORD="${{ SECRETS[matrix.environment].OCTIV_PASSWORD }}" \
+                    docker run --rm --volume $(pwd)/src/slotbooker/data/${{ matrix.environment }}:/app/src/slotbooker/data/ \
+                    -e OCTIV_USERNAME="${{ SECRETS.OCTIV_USERNAME }}" \
+                    -e OCTIV_PASSWORD="${{ SECRETS.OCTIV_PASSWORD }}" \
                     -e EMAIL_SENDER="${{ SECRETS.EMAIL_SENDER }}" \
                     -e EMAIL_PASSWORD="${{ SECRETS.EMAIL_PASSWORD }}" \
                     -e EMAIL_RECEIVER="${{ SECRETS.EMAIL_RECEIVER }}" \
