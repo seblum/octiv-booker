@@ -3,11 +3,11 @@ name: Release CD
 env:
   DOCKERREPO: seblum/octivbooker
 
-
 on:
   workflow_dispatch:
   push:
-    branches: master
+    branches:
+      - master
     paths:
       - src/**
       - poetry.Dockerfile
@@ -24,20 +24,20 @@ jobs:
       pull-requests: write  # to be able to comment on released pull requests
     steps:
       - 
-        uses: googleapis/release-please-action@v4
+        name: Checkout code
+        uses: actions/checkout@v4
+      - 
         name: Release
+        uses: googleapis/release-please-action@v4
         id: release
         with:
           release-type: "python"
-      - 
-        uses: actions/checkout@v4
       - 
         name: 🏷️ Tag Major and Minor Versions
         if: ${{ steps.release.outputs.release_created }}
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/google-github-actions/release-please-action.git"
           git tag -d v${{ steps.release.outputs.major }} || true
           git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
           git push origin :v${{ steps.release.outputs.major }} || true
@@ -46,7 +46,7 @@ jobs:
           git tag -a v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "Release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
           git push origin v${{ steps.release.outputs.major }}
           git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
-  
+
   poetry-version-tag:
     runs-on: ubuntu-latest
     permissions:
@@ -56,6 +56,7 @@ jobs:
     needs: release
     steps:
       - 
+        name: Checkout code with full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -68,18 +69,18 @@ jobs:
         name: Extract tag version
         id: extract_version
         run: |
-          TAG_VERSION=$(git describe --match "v*.*.*" --tags --abbrev=0)
+          TAG_VERSION=$(git describe --match "v*.*.*" --tags --abbrev=0 || echo "no-tags")
           echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
-          echo $TAG_VERSION
-      -
+          echo "Extracted tag version: $TAG_VERSION"
+      - 
         name: Create new Branch
         run: |
-          git pull
+          git fetch origin
           git checkout -b update-version-$TAG_VERSION origin/master
           git pull --rebase
           git push origin update-version-$TAG_VERSION --force
         env:
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - 
         name: Update Version in pyproject.toml
         run: |
@@ -94,19 +95,22 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add pyproject.toml
           git commit -m "Update version to $TAG_VERSION"
-          git push origin update-version-$TAG_VERSION          
-      -
+          git push origin update-version-$TAG_VERSION
+      - 
+        name: Install GitHub CLI
+        run: |
+          sudo apt-get install gh
+      - 
         name: Create Pull Request
         run: |
-          PR_EXISTS=$(gh pr list --head $BRANCH --json number --jq '.[0]')
+          PR_EXISTS=$(gh pr list --head update-version-$TAG_VERSION --json number --jq '.[0].number' || echo "")
           if [ -z "$PR_EXISTS" ]; then
-            gh pr create --title "$TITLE" --body "$BODY" --base $BASE --head $BRANCH
+            gh pr create --title "Bump version to $TAG_VERSION" \
+                         --body "This PR updates the version in pyproject.toml to $TAG_VERSION." \
+                         --base master \
+                         --head update-version-$TAG_VERSION
           else
             echo "PR already exists."
           fi
         env:
-          TITLE: "Bump version to $TAG_VERSION"
-          BODY: "This PR updates the version in pyproject.toml to $TAG_VERSION."
-          BASE: "master"
-          BRANCH: "update-version-$TAG_VERSION"
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
