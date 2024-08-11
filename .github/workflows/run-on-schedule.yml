@@ -2,7 +2,7 @@ name: Run OctivBookerBot on Schedule
 
 on:
     schedule:
-        - cron: "55 20 * * *" # “At 20:55 every day.”
+        - cron: "55 18 * * *" # “At 18:55 UTC every day.”
     workflow_dispatch:
 
 env:
@@ -54,6 +54,7 @@ jobs:
                     -e EMAIL_SENDER="${{ SECRETS.EMAIL_SENDER }}" \
                     -e EMAIL_PASSWORD="${{ SECRETS.EMAIL_PASSWORD }}" \
                     -e EMAIL_RECEIVER="${{ SECRETS.EMAIL_RECEIVER }}" \
+                    -e EMAIL_RECEIVER_NAME="${{ SECRETS.EMAIL_RECEIVER_NAME }}" \
                     -e DAYS_BEFORE_BOOKABLE="${{ VARS.DAYS_BEFORE_BOOKABLE }}" \
                     -e EXECUTION_BOOKING_TIME="${{ VARS.EXECUTION_BOOKING_TIME }}" \
                     seblum/${{ENV.DOCKER_IMAGE}}
