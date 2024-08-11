@@ -2,9 +2,7 @@ name: Run OctivBookerBot on Schedule
 
 on:
     schedule:
-        - cron: "54 20 * * *" # “At 20:55 every day.”
-    pull_request:
-        branches: [ master ]
+        - cron: "55 20 * * *" # “At 20:55 every day.”
     workflow_dispatch:
 
 env:
