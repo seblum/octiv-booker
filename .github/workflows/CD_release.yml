@@ -1,4 +1,4 @@
-name: Deployment CD
+name: Release CD
 
 env:
   DOCKERREPO: seblum/octivbooker
@@ -15,58 +15,9 @@ on:
       - CHANGELOG.md
 
 jobs:
-  get-tag:
-    name: Get Tag
-    runs-on: ubuntu-latest
-    outputs:
-      PACKAGE_VERSION: ${{ steps.extract_version.outputs.PACKAGE_VERSION }}
-    steps:
-      - 
-        name: Checkout code
-        uses: actions/checkout@v4
-      -  
-        name: Extract version from pyproject.toml
-        id: extract_version
-        run: |
-          VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' ./pyproject.toml)
-          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
-
-  docker:
-    name: "📦 Build & Push : ${{ matrix.tags }}"
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        tags: ["latest","v${{ needs.get-tag.outputs.PACKAGE_VERSION }}"]
-    needs: get-tag
-    steps:
-      - 
-        name: Checkout code
-        uses: actions/checkout@v4
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          file: ./poetry.Dockerfile
-          push: true
-          tags: ${{ env.DOCKERREPO }}:${{ matrix.tags }}
-
   release:
     name: 🚀 Release
     runs-on: ubuntu-latest
-    needs:
-      - docker
     permissions:
       contents: write  # to be able to publish a GitHub release
       issues: write  # to be able to comment on released issues
@@ -95,3 +46,44 @@ jobs:
           git tag -a v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "Release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
           git push origin v${{ steps.release.outputs.major }}
           git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
+
+  poetry-version-tag:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - 
+        name: Checkout code
+        uses: actions/checkout@v4
+      - 
+        name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - 
+        name: Extract tag version
+        id: extract_version
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/}
+          echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
+      - 
+        name: Update pyproject.toml version
+        run: |
+          sed -i '' "s/^version = \".*\"/version = \"$TAG_VERSION\"/" pyproject.toml
+      - 
+        name: Commit changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout -b update-version-$TAG_VERSION
+          git add pyproject.toml
+          git commit -m "Update version to $TAG_VERSION"
+          git push origin update-version-$TAG_VERSION
+      - 
+        name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: bump-version-$TAG_VERSION
+          title: "Bump version to $TAG_VERSION"
+          body: "This PR updates the version in pyproject.toml to $TAG_VERSION."
+          base: main

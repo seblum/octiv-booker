@@ -18,7 +18,13 @@ jobs:
             - 
                 name: Checkout code
                 uses: actions/checkout@v4
-            - 
+            # - 
+            #     name: Extract version from pyproject.toml
+            #     id: extract_version
+            #     run: |
+            #         VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' ./pyproject.toml)
+            #         echo "DOCKER_IMAGE=octivbooker:v$VERSION" >> $GITHUB_ENV
+            -
                 name: List environment subdirectories
                 id: get_envdirs
                 run: |
