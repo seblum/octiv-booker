@@ -1,4 +1,4 @@
-name: Run MailingBot on Schedule
+name: Run OctivBookerBot on Schedule
 
 on:
     schedule:
@@ -8,7 +8,7 @@ on:
     workflow_dispatch:
 
 env:
-    DOCKER_TAG: "v2.4.0"
+    DOCKER_IMAGE: "octivbooker:v2.4.0"
 
 jobs:
     # Step 1: Pull the Docker image and list subdirectories
@@ -22,7 +22,7 @@ jobs:
                 uses: actions/checkout@v4
             - 
                 name: Pull Docker Image
-                run: docker pull seblum/mailingbot:${{ENV.DOCKER_TAG}}
+                run: docker pull seblum/${{ENV.DOCKER_IMAGE}}
             - 
                 name: List environment subdirectories
                 id: get_envdirs
@@ -58,4 +58,4 @@ jobs:
                     -e EMAIL_RECEIVER="${{ SECRETS.EMAIL_RECEIVER }}" \
                     -e DAYS_BEFORE_BOOKABLE="${{ VARS.DAYS_BEFORE_BOOKABLE }}" \
                     -e EXECUTION_BOOKING_TIME="${{ VARS.EXECUTION_BOOKING_TIME }}" \
-                    seblum/mailingbot:${{ENV.DOCKER_TAG}}
+                    seblum/${{ENV.DOCKER_IMAGE}}
