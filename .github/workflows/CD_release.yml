@@ -85,10 +85,18 @@ jobs:
           git push origin update-version-$TAG_VERSION
       - 
         name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: bump-version-$TAG_VERSION
-          title: "Bump version to $TAG_VERSION"
-          body: "This PR updates the version in pyproject.toml to $TAG_VERSION."
-          base: main
+        run: |
+          PR_RESPONSE=$(curl -s -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/pulls \
+            -d @- << EOF
+          {
+            "title": "Bump version to $TAG_VERSION",
+            "body": "This PR updates the version in pyproject.toml to $TAG_VERSION.",
+            "head": "update-version-$TAG_VERSION",
+            "base": "main"
+          }
+          EOF
+          )
+          echo "Pull Request created: $(echo $PR_RESPONSE | jq -r .html_url)"
