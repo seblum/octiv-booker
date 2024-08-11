@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "slotBooker"
-version = "2.4.0"
+version = "2.5.0"
 description = ""
 authors = ["Sebastian Blum <hello@seblum.com>"]
 packages = [{include = "slotbooker", from = "src"}]

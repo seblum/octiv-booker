@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.5.0](https://github.com/seblum/octiv-booker/compare/v2.4.0...v2.5.0) (2024-08-11)
+
+
+### Features
+
+* add additional dependencies between cd steps ([#49](https://github.com/seblum/octiv-booker/issues/49)) ([0bf45f3](https://github.com/seblum/octiv-booker/commit/0bf45f3c266db14b64be5cb7d10708df32182cac))
+* link CI/CD pipelines and automate further ([#42](https://github.com/seblum/octiv-booker/issues/42)) ([23832d8](https://github.com/seblum/octiv-booker/commit/23832d8a0a830791079eba4174fe53b45566abf4))
+* Setup pipeline to run bookings ([#40](https://github.com/seblum/octiv-booker/issues/40)) ([10c6b20](https://github.com/seblum/octiv-booker/commit/10c6b200057e269ebbd11ae3258070f4946db95e))
+
+
+### Bug Fixes
+
+* tag change in pyproject toml ([#45](https://github.com/seblum/octiv-booker/issues/45)) ([9c68a0e](https://github.com/seblum/octiv-booker/commit/9c68a0e6c056e4d95e7d273375b1f80b3252b19d))
+
 ## [2.4.0](https://github.com/seblum/octiv-booker/compare/v2.3.0...v2.4.0) (2024-07-21)
 
 
