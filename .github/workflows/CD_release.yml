@@ -69,7 +69,7 @@ jobs:
         name: Extract tag version
         id: extract_version
         run: |
-          TAG_VERSION=$(git describe --match "v*.*.*" --tags --abbrev=0 || echo "no-tags")
+          TAG_VERSION=$(git describe --match "v*.*.*" --tags --abbrev=0 | sed 's/^v//' || echo "no-tags")
           echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
           echo "Extracted tag version: $TAG_VERSION"
       - 
@@ -105,7 +105,7 @@ jobs:
         run: |
           PR_EXISTS=$(gh pr list --head update-version-$TAG_VERSION --json number --jq '.[0].number' || echo "")
           if [ -z "$PR_EXISTS" ]; then
-            gh pr create --title "Bump version to $TAG_VERSION" \
+            gh pr create --title "Bump pyproject.toml version to $TAG_VERSION" \
                          --body "This PR updates the version in pyproject.toml to $TAG_VERSION." \
                          --base master \
                          --head update-version-$TAG_VERSION
