@@ -1,0 +1,59 @@
+name: Run MailingBot on Schedule
+
+on:
+    schedule:
+        - cron: "55 20 * * *" # “At 20:55 every day.”
+    workflow_dispatch:
+
+env:
+    DOCKER_TAG: latest
+
+jobs:
+    # Step 1: Pull the Docker image and list subdirectories
+    prepare:
+        runs-on: ubuntu-latest
+        outputs:
+            environment_dir_list: ${{ steps.get_envdirs.outputs.environment_dir_list }}
+        steps:
+            - 
+                name: Checkout code
+                uses: actions/checkout@v4
+            - 
+                name: Pull Docker Image
+                run: docker pull seblum/mailingbot:${{ENV.DOCKER_TAG}}
+            - 
+                name: List environment subdirectories
+                id: get_envdirs
+                run: |
+                    # Find all subdirectories within /src/data/prod
+                    ENV_SUBDIRS=$(find src/slotbooker/data/prod -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
+                    ENV_SUBDIR_LIST=$(echo "$ENV_SUBDIRS" | jq -R -s -c 'split("\n")[:-1]')
+
+                    echo "environment_dir_list=$ENV_SUBDIR_LIST" >> $GITHUB_OUTPUT
+
+    # Step 2: Run MailingBot for each subdirectory
+    run-mailingbot:
+        needs: prepare
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                environment:  ${{ fromJson(needs.prepare.outputs.environment_dir_list) }}
+        steps:
+            - 
+                name: Checkout code
+                uses: actions/checkout@v4
+            - 
+                name: Set up Docker
+                uses: docker/setup-buildx-action@v2
+            - 
+                name: Run MailingBot Docker Container
+                run: |
+                    docker run --rm --volume $(pwd)/src/data/${{ matrix.environment }}:/src/data/ \
+                    -e OCTIV_USERNAME="${{ SECRETS[matrix.environment].OCTIV_USERNAME }}" \
+                    -e OCTIV_PASSWORD="${{ SECRETS[matrix.environment].OCTIV_PASSWORD }}" \
+                    -e EMAIL_SENDER="${{ SECRETS.EMAIL_SENDER }}" \
+                    -e EMAIL_PASSWORD="${{ SECRETS.EMAIL_PASSWORD }}" \
+                    -e EMAIL_RECEIVER="${{ SECRETS.EMAIL_RECEIVER }}" \
+                    -e DAYS_BEFORE_BOOKABLE="${{ VARS.DAYS_BEFORE_BOOKABLE }}" \
+                    -e EXECUTION_BOOKING_TIME="${{ VARS.EXECUTION_BOOKING_TIME }}" \
+                    seblum/mailingbot:${{ENV.DOCKER_TAG}}
