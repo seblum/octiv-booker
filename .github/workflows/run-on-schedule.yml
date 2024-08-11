@@ -20,9 +20,6 @@ jobs:
             - 
                 name: Checkout code
                 uses: actions/checkout@v4
-            # - 
-            #     name: Pull Docker Image
-            #     run: docker pull seblum/${{ENV.DOCKER_IMAGE}}
             - 
                 name: List environment subdirectories
                 id: get_envdirs
@@ -34,8 +31,9 @@ jobs:
                     echo "environment_dir_list=$ENV_SUBDIR_LIST" >> $GITHUB_OUTPUT
                     echo $ENV_SUBDIR_LIST
 
-    # Step 2: Run MailingBot for each subdirectory
-    run-mailingbot:
+    # Step 2: Run OctivBooker for each subdirectory
+    run-octivbooker:
+        name: Run OctivBooker ${{ matrix.environment }}
         needs: prepare
         runs-on: ubuntu-latest
         strategy:
