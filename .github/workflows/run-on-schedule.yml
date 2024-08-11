@@ -51,7 +51,7 @@ jobs:
             - 
                 name: Run MailingBot Docker Container
                 run: |
-                    docker run --rm --volume $(pwd)/src/slotbooker/data/${{ matrix.environment }}:/app/src/slotbooker/data/ \
+                    docker run --rm --volume $(pwd)/src/slotbooker/data/prod/${{ matrix.environment }}:/app/src/slotbooker/data/ \
                     -e OCTIV_USERNAME="${{ SECRETS.OCTIV_USERNAME }}" \
                     -e OCTIV_PASSWORD="${{ SECRETS.OCTIV_PASSWORD }}" \
                     -e EMAIL_SENDER="${{ SECRETS.EMAIL_SENDER }}" \
