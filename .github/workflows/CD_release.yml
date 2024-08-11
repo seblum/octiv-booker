@@ -3,11 +3,11 @@ name: Release CD
 env:
   DOCKERREPO: seblum/octivbooker
 
-
 on:
   workflow_dispatch:
   push:
-    branches: master
+    branches:
+      - master
     paths:
       - src/**
       - poetry.Dockerfile
@@ -24,20 +24,20 @@ jobs:
       pull-requests: write  # to be able to comment on released pull requests
     steps:
       - 
-        uses: googleapis/release-please-action@v4
+        name: Checkout code
+        uses: actions/checkout@v4
+      - 
         name: Release
+        uses: googleapis/release-please-action@v4
         id: release
         with:
           release-type: "python"
-      - 
-        uses: actions/checkout@v4
       - 
         name: 🏷️ Tag Major and Minor Versions
         if: ${{ steps.release.outputs.release_created }}
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/google-github-actions/release-please-action.git"
           git tag -d v${{ steps.release.outputs.major }} || true
           git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
           git push origin :v${{ steps.release.outputs.major }} || true
@@ -49,11 +49,17 @@ jobs:
 
   poetry-version-tag:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     needs: release
     steps:
       - 
-        name: Checkout code
+        name: Checkout code with full history
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - 
         name: Set up Python
         uses: actions/setup-python@v4
@@ -63,31 +69,48 @@ jobs:
         name: Extract tag version
         id: extract_version
         run: |
-          echo "Current directory: $(pwd)"
-          echo "Listing all tags:"
-          git tag -l
-          TAG_VERSION=$(git describe --match "v*.*.*" --tags --abbrev=0)
+          TAG_VERSION=$(git describe --match "v*.*.*" --tags --abbrev=0 | sed 's/^v//' || echo "no-tags")
           echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
-          echo $TAG_VERSION
+          echo "Extracted tag version: $TAG_VERSION"
       - 
-        name: Update pyproject.toml version
+        name: Create new Branch
         run: |
-          sed -i '' "s/^version = \".*\"/version = \"$TAG_VERSION\"/" pyproject.toml
+          git fetch origin
+          git checkout -b update-pyproject-version-$TAG_VERSION origin/master
+          git pull --rebase
+          git push origin update-pyproject-version-$TAG_VERSION --force
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - 
+        name: Update Version in pyproject.toml
+        run: |
+          sed -i "s/^version = \".*\"/version = \"$TAG_VERSION\"/" ./pyproject.toml
+      - 
+        name: Verify Update
+        run: cat ./pyproject.toml
       - 
         name: Commit changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git checkout -b update-version-$TAG_VERSION
           git add pyproject.toml
           git commit -m "Update version to $TAG_VERSION"
-          git push origin update-version-$TAG_VERSION
+          git push origin update-pyproject-version-$TAG_VERSION
+      - 
+        name: Install GitHub CLI
+        run: |
+          sudo apt-get install gh
       - 
         name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: bump-version-$TAG_VERSION
-          title: "Bump version to $TAG_VERSION"
-          body: "This PR updates the version in pyproject.toml to $TAG_VERSION."
-          base: main
+        run: |
+          PR_EXISTS=$(gh pr list --head update-pyproject-version-$TAG_VERSION --json number --jq '.[0].number' || echo "")
+          if [ -z "$PR_EXISTS" ]; then
+            gh pr create --title "Bump pyproject.toml version to $TAG_VERSION" \
+                         --body "This PR updates the version in pyproject.toml to $TAG_VERSION." \
+                         --base master \
+                         --head update-pyproject-version-$TAG_VERSION
+          else
+            echo "PR already exists."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
