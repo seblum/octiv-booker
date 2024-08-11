@@ -79,10 +79,12 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git checkout -b update-version-$TAG_VERSION
+          git pull
+          git checkout -b update-version-$TAG_VERSION origin/main
+          git pull --rebase
           git add pyproject.toml
           git commit -m "Update version to $TAG_VERSION"
-          git push origin update-version-$TAG_VERSION
+          git push origin update-version-$TAG_VERSION --force            
       -
         name: Create Pull Request
         run: |
