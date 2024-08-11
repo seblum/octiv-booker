@@ -6,7 +6,7 @@ on:
     workflow_dispatch:
 
 env:
-    DOCKER_TAG: latest
+    DOCKER_TAG: "v2.4.0"
 
 jobs:
     # Step 1: Pull the Docker image and list subdirectories
