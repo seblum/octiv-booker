@@ -67,24 +67,28 @@ jobs:
           TAG_VERSION=$(git describe --match "v*.*.*" --tags --abbrev=0)
           echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV
           echo $TAG_VERSION
+      -
+        name: Create new Branch
+        run: |
+          git pull
+          git checkout -b update-version-$TAG_VERSION origin/master
+          git pull --rebase
+          git push origin update-version-$TAG_VERSION --force
+        env:
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - 
         name: Update Version in pyproject.toml
         run: |
           sed -i "s/^version = \".*\"/version = \"$TAG_VERSION\"/" ./pyproject.toml
-      - 
-        name: Verify Update
-        run: cat ./pyproject.toml
+          cat ./pyproject.toml
       - 
         name: Commit changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git pull
-          git checkout -b update-version-$TAG_VERSION origin/master
-          git pull --rebase
           git add pyproject.toml
           git commit -m "Update version to $TAG_VERSION"
-          git push origin update-version-$TAG_VERSION --force            
+          git push origin update-version-$TAG_VERSION          
       -
         name: Create Pull Request
         run: |
