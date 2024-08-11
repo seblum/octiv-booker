@@ -76,9 +76,9 @@ jobs:
         name: Create new Branch
         run: |
           git fetch origin
-          git checkout -b update-version-$TAG_VERSION origin/master
+          git checkout -b update-pyproject-version-$TAG_VERSION origin/master
           git pull --rebase
-          git push origin update-version-$TAG_VERSION --force
+          git push origin update-pyproject-version-$TAG_VERSION --force
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - 
@@ -95,7 +95,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add pyproject.toml
           git commit -m "Update version to $TAG_VERSION"
-          git push origin update-version-$TAG_VERSION
+          git push origin update-pyproject-version-$TAG_VERSION
       - 
         name: Install GitHub CLI
         run: |
@@ -103,12 +103,12 @@ jobs:
       - 
         name: Create Pull Request
         run: |
-          PR_EXISTS=$(gh pr list --head update-version-$TAG_VERSION --json number --jq '.[0].number' || echo "")
+          PR_EXISTS=$(gh pr list --head update-pyproject-version-$TAG_VERSION --json number --jq '.[0].number' || echo "")
           if [ -z "$PR_EXISTS" ]; then
             gh pr create --title "Bump pyproject.toml version to $TAG_VERSION" \
                          --body "This PR updates the version in pyproject.toml to $TAG_VERSION." \
                          --base master \
-                         --head update-version-$TAG_VERSION
+                         --head update-pyproject-version-$TAG_VERSION
           else
             echo "PR already exists."
           fi
