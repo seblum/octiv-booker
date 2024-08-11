@@ -70,7 +70,7 @@ jobs:
       - 
         name: Update pyproject.toml version
         run: |
-          sed -i '' "s/^version = \".*\"/version = \"$TAG_VERSION\"/" ./pyproject.toml
+          sed -i '' "s/^version = \".*\"/version = \"$TAG_VERSION\"/" $(pwd)/pyproject.toml
       - 
         name: Commit changes
         run: |
