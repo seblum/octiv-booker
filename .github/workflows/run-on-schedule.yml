@@ -41,6 +41,7 @@ jobs:
         strategy:
             matrix:
                 environment:  ${{ fromJson(needs.prepare.outputs.environment_dir_list) }}
+        environment: ${{ matrix.environment }} # Use the environment from the matrix
         steps:
             - 
                 name: Checkout code
