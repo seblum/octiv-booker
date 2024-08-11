@@ -80,7 +80,11 @@ jobs:
       - 
         name: Test Run
         run: |
-          docker run --env IS_TEST=$IS_TEST --env OCTIV_USERNAME=$OCTIV_USERNAME --rm ${{ env.TEST_TAG }}
+          docker run \
+          --env IS_TEST=$IS_TEST \ 
+          --env OCTIV_USERNAME=$OCTIV_USERNAME \
+          --volume $(pwd)/src/slotbooker/data/dev/:/app/src/slotbooker/data/ \
+          --rm ${{ env.TEST_TAG }}
         env:
           IS_TEST: "True"
           OCTIV_USERNAME: "Test-mail"

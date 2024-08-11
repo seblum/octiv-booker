@@ -6,7 +6,7 @@ from .booking_handler import Booker
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
 config = yaml.safe_load(open(config_path))
 
-classes_path = os.path.join(os.path.dirname(__file__), "data/dev/classes.yaml")
+classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
 classes = yaml.safe_load(open(classes_path))
 
 
