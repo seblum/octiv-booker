@@ -80,7 +80,7 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git pull
-          git checkout -b update-version-$TAG_VERSION origin/main
+          git checkout -b update-version-$TAG_VERSION origin/master
           git pull --rebase
           git add pyproject.toml
           git commit -m "Update version to $TAG_VERSION"
