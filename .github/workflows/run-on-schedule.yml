@@ -3,6 +3,8 @@ name: Run MailingBot on Schedule
 on:
     schedule:
         - cron: "55 20 * * *" # “At 20:55 every day.”
+    pull_request:
+        branches: [ master ]
     workflow_dispatch:
 
 env:
