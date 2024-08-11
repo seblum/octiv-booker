@@ -80,7 +80,9 @@ jobs:
         name: Update Version in pyproject.toml
         run: |
           sed -i "s/^version = \".*\"/version = \"$TAG_VERSION\"/" ./pyproject.toml
-          cat ./pyproject.toml
+      - 
+        name: Verify Update
+        run: cat ./pyproject.toml
       - 
         name: Commit changes
         run: |
@@ -101,6 +103,6 @@ jobs:
         env:
           TITLE: "Bump version to $TAG_VERSION"
           BODY: "This PR updates the version in pyproject.toml to $TAG_VERSION."
-          BASE: "main"
+          BASE: "master"
           BRANCH: "update-version-$TAG_VERSION"
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
