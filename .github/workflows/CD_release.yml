@@ -22,6 +22,8 @@ jobs:
       contents: write  # to be able to publish a GitHub release
       issues: write  # to be able to comment on released issues
       pull-requests: write  # to be able to comment on released pull requests
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
     steps:
       - 
         name: Checkout code
@@ -54,6 +56,7 @@ jobs:
       issues: write
       pull-requests: write
     needs: release
+    if: ${{ needs.release.outputs.release_created }}
     steps:
       - 
         name: Checkout code with full history

@@ -7,8 +7,9 @@ env:
 on:
   workflow_dispatch:
   push:
-    tags:
-      - '*'  # This will trigger the workflow for any tag
+    paths:
+      - 'pyproject.toml'  # This will trigger the workflow only if pyproject.toml is changed
+    
       
 jobs:
   get-tag:
@@ -16,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       PACKAGE_VERSION: ${{ steps.extract_version.outputs.PACKAGE_VERSION }}
+      versions_changed: ${{ steps.compare_versions.outputs.versions_changed }}
     steps:
       - 
         name: Checkout code
@@ -26,14 +28,33 @@ jobs:
         run: |
           VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' ./pyproject.toml)
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
+      - 
+        name: Get previous version
+        id: get_previous_version
+        run: |
+          PREVIOUS_VERSION=$(git show HEAD~1:pyproject.toml | sed -n 's/^version = "\(.*\)"/\1/p')
+          echo "PREVIOUS_VERSION=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
+      - 
+        name: Compare versions
+        id: compare_versions
+        run: |
+          if [ "${{ steps.extract_version.outputs.PACKAGE_VERSION }}" = "${{ steps.get_previous_version.outputs.PREVIOUS_VERSION }}" ]; then
+            echo "Version has not changed. Exiting."
+            echo "versions_changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          else
+            echo "Version has changed. Proceeding."
+            echo "versions_changed=true" >> $GITHUB_OUTPUT
+          fi
 
-  docker:
+  deploy:
     name: "📦 Build & Push : ${{ matrix.tags }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
         tags: ["latest","v${{ needs.get-tag.outputs.PACKAGE_VERSION }}"]
     needs: get-tag
+    if: ${{ needs.get-tag.outputs.versions_changed }}
     steps:
       - 
         name: Checkout code
