@@ -117,10 +117,10 @@ jobs:
       - 
         name: Update Version in pyproject.toml
         run: |
-          sed -i "s/^DOCKER_IMAGE: \"octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ needs.get-tag.outputs.PACKAGE_VERSION }}\"/" ./github/workflows/run-on-schedule.yml
+          sed -i "s/^DOCKER_IMAGE: \"octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ needs.get-tag.outputs.PACKAGE_VERSION }}\"/" .github/workflows/run-on-schedule.yml
       - 
         name: Verify Update
-        run: cat ./github/workflows/run-on-schedule.yml
+        run: cat .github/workflows/run-on-schedule.yml
       - 
         name: Commit changes
         run: |
