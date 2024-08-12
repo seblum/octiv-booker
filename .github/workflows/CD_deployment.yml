@@ -111,11 +111,9 @@ jobs:
         name: Update Version in pyproject.toml
         run: |
           echo ${{ github.workspace }}
-          cd .github/
+          cd .github/workflows/
           echo $(ls)
-          cd workflows/
-          echo $(ls)
-          sed -i "s/^DOCKER_IMAGE: \"octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ env.TAG_VERSION }}\"/" run-on-schedule.yml
+          sed -i "s/^    DOCKER_IMAGE: \"    octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ env.TAG_VERSION }}\"/" run-on-schedule.yml
       - 
         name: Verify Update
         run: cat .github/workflows/run-on-schedule.yml
