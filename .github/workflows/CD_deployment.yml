@@ -123,6 +123,8 @@ jobs:
           git add .github/workflows/run-on-schedule.yml
           git commit -m "Update version to ${{ env.TAG_VERSION }}"
           git push origin update-run-on-schedule-version-${{ env.TAG_VERSION }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - 
         name: Install GitHub CLI
         run: |
