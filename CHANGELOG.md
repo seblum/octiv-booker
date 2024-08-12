@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0](https://github.com/seblum/octiv-booker/compare/v2.5.0...v2.6.0) (2024-08-12)
+
+
+### Features
+
+* switch run to utc 1855 ([#50](https://github.com/seblum/octiv-booker/issues/50)) ([3e7cd28](https://github.com/seblum/octiv-booker/commit/3e7cd2826eadeefba5887dcf67edc0481c9f847c))
+
 ## [2.5.0](https://github.com/seblum/octiv-booker/compare/v2.4.0...v2.5.0) (2024-08-11)
 
 
