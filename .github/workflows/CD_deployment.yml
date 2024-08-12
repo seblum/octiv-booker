@@ -96,12 +96,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # - 
-      #   name: Extract tag version
-      #   id: extract_version
-      #   run: |
-      #     echo "TAG_VERSION=v${{ needs.get-tag.outputs.PACKAGE_VERSION }}" >> $GITHUB_ENV
-      #     echo "Extracted tag version: $TAG_VERSION"
       - 
         name: Create new Branch
         run: |
@@ -115,7 +109,8 @@ jobs:
         name: Update Version in pyproject.toml
         run: |
           echo "Extracted tag version: ${{ env.TAG_VERSION }}"
-          sed -i "s/^DOCKER_IMAGE: \"octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ env.TAG_VERSION }}\"/" .github/workflows/run-on-schedule.yml
+          cd .github/workflows
+          sed -i "s/^DOCKER_IMAGE: \"octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ env.TAG_VERSION }}\"/" run-on-schedule.yml
       - 
         name: Verify Update
         run: cat .github/workflows/run-on-schedule.yml
