@@ -110,6 +110,7 @@ jobs:
       - 
         name: Update Version in pyproject.toml
         run: |
+          echo ${pwd}
           cd .github/workflows
           sed -i "s/^DOCKER_IMAGE: \"octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ env.TAG_VERSION }}\"/" run-on-schedule.yml
       - 
