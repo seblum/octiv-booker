@@ -99,6 +99,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.WORKFLOW_TOKEN }}
       - 
         name: Create new Branch
         run: |
@@ -123,9 +124,6 @@ jobs:
           git add .github/workflows/run-on-schedule.yml
           git commit -m "Update version to ${{ env.TAG_VERSION }}"
           git push origin update-run-on-schedule-version-${{ env.TAG_VERSION }}
-        env:
-          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-          token: ${{ secrets.WORKFLOW_TOKEN }}
       - 
         name: Install GitHub CLI
         run: |
