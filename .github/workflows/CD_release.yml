@@ -8,11 +8,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - src/**
-      - poetry.Dockerfile
-      - pyproject.toml
-      - CHANGELOG.md
 
 jobs:
   release:
@@ -50,7 +45,7 @@ jobs:
           git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
 
   poetry-version-tag:
-    name: "🗃️ Create Version Bump PR"
+    name: "🗃️ Create Poetry Version Bump PR"
     runs-on: ubuntu-latest
     permissions:
       contents: write
