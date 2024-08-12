@@ -11,7 +11,7 @@ on:
 
 jobs:
   test-and-lint:
-    name: Test & Lint
+    name: "🧰 Test & Lint"
     runs-on: ubuntu-latest
     outputs:
       PACKAGE_VERSION: ${{ steps.extract_version.outputs.PACKAGE_VERSION }}
@@ -60,7 +60,7 @@ jobs:
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
 
   docker-test:
-    name: "Test Build Docker Image"
+    name: "🧰 Test Build Docker Image"
     runs-on: ubuntu-latest
     needs: test-and-lint
     steps:
