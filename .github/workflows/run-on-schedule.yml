@@ -6,7 +6,7 @@ on:
     workflow_dispatch:
 
 env:
-    DOCKER_IMAGE: "octivbooker:v2.4.0"
+    DOCKER_IMAGE: "octivbooker:v2.6.1"
 
 jobs:
     prepare:
