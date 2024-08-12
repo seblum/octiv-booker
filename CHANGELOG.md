@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.6.1](https://github.com/seblum/octiv-booker/compare/v2.6.0...v2.6.1) (2024-08-12)
+
+
+### Bug Fixes
+
+* release manual poetry bump ([#58](https://github.com/seblum/octiv-booker/issues/58)) ([468fa70](https://github.com/seblum/octiv-booker/commit/468fa70f1e2105d6d70c98f5e838cd2f80567379))
+* Release on any master push irrespective path ([#55](https://github.com/seblum/octiv-booker/issues/55)) ([56793e1](https://github.com/seblum/octiv-booker/commit/56793e15d2756850dcf18e2355007e9c8f2f9ac7))
+
 ## [2.6.0](https://github.com/seblum/octiv-booker/compare/v2.5.0...v2.6.0) (2024-08-12)
 
 
