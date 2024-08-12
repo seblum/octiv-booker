@@ -125,6 +125,8 @@ jobs:
           git push origin update-run-on-schedule-version-${{ env.TAG_VERSION }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - 
         name: Install GitHub CLI
         run: |
