@@ -108,10 +108,13 @@ jobs:
         run: |
           PR_EXISTS=$(gh pr list --head update-pyproject-version-$TAG_VERSION --json number --jq '.[0].number' || echo "")
           if [ -z "$PR_EXISTS" ]; then
-            gh pr create --title "Bump pyproject.toml version to $TAG_VERSION" \
-                         --body "This PR updates the version in pyproject.toml to $TAG_VERSION." \
-                         --base master \
-                         --head update-pyproject-version-$TAG_VERSION
+            PR_URL=$(gh pr create --title "Bump pyproject.toml version to $TAG_VERSION" \
+                                  --body "This PR updates the version in pyproject.toml to $TAG_VERSION." \
+                                  --base master \
+                                  --head update-pyproject-version-$TAG_VERSION \
+                                  --json url --jq '.url')
+            echo "Created PR: $PR_URL"
+            gh pr merge --auto --squash --delete-branch $PR_URL
           else
             echo "PR already exists."
           fi
