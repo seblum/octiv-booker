@@ -8,11 +8,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - src/**
-      - poetry.Dockerfile
-      - pyproject.toml
-      - CHANGELOG.md
 
 jobs:
   release:
@@ -50,7 +45,7 @@ jobs:
           git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
 
   poetry-version-tag:
-    name: "🗃️ Create Version Bump PR"
+    name: "🗃️ Create Poetry Version Bump PR"
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -97,7 +92,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add pyproject.toml
+          git add ./pyproject.toml
           git commit -m "Update version to $TAG_VERSION"
           git push origin update-pyproject-version-$TAG_VERSION
       - 
