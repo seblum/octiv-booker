@@ -88,17 +88,14 @@ jobs:
     needs: 
       - deploy
       - get-tag
+    env:
+      TAG_VERSION: ${{ needs.get-tag.outputs.PACKAGE_VERSION }}  
     steps:
       - 
         name: Checkout code with full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # - 
-      #   name: Set up Python
-      #   uses: actions/setup-python@v4
-      #   with:
-      #     python-version: '3.x'
       # - 
       #   name: Extract tag version
       #   id: extract_version
@@ -117,6 +114,7 @@ jobs:
       - 
         name: Update Version in pyproject.toml
         run: |
+          echo "Extracted tag version: $TAG_VERSION"
           sed -i "s/^DOCKER_IMAGE: \"octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ needs.get-tag.outputs.PACKAGE_VERSION }}\"/" .github/workflows/run-on-schedule.yml
       - 
         name: Verify Update
