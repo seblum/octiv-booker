@@ -111,8 +111,10 @@ jobs:
         name: Update Version in pyproject.toml
         run: |
           echo ${{ github.workspace }}
-          echo $(ls -la)
-          cd .github/workflows
+          cd .github/
+          echo $(ls)
+          cd workflows/
+          echo $(ls)
           sed -i "s/^DOCKER_IMAGE: \"octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ env.TAG_VERSION }}\"/" run-on-schedule.yml
       - 
         name: Verify Update
