@@ -6,7 +6,7 @@ on:
     workflow_dispatch:
 
 env:
-    DOCKER_IMAGE: "octivbooker:v2.4.0"
+    DOCKER_IMAGE: "octivbooker:v2.5.0"
 
 jobs:
     # Step 1: Pull the Docker image and list subdirectories
