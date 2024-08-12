@@ -16,7 +16,7 @@ on:
 
 jobs:
   release:
-    name: 🚀 Release
+    name: "🚀 Release"
     runs-on: ubuntu-latest
     permissions:
       contents: write  # to be able to publish a GitHub release
@@ -35,7 +35,7 @@ jobs:
         with:
           release-type: "python"
       - 
-        name: 🏷️ Tag Major and Minor Versions
+        name: "🏷️ Tag Major and Minor Versions"
         if: ${{ steps.release.outputs.release_created }}
         run: |
           git config user.name github-actions[bot]
@@ -50,6 +50,7 @@ jobs:
           git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
 
   poetry-version-tag:
+    name: "🗃️ Create Version Bump PR"
     runs-on: ubuntu-latest
     permissions:
       contents: write
