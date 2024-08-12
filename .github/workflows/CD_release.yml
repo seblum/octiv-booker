@@ -92,7 +92,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add pyproject.toml
+          git add ./pyproject.toml
           git commit -m "Update version to $TAG_VERSION"
           git push origin update-pyproject-version-$TAG_VERSION
       - 
