@@ -9,7 +9,6 @@ env:
     DOCKER_IMAGE: "octivbooker:v2.5.0"
 
 jobs:
-    # Step 1: Pull the Docker image and list subdirectories
     prepare:
         runs-on: ubuntu-latest
         outputs:
@@ -29,9 +28,8 @@ jobs:
                     echo "environment_dir_list=$ENV_SUBDIR_LIST" >> $GITHUB_OUTPUT
                     echo $ENV_SUBDIR_LIST
 
-    # Step 2: Run OctivBooker for each subdirectory
     run-octivbooker:
-        name: Run OctivBooker ${{ matrix.environment }}
+        name: "🏋️‍♂️ Run OctivBooker ${{ matrix.environment }}"
         needs: prepare
         runs-on: ubuntu-latest
         strategy:

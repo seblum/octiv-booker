@@ -16,7 +16,7 @@ on:
 
 jobs:
   release:
-    name: 🚀 Release
+    name: "🚀 Release"
     runs-on: ubuntu-latest
     permissions:
       contents: write  # to be able to publish a GitHub release
@@ -35,7 +35,7 @@ jobs:
         with:
           release-type: "python"
       - 
-        name: 🏷️ Tag Major and Minor Versions
+        name: "🏷️ Tag Major and Minor Versions"
         if: ${{ steps.release.outputs.release_created }}
         run: |
           git config user.name github-actions[bot]
@@ -50,6 +50,7 @@ jobs:
           git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
 
   poetry-version-tag:
+    name: "🗃️ Create Version Bump PR"
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -108,10 +109,13 @@ jobs:
         run: |
           PR_EXISTS=$(gh pr list --head update-pyproject-version-$TAG_VERSION --json number --jq '.[0].number' || echo "")
           if [ -z "$PR_EXISTS" ]; then
-            gh pr create --title "Bump pyproject.toml version to $TAG_VERSION" \
-                         --body "This PR updates the version in pyproject.toml to $TAG_VERSION." \
-                         --base master \
-                         --head update-pyproject-version-$TAG_VERSION
+            PR_URL=$(gh pr create --title "Bump pyproject.toml version to $TAG_VERSION" \
+                                  --body "This PR updates the version in pyproject.toml to $TAG_VERSION." \
+                                  --base master \
+                                  --head update-pyproject-version-$TAG_VERSION \
+                                  --json url --jq '.url')
+            echo "Created PR: $PR_URL"
+            gh pr merge --auto --squash --delete-branch $PR_URL
           else
             echo "PR already exists."
           fi
