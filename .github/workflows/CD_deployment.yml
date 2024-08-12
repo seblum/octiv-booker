@@ -87,7 +87,7 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-      workflows: write
+      actions: write
     needs: 
       # - deploy
       - get-tag
