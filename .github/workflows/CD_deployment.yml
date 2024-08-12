@@ -106,16 +106,16 @@ jobs:
         name: Create new Branch
         run: |
           git fetch origin
-          git checkout -b update-run-on-schedule-version-$TAG_VERSION origin/master
+          git checkout -b update-run-on-schedule-version-${{ env.TAG_VERSION }} origin/master
           git pull --rebase
-          git push origin update-run-on-schedule-version-$TAG_VERSION --force
+          git push origin update-run-on-schedule-version-${{ env.TAG_VERSION }} --force
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - 
         name: Update Version in pyproject.toml
         run: |
-          echo "Extracted tag version: $TAG_VERSION"
-          sed -i "s/^DOCKER_IMAGE: \"octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ needs.get-tag.outputs.PACKAGE_VERSION }}\"/" .github/workflows/run-on-schedule.yml
+          echo "Extracted tag version: ${{ env.TAG_VERSION }}"
+          sed -i "s/^DOCKER_IMAGE: \"octivbooker:.*\"/DOCKER_IMAGE: \"octivbooker:v${{ env.TAG_VERSION }}\"/" .github/workflows/run-on-schedule.yml
       - 
         name: Verify Update
         run: cat .github/workflows/run-on-schedule.yml
@@ -125,8 +125,8 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add .github/workflows/run-on-schedule.yml
-          git commit -m "Update version to $TAG_VERSION"
-          git push origin update-run-on-schedule-version-$TAG_VERSION
+          git commit -m "Update version to ${{ env.TAG_VERSION }}"
+          git push origin update-run-on-schedule-version-${{ env.TAG_VERSION }}
       - 
         name: Install GitHub CLI
         run: |
@@ -134,12 +134,12 @@ jobs:
       - 
         name: Create Pull Request
         run: |
-          PR_EXISTS=$(gh pr list --head update-run-on-schedule-version-$TAG_VERSION --json number --jq '.[0].number' || echo "")
+          PR_EXISTS=$(gh pr list --head update-run-on-schedule-version-${{ env.TAG_VERSION }} --json number --jq '.[0].number' || echo "")
           if [ -z "$PR_EXISTS" ]; then
-            gh pr create --title "Bump run-on-schedule.yml version to $TAG_VERSION" \
-                          --body "This PR updates the version in run-on-schedule.yml to $TAG_VERSION." \
+            gh pr create --title "Bump run-on-schedule.yml version to ${{ env.TAG_VERSION }}" \
+                          --body "This PR updates the version in run-on-schedule.yml to ${{ env.TAG_VERSION }}." \
                           --base master \
-                          --head update-run-on-schedule-version-$TAG_VERSION
+                          --head update-run-on-schedule-version-${{ env.TAG_VERSION }}
           else
             echo "PR already exists."
           fi
