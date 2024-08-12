@@ -83,11 +83,11 @@ jobs:
 
   run-on-schedule-version-bump:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-      actions: write
+    permissions: write-all
+      # contents: write
+      # issues: write
+      # pull-requests: write
+      # actions: write
     needs: 
       # - deploy
       - get-tag
