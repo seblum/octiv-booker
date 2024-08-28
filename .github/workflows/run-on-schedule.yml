@@ -21,7 +21,7 @@ jobs:
                 name: List environment subdirectories
                 id: get_envdirs
                 run: |
-                    # Find all subdirectories within /src/data/prod
+                    # Find all subdirectories within /src/slotbooker/data/prod
                     ENV_SUBDIRS=$(find src/slotbooker/data/prod -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
                     ENV_SUBDIR_LIST=$(echo "$ENV_SUBDIRS" | jq -R -s -c 'split("\n")[:-1]')
 
