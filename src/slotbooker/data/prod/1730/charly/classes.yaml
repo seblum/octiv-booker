@@ -1,0 +1,28 @@
+book_class: True
+class_dict:
+  Monday: 
+    - time: "17:30"
+      class: "Open Gym"
+      wl: True
+  Tuesday:
+    - time: "17:30"
+      class: "Open Gym"
+      wl: True
+  Wednesday:
+    - time: "17:30"
+      class: "Open Gym"
+      wl: True
+  Thursday:
+    - time: "17:30"
+      class: "Open Gym"
+      wl: True
+  Friday:
+    - time: "17:30"
+      class: "Open Gym"
+      wl: True
+  Saturday: 
+    - time: None
+      class: None
+  Sunday:
+    - time: None
+      class: None

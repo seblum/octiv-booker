@@ -13,7 +13,7 @@ ENV TZ="Europe/Berlin"
 
 # Install Chromedriver
 RUN apt-get install -yqq unzip
-ENV ChromedriverVersion="129.0.6668.58"
+ENV ChromedriverVersion="130.0.6723.91"
 RUN wget -O /tmp/chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/$ChromedriverVersion/linux64/chromedriver-linux64.zip
 RUN unzip /tmp/chromedriver.zip chromedriver-linux64/chromedriver -d /usr/local/bin/
 

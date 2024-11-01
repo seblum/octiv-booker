@@ -1,4 +1,4 @@
-name: Run OctivBookerBot on Schedule
+name: Run OctivBookerBot on 1900 schedule
 
 on:
     schedule:
@@ -21,8 +21,8 @@ jobs:
                 name: List environment subdirectories
                 id: get_envdirs
                 run: |
-                    # Find all subdirectories within /src/slotbooker/data/prod
-                    ENV_SUBDIRS=$(find src/slotbooker/data/prod -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
+                    # Find all subdirectories within /src/slotbooker/data/prod/1900
+                    ENV_SUBDIRS=$(find src/slotbooker/data/prod/1900 -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
                     ENV_SUBDIR_LIST=$(echo "$ENV_SUBDIRS" | jq -R -s -c 'split("\n")[:-1]')
 
                     echo "environment_dir_list=$ENV_SUBDIR_LIST" >> $GITHUB_OUTPUT
@@ -46,7 +46,7 @@ jobs:
             - 
                 name: Run MailingBot Docker Container
                 run: |
-                    docker run --rm --volume $(pwd)/src/slotbooker/data/prod/${{ matrix.environment }}:/app/src/slotbooker/data/ \
+                    docker run --rm --volume $(pwd)/src/slotbooker/data/prod/1900/${{ matrix.environment }}:/app/src/slotbooker/data/ \
                     -e OCTIV_USERNAME="${{ SECRETS.OCTIV_USERNAME }}" \
                     -e OCTIV_PASSWORD="${{ SECRETS.OCTIV_PASSWORD }}" \
                     -e EMAIL_SENDER="${{ SECRETS.EMAIL_SENDER }}" \
