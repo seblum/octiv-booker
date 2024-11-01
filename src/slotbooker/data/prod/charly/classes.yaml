@@ -1,24 +1,24 @@
 book_class: True
 class_dict:
   Monday: 
-    - time: "19:00"
-      class: "Remote Coaching"
+    - time: "17:30"
+      class: "Open Gym"
       wl: True
   Tuesday:
-    - time: "19:00"
-      class: "Remote Coaching"
+    - time: "17:30"
+      class: "Open Gym"
       wl: True
   Wednesday:
-    - time: "19:00"
-      class: "Remote Coaching"
+    - time: "17:30"
+      class: "Open Gym"
       wl: True
   Thursday:
-    - time: "19:00"
-      class: "Remote Coaching"
+    - time: "17:30"
+      class: "Open Gym"
       wl: True
   Friday:
-    - time: "19:00"
-      class: "Remote Coaching"
+    - time: "17:30"
+      class: "Open Gym"
       wl: True
   Saturday: 
     - time: None
