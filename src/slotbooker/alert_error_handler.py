@@ -2,7 +2,8 @@ from enum import Enum
 import logging
 from typing import Any, Optional
 from selenium.webdriver.common.by import By
-from .helper_functions import XPathHelper, BookingHelper
+from .xpaths import XPathHelper
+from .utils.helpers import stop_booking_process
 
 
 class AlertTypes(Enum):
@@ -24,7 +25,6 @@ class AlertErrorHandler:
     def __init__(self, driver, selenium_manager):
         self.driver = driver
         self.xpath_helper = XPathHelper()
-        self.booking_helper = BookingHelper()
         self.selenium_manager = selenium_manager
 
     def alert_is_present(self) -> Optional[object]:
@@ -47,7 +47,7 @@ class AlertErrorHandler:
             return self._handle_cancel_slot(alert_obj)
         else:
             logging.warning(f"{AlertTypes.NotIdentifyAlert.value}: {alert_text}")
-            return not self.booking_helper.stop_booking_process()
+            return not stop_booking_process()
 
     def _contains_keywords(self, text: str, keywords: list) -> bool:
         return any(keyword.lower() in text.lower() for keyword in keywords)
@@ -60,7 +60,7 @@ class AlertErrorHandler:
             logging.info("Booking waiting list...")
             alert_obj.accept()
             logging.info("Waiting list booked")
-            return self.booking_helper.stop_booking_process()
+            return stop_booking_process
         else:
             logging.info(
                 f"Parameter 'wl' is set to {prioritize_waiting_list} > Skipping waiting list"
@@ -68,14 +68,14 @@ class AlertErrorHandler:
             alert_obj.dismiss()
             logging.info("Looking for further slots...")
             # TODO: I could send an email here.
-            return not self.booking_helper.stop_booking_process()
+            return not stop_booking_process
 
     def _handle_cancel_slot(self, alert_obj: object) -> bool:
         """Handle aborting the canceling of a slot."""
         logging.warning("Aborted canceling slot...")
         alert_obj.dismiss()
         logging.info("Looking for further slots...")
-        return not self.booking_helper.stop_booking_process()
+        return not stop_booking_process
 
     def error_is_present(self) -> Optional[str]:
         """Checks if an error is present and returns the error text."""

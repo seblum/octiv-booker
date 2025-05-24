@@ -5,10 +5,11 @@ from datetime import datetime
 # from selenium.common.exceptions import NoSuchElementException
 import time
 from .alert_error_handler import AlertErrorHandler
-from .helper_functions import XPathHelper, BookingHelper
+from .xpaths import XPathHelper
 from .utils.logging import CustomLogger, LogHandler
-from .utils.mail_handler import MailHandler  # Assuming MailHandler is in this module
+from .notifications.mailing import MailHandler  # Assuming MailHandler is in this module
 from .utils.selenium_manager import SeleniumManager
+from .utils.helpers import stop_booking_process, get_day, get_day_button
 
 # Set up custom logger
 logging.setLoggerClass(CustomLogger)
@@ -52,7 +53,6 @@ class Booker:
         self.days_before_bookable = days_before_bookable
         self.execution_booking_time = execution_booking_time
         self.xpath_helper = XPathHelper()
-        self.booking_helper = BookingHelper()
         self.warning_prompt_helper = AlertErrorHandler(
             driver=self.selenium_manager.get_driver(),
             selenium_manager=self.selenium_manager,
@@ -103,15 +103,15 @@ class Booker:
                 for keyword in ["credentials", "Fehler"]
             ):
                 logging.error(f"Incorrect credentials: {alert_text}")
-                return self.booking_helper.stop_booking_process()
+                return stop_booking_process()
         except Exception as e:
             logging.error(f"! Error during login attempt: {e}")
         logging.success("Login successful")
-        return not self.booking_helper.stop_booking_process()
+        return not stop_booking_process
 
     def switch_day(self) -> (str, str):
         """Switch to the desired day for booking slots."""
-        future_date, diff_week = self.booking_helper.get_day(self.days_before_bookable)
+        future_date, diff_week = get_day(self.days_before_bookable)
         self.day = future_date.strftime("%A")
 
         try:
@@ -121,7 +121,7 @@ class Booker:
                 )
                 logging.info("Switched to following week")
 
-            day_button = self.booking_helper.get_day_button(self.day, self.xpath_helper)
+            day_button = get_day_button(self.day, self.xpath_helper)
             self.selenium_manager.click_button(day_button)
             logging.info(f"Booking on {self.day}, {future_date}")
         except Exception as e:
@@ -288,7 +288,7 @@ class Booker:
 
         logging.success("Class booked")
         self.booking_successful = True
-        return self.booking_helper.stop_booking_process()
+        return stop_booking_process
 
     def _click_book_button(self, xpath_button_book: str) -> None:
         """Click the book button using JavaScript execution."""

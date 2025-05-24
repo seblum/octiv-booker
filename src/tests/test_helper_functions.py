@@ -1,6 +1,12 @@
 import unittest
 from datetime import date, timedelta
-from slotbooker.helper_functions import XPathHelper, BookingHelper
+from slotbooker.utils.helpers import XPathHelper
+from slotbooker.utils.helpers import (
+    stop_booking_process,
+    get_day,
+    get_day_button,
+    get_booking_slot,
+)
 
 
 class TestXPathHelper(unittest.TestCase):
@@ -65,7 +71,7 @@ class TestBookingHelper(unittest.TestCase):
 
     def test_get_day(self):
         today = date.today()
-        future_date, diff_week = BookingHelper.get_day(5)
+        future_date, diff_week = get_day(5)
         self.assertEqual(future_date, today + timedelta(days=5))
         self.assertEqual(
             diff_week, (future_date.isocalendar().week - today.isocalendar().week)
@@ -73,30 +79,30 @@ class TestBookingHelper(unittest.TestCase):
 
     def test_get_day_button(self):
         self.assertEqual(
-            BookingHelper.get_day_button("Monday", self.xpath_helper),
+            get_day_button("Monday", self.xpath_helper),
             "/html/body/div/div[6]/div/div[3]/div[2]/div/p",
         )
         self.assertEqual(
-            BookingHelper.get_day_button("Sunday", self.xpath_helper),
+            get_day_button("Sunday", self.xpath_helper),
             "/html/body/div/div[6]/div/div[3]/div[8]/div/p",
         )
         self.assertEqual(
-            BookingHelper.get_day_button("NonexistentDay", self.xpath_helper),
+            get_day_button("NonexistentDay", self.xpath_helper),
             "/html/body/div/div[6]/div/div[3]/div[0]/div/p",
         )
 
     def test_get_booking_slot(self):
         self.assertEqual(
-            BookingHelper.get_booking_slot(1, True, self.xpath_helper),
+            get_booking_slot(1, True, self.xpath_helper),
             "/html/body/div/div[6]/div/div[1]/div/div[1]/div[3]/button",
         )
         self.assertEqual(
-            BookingHelper.get_booking_slot(1, False, self.xpath_helper),
+            get_booking_slot(1, False, self.xpath_helper),
             "/html/body/div/div[6]/div/div[1]/div/div[2]/div[3]/button",
         )
 
     def test_stop_booking_process(self):
-        self.assertTrue(BookingHelper.stop_booking_process())
+        self.assertTrue(stop_booking_process())
 
 
 if __name__ == "__main__":

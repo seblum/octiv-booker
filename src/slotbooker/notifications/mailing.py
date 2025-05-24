@@ -141,10 +141,12 @@ class MailHandler:
         with open(template_path, "r") as file:
             template = Template(file.read())
 
-        booking_template = Template("""
+        booking_template = Template(
+            """
         <p class="booking-time"><strong>${booking_class}</strong></p>
         <p class="booking-time"><strong>${booking_date}; ${booking_time}</strong></p>
-        """)
+        """
+        )
         booking_html = "".join(
             [
                 booking_template.substitute(
@@ -207,9 +209,11 @@ class MailHandler:
         with open(template_path, "r") as file:
             template = Template(file.read())
 
-        booking_template = Template("""
+        booking_template = Template(
+            """
             <li class="booking-time"><strong>${booking_class}</strong> on <strong>${booking_date}</strong> at <strong>${booking_time}</strong></li>
-        """)
+        """
+        )
         booking_html = "".join(
             [
                 booking_template.substitute(

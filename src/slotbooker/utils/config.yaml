@@ -4,3 +4,24 @@
 # chromedriver: '/usr/local/bin/chromedriver-linux64/chromedriver'
 
 base_url: 'https://app.octivfitness.com/login'
+
+xpath:
+  booking_head: "/html/body/div/div[6]/div/div"
+  login:
+    username_head: "/html/body/div/div[3]/div/div/div/div/div/div/form"
+    password_head: "/html/body/div[1]/div[3]/div/div/div/div/div/div/form"
+    error_window: "/html/body/div/div[2]/div/div"
+  error:
+    window_path: "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[1]"
+    text_window_path: "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[2]"
+  day_buttons:
+    Monday: 2
+    Tuesday: 3
+    Wednesday: 4
+    Thursday: 5
+    Friday: 6
+    Saturday: 7
+    Sunday: 8
+  booking_slots:
+    book: "{booking_head}/{slot}/div/div[1]/div[3]/button"
+    cancel: "{booking_head}/{slot}/div/div[2]/div[3]/button"
