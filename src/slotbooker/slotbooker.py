@@ -5,7 +5,7 @@ from datetime import datetime
 # from selenium.common.exceptions import NoSuchElementException
 import time
 from .alert_error_handler import AlertErrorHandler
-from .xpaths import XPathHelper
+from .utils.xpaths import XPathHelper
 from .utils.logging import CustomLogger, LogHandler
 from .notifications.mailing import MailHandler  # Assuming MailHandler is in this module
 from .utils.selenium_manager import SeleniumManager

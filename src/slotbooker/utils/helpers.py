@@ -1,6 +1,6 @@
 import os
 from datetime import date, timedelta
-from src.slotbooker.xpaths import XPathHelper
+from slotbooker.utils.xpaths import XPathHelper
 
 
 class EnvVarNotSetError(Exception):

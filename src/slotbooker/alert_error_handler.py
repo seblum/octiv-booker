@@ -2,7 +2,7 @@ from enum import Enum
 import logging
 from typing import Any, Optional
 from selenium.webdriver.common.by import By
-from .xpaths import XPathHelper
+from .utils.xpaths import XPathHelper
 from .utils.helpers import stop_booking_process
 
 

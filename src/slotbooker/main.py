@@ -2,7 +2,7 @@ import os
 import logging
 import yaml
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
-from .booker import Booker
+from .slotbooker import Booker
 
 # Define file paths for configuration and classes
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "utils/config.yaml")

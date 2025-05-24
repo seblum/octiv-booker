@@ -1,6 +1,6 @@
 import os
 import yaml
-from .booker import Booker
+from .slotbooker import Booker
 
 # Load config yaml
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
