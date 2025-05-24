@@ -90,7 +90,17 @@ class Booker:
             logging.error(f"! Error during username entry: {e}")
 
         try:
-            alert_text = self._check_login_alert()
+            alert_div = self.selenium_manager.wait_for_element(
+                xpath=XPath.login_error_window(), timeout=10
+            )
+
+            if alert_div is not None:
+                logging.error("Login alert found")
+                alert_text = alert_div.text
+            else:
+                logging.info("No login alert found")
+                alert_text = ""
+
             if alert_text and any(
                 keyword.lower() in alert_text.lower()
                 for keyword in ["credentials", "Fehler"]
@@ -131,21 +141,25 @@ class Booker:
         """Book classes based on provided booking information."""
         self.booking_action = booking_action
         self.class_dict = class_dict.get(self.day)
-        class_entry_list = self._load_and_transform_input_class_dict()
 
-        all_slots_bounding_boxes = self._get_all_bounding_boxes_in_window()
-        all_possible_booking_slots_dict = self._get_all_bounding_boxes_by_class_name(
+        # Load and transform the input class_dict into a list of unique class entries.
+        class_entry_list = list({entry.get("class") for entry in self.class_dict})
+
+        # Get all bounding boxes containing booking slots present in the current window.
+        self.selenium_manager.wait_for_element(xpath=XPath.booking_section_head())
+        all_slots_bounding_boxes = self.selenium_manager.find_elements(
+            xpath=XPath.booking_section_head()
+        )
+
+        all_possible_booking_slots_dict = self._generate_bounding_box_class_dict(
             class_entry_list, all_slots_bounding_boxes
         )
 
         for entry in self.class_dict:
             if entry.get("class") == "None":
                 logging.info("! No class set for this day.")
-                return (
-                    self.booking_successful,
-                    self.booking_class_slot,
-                    self.booking_time_slot,
-                )
+                return self.return_bookings()
+
             self.booking_time_slot, self.booking_class_slot, prioritize_waiting_list = (
                 entry.get("time"),
                 entry.get("class"),
@@ -157,97 +171,78 @@ class Booker:
 
             if not all_possible_booking_slots_dict:
                 logging.info("! No classes found overall for this day.")
-                return (
-                    self.booking_successful,
-                    self.booking_class_slot,
-                    self.booking_time_slot,
+                return self.return_bookings()
+
+            try:
+                button_xpath = all_possible_booking_slots_dict[self.booking_class_slot][
+                    self.booking_time_slot
+                ]["xpath"]
+                logging.info(
+                    f"? Checking {self.booking_class_slot} at {self.booking_time_slot}..."
                 )
-            button_xpath = self._get_button_xpath(all_possible_booking_slots_dict)
+            except KeyError:
+                button_xpath = None
+                logging.info(
+                    f"! No class of type {self.booking_class_slot} is present on {self.day} at {self.booking_time_slot}"
+                )
+
             if not button_xpath:
                 logging.info(
                     f"! No class {self.booking_class_slot} found for this day."
                 )
-                return (
-                    self.booking_successful,
-                    self.booking_class_slot,
-                    self.booking_time_slot,
-                )
+                return self.return_bookings()
 
             if self._book_class_slot(button_xpath, prioritize_waiting_list):
-                return (
-                    self.booking_successful,
-                    self.booking_class_slot,
-                    self.booking_time_slot,
-                )
+                return self.return_bookings()
 
         return self.booking_successful, self.booking_class_slot, self.booking_time_slot
 
-    def _load_and_transform_input_class_dict(self) -> list:
-        """Load and transform the input class_dict into a list of unique class entries."""
-        return list({entry.get("class") for entry in self.class_dict})
+    def return_bookings(self) -> (str, str, str):
+        """Return the booking information."""
+        return (
+            self.booking_successful,
+            self.booking_class_slot,
+            self.booking_time_slot,
+        )
 
-    def _get_all_bounding_boxes_in_window(self) -> list:
-        """Get all bounding boxes containing booking slots present in the current window."""
-        self.selenium_manager.wait_for_element(xpath=XPath.booking_section_head())
-        return self.selenium_manager.find_elements(xpath=XPath.booking_section_head())
-
-    def _get_all_bounding_boxes_by_class_name(
+    def _generate_bounding_box_class_dict(
         self, class_entry_list: list, all_slots_bounding_boxes: list
     ) -> dict:
         """Get all possible booking slots for specified class entries and bounding boxes."""
         logging.info(f"? Possible classes: {class_entry_list}")
 
         bounding_box_number_by_action = 1 if self.booking_action else 2
-        all_possible_booking_slots_dict = defaultdict(list)
+        all_possible_booking_slots_dict = defaultdict(dict)
 
         for slot_index, box in enumerate(all_slots_bounding_boxes, start=1):
-            XPath.test = f"{XPath.booking_section_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
             try:
-                textfield = self.selenium_manager.get_element_text(xpath=XPath.test)
-                if textfield in class_entry_list:
+                class_name = self.selenium_manager.get_element_text(
+                    xpath=XPath.bounding_box_label(
+                        slot_index=slot_index,
+                        bounding_box_number=bounding_box_number_by_action,
+                    )
+                )
+                if class_name in class_entry_list:
                     time_slot = self.selenium_manager.get_element_text(
-                        xpath=f"{XPath.booking_section_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
+                        xpath=XPath.bounding_box_time(
+                            slot_index=slot_index,
+                            bounding_box_number=bounding_box_number_by_action,
+                        )
                     )
-                    logging.info(f"- Time: {time_slot} - Class: {textfield}")
+                    logging.info(f"- Time: {time_slot} - Class: {class_name}")
 
-                    XPath.button_book = XPath.booking_slot(
-                        slot=slot_index, book_action=self.booking_action
-                    )
-                    all_possible_booking_slots_dict[textfield].append(
-                        {
-                            time_slot: {
-                                "xpath": XPath.button_book,
-                            }
-                        }
-                    )
+                    if self.booking_action:
+                        button_book = XPath.enter_slot(slot=slot_index)
+                    else:
+                        button_book = XPath.cancel_slot(slot=slot_index)
+
+                    all_possible_booking_slots_dict[class_name][time_slot] = {
+                        "xpath": button_book
+                    }
             except Exception:
                 continue
 
         return all_possible_booking_slots_dict
-
-    def _get_button_xpath(self, all_possible_booking_slots_dict: dict) -> str:
-        """Get the XPath of the button for booking a class slot."""
-        try:
-            all_possible_booking_slots_dict_flatten = {
-                k: v
-                for d in all_possible_booking_slots_dict.get(
-                    self.booking_class_slot, []
-                )
-                for k, v in d.items()
-            }
-
-            button_xpath = all_possible_booking_slots_dict_flatten.get(
-                self.booking_time_slot, {}
-            ).get("xpath")
-            logging.info(
-                f"? Checking {self.booking_class_slot} at {self.booking_time_slot}..."
-            )
-            return button_xpath
-        except (AttributeError, TypeError):
-            logging.info(
-                f"! No class of type {self.booking_class_slot} is present on {self.day} at {self.booking_time_slot}"
-            )
-            return None
 
     def _book_class_slot(
         self,
@@ -294,19 +289,6 @@ class Booker:
                 logging.info(f"Executed at {end_time.time()}")
                 logging.info(f"Took {(end_time - start_time).total_seconds()}s")
                 break
-
-    def _check_login_alert(self) -> str:
-        """Check for alert messages after login."""
-        alert_div = self.selenium_manager.wait_for_element(
-            xpath=XPath.login_error_window(), timeout=10
-        )
-
-        if alert_div is not None:
-            logging.error("Login alert found")
-            return alert_div.text
-        else:
-            logging.info("No login alert found")
-            return ""
 
     def close(self):
         """Closes the WebDriver."""

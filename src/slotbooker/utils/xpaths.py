@@ -27,8 +27,11 @@ class XPathEnum(str, Enum):
     # Booking
     SWITCH_WEEK_BUTTON = f"{BOOKING_SECTION}[3]/div[9]/div/div/i"
     GET_DAY_BUTTON = f"{BOOKING_SECTION}[3]/div[{{day_index}}]/div/p"
-    BOOK_SLOT_ACTION = f"{BOOKING_SECTION}[{{slot}}]/div/div[1]/div[3]/button"
-    CANCEL_SLOT_ACTION = f"{BOOKING_SECTION}[{{slot}}]/div/div[2]/div[3]/button"
+    BOUNDING_BOX_LABEL = f"{BOOKING_SECTION}[{{slot_index}}]/div/div[{{bounding_box_number}}]/div[2]/p[1]"
+    BOUNDING_BOX_TIME = f"{BOOKING_SECTION}[{{slot_index}}]/div/div[{{bounding_box_number}}]/div[1]/p[1]"
+
+    ENTER_SLOT = f"{BOOKING_SECTION}[{{slot}}]/div/div[1]/div[3]/button"
+    CANCEL_SLOT = f"{BOOKING_SECTION}[{{slot}}]/div/div[2]/div[3]/button"
 
 
 class XPath:
@@ -85,12 +88,24 @@ class XPath:
         )
 
     @staticmethod
-    def booking_slot_action(slot: int) -> str:
-        return XPathEnum.BOOK_SLOT_ACTION.value.format(slot=slot)
+    def bounding_box_label(slot_index: int, bounding_box_number: int) -> str:
+        return XPathEnum.BOUNDING_BOX_LABEL.value.format(
+            slot_index=slot_index, bounding_box_number=bounding_box_number
+        )
 
     @staticmethod
-    def cancel_slot_action(slot: int) -> str:
-        return XPathEnum.CANCEL_SLOT_ACTION.value.format(slot=slot)
+    def bounding_box_time(slot_index: int, bounding_box_number: int) -> str:
+        return XPathEnum.BOUNDING_BOX_TIME.value.format(
+            slot_index=slot_index, bounding_box_number=bounding_box_number
+        )
+
+    @staticmethod
+    def enter_slot(slot: int) -> str:
+        return XPathEnum.ENTER_SLOT.value.format(slot=slot)
+
+    @staticmethod
+    def cancel_slot(slot: int) -> str:
+        return XPathEnum.CANCEL_SLOT.value.format(slot=slot)
 
     # @staticmethod
     # def booking_slot(slot: int, book_action: bool) -> str:
