@@ -2,7 +2,7 @@ import os
 import logging
 import yaml
 from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverException
-from .booking_handler import Booker
+from .booker import Booker
 
 # Define file paths for configuration and classes
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
@@ -59,7 +59,7 @@ def main(retry: int = 3):
             )
 
             # Login and book the class
-            if not booker.login(username=user, password=password):
+            if booker.login(username=user, password=password):
                 raise ValueError("Login failed")
 
             booker.switch_day()
