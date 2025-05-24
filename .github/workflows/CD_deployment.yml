@@ -114,13 +114,13 @@ jobs:
           sed -i "s/^    DOCKER_IMAGE: \"octivbooker:.*\"/    DOCKER_IMAGE: \"octivbooker:v${{ env.TAG_VERSION }}\"/" .github/workflows/run-on-schedule-*.yml
       - 
         name: Verify Update
-        run: cat .github/workflows/run-on-schedule.yml
+        run: cat .github/workflows/run-on-schedule-*.yml
       - 
         name: Commit changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .github/workflows/run-on-schedule.yml
+          git add .github/workflows/run-on-schedule-*.yml
           git commit -m "Update DOCKER_IMAGE: to ${{ env.TAG_VERSION }}"
           git push origin update-run-on-schedule-version-${{ env.TAG_VERSION }}
       - 
