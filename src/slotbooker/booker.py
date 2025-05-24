@@ -6,7 +6,7 @@ from datetime import datetime
 import time
 from .alert_error_handler import AlertErrorHandler
 from .helper_functions import XPathHelper, BookingHelper
-from .utils.log_handler import CustomLogger, LogHandler
+from .utils.logging import CustomLogger, LogHandler
 from .utils.mail_handler import MailHandler  # Assuming MailHandler is in this module
 from .utils.selenium_manager import SeleniumManager
 
@@ -57,7 +57,7 @@ class Booker:
             driver=self.selenium_manager.get_driver(),
             selenium_manager=self.selenium_manager,
         )
-        self.log_handler = LogHandler(log_level=logging.INFO)
+        self.loggingHandler = LogHandler(log_level=logging.INFO)
         self.mail_handler = None
         self.class_dict = None
         self.booking_action = None
@@ -95,8 +95,7 @@ class Booker:
                 self.xpath_helper.get_xpath_login_password_head() + "/button"
             )
         except Exception as e:
-            logging.error(f"! Error during login attempt: {e}")
-
+            logging.error(f"! Error during username entry: {e}")
         try:
             alert_text = self._check_login_alert()
             if alert_text and any(
@@ -105,9 +104,8 @@ class Booker:
             ):
                 logging.error(f"Incorrect credentials: {alert_text}")
                 return self.booking_helper.stop_booking_process()
-        except Exception:
-            pass
-
+        except Exception as e:
+            logging.error(f"! Error during login attempt: {e}")
         logging.success("Login successful")
         return not self.booking_helper.stop_booking_process()
 
@@ -310,13 +308,16 @@ class Booker:
 
     def _check_login_alert(self) -> str:
         """Check for alert messages after login."""
-        # try:
         alert_div = self.selenium_manager.wait_for_element(
             xpath=self.xpath_helper.get_xpath_login_error_window(), timeout=10
         )
-        return alert_div.text
-        # except NoSuchElementException:
-        #     return ""
+
+        if alert_div is not None:
+            logging.error("Login alert found")
+            return alert_div.text
+        else:
+            logging.info("No login alert found")
+            return ""
 
     def close(self):
         """Closes the WebDriver."""
@@ -348,7 +349,7 @@ class Booker:
 
         attachment_path = None
         if attach_logfile:
-            attachment_path = self.log_handler.get_log_file_path()
+            attachment_path = self.loggingHandler.get_log_file_path()
 
         if self.booking_successful:
             self.mail_handler.send_successful_booking_email(

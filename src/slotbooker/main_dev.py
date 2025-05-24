@@ -1,6 +1,6 @@
 import os
 import yaml
-from .booking_handler import Booker
+from .booker import Booker
 
 # Load config yaml
 config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
@@ -42,7 +42,7 @@ def main():
         attach_logfile=True,
     )
 
-    booker.close()
+    # booker.close()
 
 
 if __name__ == "__main__":
