@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.3](https://github.com/seblum/octiv-booker/compare/v2.6.2...v2.6.3) (2025-05-24)
+
+
+### Bug Fixes
+
+* update version CD bump ([#76](https://github.com/seblum/octiv-booker/issues/76)) ([43f1226](https://github.com/seblum/octiv-booker/commit/43f1226c08467375d22efa8eea94a6395af6ee9c))
+
 ## [2.6.2](https://github.com/seblum/octiv-booker/compare/v2.6.1...v2.6.2) (2025-05-24)
 
 
