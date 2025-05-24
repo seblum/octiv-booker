@@ -5,11 +5,11 @@ from datetime import datetime
 # from selenium.common.exceptions import NoSuchElementException
 import time
 from .alert_error_handler import AlertErrorHandler
-from .utils.xpaths import XPathHelper
 from .utils.logging import CustomLogger, LogHandler
 from .notifications.mailing import MailHandler  # Assuming MailHandler is in this module
 from .utils.selenium_manager import SeleniumManager
 from .utils.helpers import stop_booking_process, get_day, get_day_button
+from slotbooker.utils.xpaths import XPath
 
 # Set up custom logger
 logging.setLoggerClass(CustomLogger)
@@ -52,7 +52,6 @@ class Booker:
         self.base_url = base_url
         self.days_before_bookable = days_before_bookable
         self.execution_booking_time = execution_booking_time
-        self.xpath_helper = XPathHelper()
         self.warning_prompt_helper = AlertErrorHandler(
             driver=self.selenium_manager.get_driver(),
             selenium_manager=self.selenium_manager,
@@ -75,27 +74,21 @@ class Booker:
             self.selenium_manager.get_page(base_url=self.base_url)
 
             self.selenium_manager.input_text(
-                self.xpath_helper.get_xpath_login_username_head() + "/div[1]/input",
+                XPath.login_username_input(),
                 username,
             )
-            self.selenium_manager.click_button(
-                self.xpath_helper.get_xpath_login_username_head() + "/button"
-            )
+            self.selenium_manager.click_button(XPath.login_username_button())
             logging.info("Username submitted successfully")
 
             self.selenium_manager.input_text(
-                self.xpath_helper.get_xpath_login_password_head() + "/div[2]/input",
+                XPath.login_password_input(),
                 password,
             )
-            self.selenium_manager.click_button(
-                self.xpath_helper.get_xpath_login_password_head()
-                + "/div[3]/div/div/div[1]/div/i"
-            )
-            self.selenium_manager.click_button(
-                self.xpath_helper.get_xpath_login_password_head() + "/button"
-            )
+            self.selenium_manager.click_button(XPath.login_password_check())
+            self.selenium_manager.click_button(XPath.login_password_button())
         except Exception as e:
             logging.error(f"! Error during username entry: {e}")
+
         try:
             alert_text = self._check_login_alert()
             if alert_text and any(
@@ -106,6 +99,7 @@ class Booker:
                 return stop_booking_process()
         except Exception as e:
             logging.error(f"! Error during login attempt: {e}")
+
         logging.success("Login successful")
         return not stop_booking_process
 
@@ -117,11 +111,11 @@ class Booker:
         try:
             for _ in range(diff_week):
                 self.selenium_manager.click_button(
-                    self.xpath_helper.get_xpath_booking_head() + "[3]/div[9]/div/div/i"
+                    XPath.booking_head() + "[3]/div[9]/div/div/i"
                 )
                 logging.info("Switched to following week")
 
-            day_button = get_day_button(self.day, self.xpath_helper)
+            day_button = get_day_button(self.day, self.XPath.helper)
             self.selenium_manager.click_button(day_button)
             logging.info(f"Booking on {self.day}, {future_date}")
         except Exception as e:
@@ -195,12 +189,8 @@ class Booker:
 
     def _get_all_bounding_boxes_in_window(self) -> list:
         """Get all bounding boxes containing booking slots present in the current window."""
-        self.selenium_manager.wait_for_element(
-            xpath=self.xpath_helper.get_xpath_booking_head()
-        )
-        return self.selenium_manager.find_elements(
-            xpath=self.xpath_helper.get_xpath_booking_head()
-        )
+        self.selenium_manager.wait_for_element(xpath=XPath.booking_head())
+        return self.selenium_manager.find_elements(xpath=XPath.booking_head())
 
     def _get_all_bounding_boxes_by_class_name(
         self, class_entry_list: list, all_slots_bounding_boxes: list
@@ -212,22 +202,22 @@ class Booker:
         all_possible_booking_slots_dict = defaultdict(list)
 
         for slot_index, box in enumerate(all_slots_bounding_boxes, start=1):
-            xpath_test = f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
+            XPath.test = f"{XPath.booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
             try:
-                textfield = self.selenium_manager.get_element_text(xpath=xpath_test)
+                textfield = self.selenium_manager.get_element_text(xpath=XPath.test)
                 if textfield in class_entry_list:
                     time_slot = self.selenium_manager.get_element_text(
-                        xpath=f"{self.xpath_helper.get_xpath_booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
+                        xpath=f"{XPath.booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
                     )
                     logging.info(f"- Time: {time_slot} - Class: {textfield}")
 
-                    xpath_button_book = self.xpath_helper.get_xpath_booking_slot(
+                    XPath.button_book = XPath.booking_slot(
                         slot=slot_index, book_action=self.booking_action
                     )
                     all_possible_booking_slots_dict[textfield].append(
                         {
                             time_slot: {
-                                "xpath": xpath_button_book,
+                                "xpath": XPath.button_book,
                             }
                         }
                     )
@@ -309,7 +299,7 @@ class Booker:
     def _check_login_alert(self) -> str:
         """Check for alert messages after login."""
         alert_div = self.selenium_manager.wait_for_element(
-            xpath=self.xpath_helper.get_xpath_login_error_window(), timeout=10
+            xpath=XPath.login_error_window(), timeout=10
         )
 
         if alert_div is not None:

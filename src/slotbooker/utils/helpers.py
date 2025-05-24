@@ -1,6 +1,6 @@
 import os
 from datetime import date, timedelta
-from slotbooker.utils.xpaths import XPathHelper
+from slotbooker.utils.xpaths import XPath
 
 
 class EnvVarNotSetError(Exception):
@@ -62,7 +62,7 @@ def get_day(days_before_bookable: int) -> tuple[date, int]:
     return future_date, diff_week
 
 
-def get_day_button(day_to_book: str, xpath_helper: XPathHelper) -> str:
+def get_day_button(day_to_book: str) -> str:
     """Sets the XPath of the button of the day to be clicked.
 
     Args:
@@ -80,12 +80,10 @@ def get_day_button(day_to_book: str, xpath_helper: XPathHelper) -> str:
         "Saturday": 7,
         "Sunday": 8,
     }
-    return xpath_helper.get_day_button_xpath(day_indices.get(day_to_book, 0))
+    return XPath.helper.get_day_button_xpath(day_indices.get(day_to_book, 0))
 
 
-def get_booking_slot(
-    booking_slot: int, book_action: bool, xpath_helper: XPathHelper
-) -> str:
+def get_booking_slot(booking_slot: int, book_action: bool) -> str:
     """Sets the XPath of the booking slot button to be clicked and whether
     the slot (class) shall be booked or cancelled.
 
@@ -96,4 +94,4 @@ def get_booking_slot(
     Returns:
         str: XPath of the booking slot button to be clicked
     """
-    return xpath_helper.get_xpath_booking_slot(booking_slot, book_action)
+    return XPath.booking_slot(booking_slot, book_action)

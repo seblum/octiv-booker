@@ -2,8 +2,8 @@ from enum import Enum
 import logging
 from typing import Any, Optional
 from selenium.webdriver.common.by import By
-from .utils.xpaths import XPathHelper
 from .utils.helpers import stop_booking_process
+from slotbooker.utils.xpaths import XPath
 
 
 class AlertTypes(Enum):
@@ -24,7 +24,6 @@ class AlertTypes(Enum):
 class AlertErrorHandler:
     def __init__(self, driver, selenium_manager):
         self.driver = driver
-        self.xpath_helper = XPathHelper()
         self.selenium_manager = selenium_manager
 
     def alert_is_present(self) -> Optional[object]:
@@ -80,12 +79,12 @@ class AlertErrorHandler:
     def error_is_present(self) -> Optional[str]:
         """Checks if an error is present and returns the error text."""
         error_window = self.selenium_manager.wait_for_element(
-            xpath=self.xpath_helper.get_xpath_error_window(), timeout=3
+            xpath=XPath.error_window(), timeout=3
         )
         if error_window:
             # logging.error("! Error !")
             error_text = self.driver.find_element(
-                By.XPATH, self.xpath_helper.get_xpath_error_text_window()
+                By.XPATH, XPath.error_text_window()
             ).text
             return error_text
         return None
@@ -106,7 +105,7 @@ class AlertErrorHandler:
 
     def login_error_is_present(self):
         alert_div = self.selenium_manager.wait_for_element(
-            xpath=self.xpath_helper.get_xpath_login_error_window(), timeout=3
+            xpath=XPath.login_error_window(), timeout=3
         )
         if alert_div:
             alert_text = alert_div.text
