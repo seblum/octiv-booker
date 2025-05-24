@@ -4,31 +4,31 @@ from enum import Enum
 class XPathEnum(str, Enum):
     """Enum for commonly used XPath strings."""
 
-    BOOKING_HEAD = "/html/body/div/div[6]/div/div"
+    # Base paths
+    BASE = "/html/body/div"
+    LOGIN_SECTION = f"{BASE}/div[3]/div/div/div/div/div/div/form"
+    ERROR_SECTION = f"{BASE}/div[2]/div/div"
+    BOOKING_SECTION = f"{BASE}/div[6]/div/div"
 
-    # Username XPaths
-    LOGIN_USERNAME_INPUT = (
-        "/html/body/div/div[3]/div/div/div/div/div/div/form/div[1]/input"
-    )
-    LOGIN_USERNAME_BUTTON = "/html/body/div/div[3]/div/div/div/div/div/div/form/button"
+    # Login - Username
+    LOGIN_USERNAME_INPUT = f"{LOGIN_SECTION}/div[1]/input"
+    LOGIN_USERNAME_BUTTON = f"{LOGIN_SECTION}/button"
 
-    # Password XPaths
-    LOGIN_PASSWORD_INPUT = (
-        "/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[2]/input"
-    )
-    LOGIN_PASSWORD_CHECK = "/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[3]/div/div/div[1]/div/i"
-    LOGIN_PASSWORD_BUTTON = (
-        "/html/body/div[1]/div[3]/div/div/div/div/div/div/form/button"
-    )
+    # Login - Password
+    LOGIN_PASSWORD_INPUT = f"{LOGIN_SECTION}/div[2]/input"
+    LOGIN_PASSWORD_CHECK = f"{LOGIN_SECTION}/div[3]/div/div/div[1]/div/i"
+    LOGIN_PASSWORD_BUTTON = f"{LOGIN_SECTION}/button"
 
-    LOGIN_ERROR_WINDOW = "/html/body/div/div[2]/div/div"
-    ERROR_WINDOW_PATH = "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[1]"
-    ERROR_TEXT_WINDOW_PATH = "/html/body/div/div[2]/div/div/div[1]/div/div/div[2]/p[2]"
-    GET_DAY_BUTTON = "/html/body/div/div[6]/div/div[3]/div[{day_index}]/div/p"
-    BOOK_SLOT_ACTION = "/html/body/div/div[6]/div/div[{slot}]/div/div[1]/div[3]/button"
-    CANCEL_SLOT_ACTION = (
-        "/html/body/div/div[6]/div/div[{slot}]/div/div[2]/div[3]/button"
-    )
+    # Error handling
+    LOGIN_ERROR_WINDOW = ERROR_SECTION
+    ERROR_WINDOW_PATH = f"{ERROR_SECTION}/div[1]/div/div/div[2]/p[1]"
+    ERROR_TEXT_WINDOW_PATH = f"{ERROR_SECTION}/div[1]/div/div/div[2]/p[2]"
+
+    # Booking
+    SWITCH_WEEK_BUTTON = f"{BOOKING_SECTION}[3]/div[9]/div/div/i"
+    GET_DAY_BUTTON = f"{BOOKING_SECTION}[3]/div[{{day_index}}]/div/p"
+    BOOK_SLOT_ACTION = f"{BOOKING_SECTION}[{{slot}}]/div/div[1]/div[3]/button"
+    CANCEL_SLOT_ACTION = f"{BOOKING_SECTION}[{{slot}}]/div/div[2]/div[3]/button"
 
 
 class XPath:
@@ -63,6 +63,11 @@ class XPath:
     @staticmethod
     def login_error_window() -> str:
         return XPathEnum.LOGIN_ERROR_WINDOW.value
+
+    # Switch week button
+    @staticmethod
+    def switch_week_button() -> str:
+        return XPathEnum.SWITCH_WEEK_BUTTON.value
 
     @staticmethod
     def get_day_button_xpath(day_index: int) -> str:

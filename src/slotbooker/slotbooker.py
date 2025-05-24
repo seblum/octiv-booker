@@ -110,16 +110,15 @@ class Booker:
 
         try:
             for _ in range(diff_week):
-                self.selenium_manager.click_button(
-                    XPath.booking_head() + "[3]/div[9]/div/div/i"
-                )
+                self.selenium_manager.click_button(XPath.switch_week_button())
                 logging.info("Switched to following week")
 
-            day_button = get_day_button(self.day, self.XPath.helper)
+            day_button = get_day_button(self.day, self.XPath.helper)  # TODO: fix this
             self.selenium_manager.click_button(day_button)
             logging.info(f"Booking on {self.day}, {future_date}")
         except Exception as e:
             logging.error(f"! Error during day switch: {e}")
+            # TODO: make script fail if day switch fails
 
         self.booking_information.update(
             {"current_date": f"{self.day}, {future_date.strftime('%d/%m/%Y')}"}
