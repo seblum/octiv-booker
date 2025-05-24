@@ -66,6 +66,14 @@ class Booker:
         self.booking_successful = False
         self.booking_information = {"bookings": []}
 
+    def __return_bookings(self) -> (str, str, str):
+        """Return the booking information."""
+        return (
+            self.booking_successful,
+            self.booking_class_slot,
+            self.booking_time_slot,
+        )
+
     def login(self, username: str, password: str) -> bool:
         """Login to the booking website using the provided credentials."""
         try:
@@ -139,6 +147,11 @@ class Booker:
         self, class_dict: dict, booking_action: bool = True
     ) -> (bool, str, str):
         """Book classes based on provided booking information."""
+        if booking_action:
+            logging.info("Booking classes...")
+        else:
+            logging.info("Cancelling classes...")
+
         self.booking_action = booking_action
         self.class_dict = class_dict.get(self.day)
 
@@ -158,7 +171,7 @@ class Booker:
         for entry in self.class_dict:
             if entry.get("class") == "None":
                 logging.info("! No class set for this day.")
-                return self.return_bookings()
+                return self.__return_bookings()
 
             self.booking_time_slot, self.booking_class_slot, prioritize_waiting_list = (
                 entry.get("time"),
@@ -171,7 +184,7 @@ class Booker:
 
             if not all_possible_booking_slots_dict:
                 logging.info("! No classes found overall for this day.")
-                return self.return_bookings()
+                return self.__return_bookings()
 
             try:
                 button_xpath = all_possible_booking_slots_dict[self.booking_class_slot][
@@ -190,20 +203,12 @@ class Booker:
                 logging.info(
                     f"! No class {self.booking_class_slot} found for this day."
                 )
-                return self.return_bookings()
+                return self.__return_bookings()
 
             if self._book_class_slot(button_xpath, prioritize_waiting_list):
-                return self.return_bookings()
+                return self.__return_bookings()
 
         return self.booking_successful, self.booking_class_slot, self.booking_time_slot
-
-    def return_bookings(self) -> (str, str, str):
-        """Return the booking information."""
-        return (
-            self.booking_successful,
-            self.booking_class_slot,
-            self.booking_time_slot,
-        )
 
     def _generate_bounding_box_class_dict(
         self, class_entry_list: list, all_slots_bounding_boxes: list
@@ -211,7 +216,8 @@ class Booker:
         """Get all possible booking slots for specified class entries and bounding boxes."""
         logging.info(f"? Possible classes: {class_entry_list}")
 
-        bounding_box_number_by_action = 1 if self.booking_action else 2
+        # book class = 1, cancel class = 2
+        class_action = 1 if self.booking_action else 2
         all_possible_booking_slots_dict = defaultdict(dict)
 
         for slot_index, box in enumerate(all_slots_bounding_boxes, start=1):
@@ -219,22 +225,23 @@ class Booker:
                 class_name = self.selenium_manager.get_element_text(
                     xpath=XPath.bounding_box_label(
                         slot_index=slot_index,
-                        bounding_box_number=bounding_box_number_by_action,
+                        bounding_box_number=class_action,
                     )
                 )
                 if class_name in class_entry_list:
                     time_slot = self.selenium_manager.get_element_text(
                         xpath=XPath.bounding_box_time(
                             slot_index=slot_index,
-                            bounding_box_number=bounding_box_number_by_action,
+                            bounding_box_number=class_action,
                         )
                     )
                     logging.info(f"- Time: {time_slot} - Class: {class_name}")
 
-                    if self.booking_action:
-                        button_book = XPath.enter_slot(slot=slot_index)
-                    else:
-                        button_book = XPath.cancel_slot(slot=slot_index)
+                    button_book = (
+                        XPath.enter_slot(slot=slot_index)
+                        if self.booking_action
+                        else XPath.cancel_slot(slot=slot_index)
+                    )
 
                     all_possible_booking_slots_dict[class_name][time_slot] = {
                         "xpath": button_book
@@ -252,7 +259,20 @@ class Booker:
         """Book a specific class slot."""
         logging.info(f"> Booking {self.booking_class_slot} at {self.booking_time_slot}")
 
-        self._click_book_button(button_xpath)
+        # self._click_book_button(button_xpath)
+        element = self.selenium_manager.find_element(xpath=button_xpath)
+        while True:
+            current_time = datetime.now().time().strftime("%H:%M:%S.%f")
+            if current_time >= self.execution_booking_time:
+                start_time = datetime.now()
+                logging.info(f"Start execution at {current_time}")
+                self.selenium_manager.execute_script(
+                    script="arguments[0].click();", element=element
+                )
+                end_time = datetime.now()
+                logging.info(f"Executed at {end_time.time()}")
+                logging.info(f"Took {(end_time - start_time).total_seconds()}s")
+                break
 
         alert_obj = self.warning_prompt_helper.alert_is_present()
         if alert_obj:
@@ -273,26 +293,6 @@ class Booker:
         logging.success("Class booked")
         self.booking_successful = True
         return stop_booking_process
-
-    def _click_book_button(self, xpath_button_book: str) -> None:
-        """Click the book button using JavaScript execution."""
-        element = self.selenium_manager.find_element(xpath=xpath_button_book)
-        while True:
-            current_time = datetime.now().time().strftime("%H:%M:%S.%f")
-            if current_time >= self.execution_booking_time:
-                start_time = datetime.now()
-                logging.info(f"Start execution at {current_time}")
-                self.selenium_manager.execute_script(
-                    script="arguments[0].click();", element=element
-                )
-                end_time = datetime.now()
-                logging.info(f"Executed at {end_time.time()}")
-                logging.info(f"Took {(end_time - start_time).total_seconds()}s")
-                break
-
-    def close(self):
-        """Closes the WebDriver."""
-        self.selenium_manager.close_driver()
 
     def send_result(
         self,
@@ -338,3 +338,8 @@ class Booker:
                 booking_information=self.booking_information,
                 attachment_path=attachment_path,
             )
+
+    def close(self):
+        """Closes the WebDriver."""
+        self.selenium_manager.close_driver()
+        logging.info("WebDriver closed")
