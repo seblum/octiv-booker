@@ -8,7 +8,7 @@ from .alert_error_handler import AlertErrorHandler
 from .utils.logging import CustomLogger, LogHandler
 from .notifications.mailing import MailHandler  # Assuming MailHandler is in this module
 from .utils.selenium_manager import SeleniumManager
-from .utils.helpers import stop_booking_process, get_day, get_day_button
+from .utils.helpers import stop_booking_process, get_day
 from slotbooker.utils.xpaths import XPath
 
 # Set up custom logger
@@ -113,7 +113,7 @@ class Booker:
                 self.selenium_manager.click_button(XPath.switch_week_button())
                 logging.info("Switched to following week")
 
-            day_button = get_day_button(self.day, self.XPath.helper)  # TODO: fix this
+            day_button = XPath.weekday_button(self.day)
             self.selenium_manager.click_button(day_button)
             logging.info(f"Booking on {self.day}, {future_date}")
         except Exception as e:
@@ -188,8 +188,8 @@ class Booker:
 
     def _get_all_bounding_boxes_in_window(self) -> list:
         """Get all bounding boxes containing booking slots present in the current window."""
-        self.selenium_manager.wait_for_element(xpath=XPath.booking_head())
-        return self.selenium_manager.find_elements(xpath=XPath.booking_head())
+        self.selenium_manager.wait_for_element(xpath=XPath.booking_section_head())
+        return self.selenium_manager.find_elements(xpath=XPath.booking_section_head())
 
     def _get_all_bounding_boxes_by_class_name(
         self, class_entry_list: list, all_slots_bounding_boxes: list
@@ -201,12 +201,12 @@ class Booker:
         all_possible_booking_slots_dict = defaultdict(list)
 
         for slot_index, box in enumerate(all_slots_bounding_boxes, start=1):
-            XPath.test = f"{XPath.booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
+            XPath.test = f"{XPath.booking_section_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[2]/p[1]"
             try:
                 textfield = self.selenium_manager.get_element_text(xpath=XPath.test)
                 if textfield in class_entry_list:
                     time_slot = self.selenium_manager.get_element_text(
-                        xpath=f"{XPath.booking_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
+                        xpath=f"{XPath.booking_section_head()}[{slot_index}]/div/div[{bounding_box_number_by_action}]/div[1]/p[1]"
                     )
                     logging.info(f"- Time: {time_slot} - Class: {textfield}")
 

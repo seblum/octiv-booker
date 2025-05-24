@@ -4,15 +4,13 @@ from slotbooker.utils.helpers import XPathHelper
 from slotbooker.utils.helpers import (
     stop_booking_process,
     get_day,
-    get_day_button,
-    get_booking_slot,
 )
 from slotbooker.utils.xpaths import XPath
 
 
 class TestXPathHelper(unittest.TestCase):
     def test_xpath_booking_head(self):
-        self.assertEqual(XPath.booking_head(), "/html/body/div/div[6]/div/div")
+        self.assertEqual(XPath.booking_section_head(), "/html/body/div/div[6]/div/div")
 
     def test_xpath_login_username_head(self):
         self.assertEqual(
@@ -34,7 +32,7 @@ class TestXPathHelper(unittest.TestCase):
 
     def test_get_day_button_xpath(self):
         self.assertEqual(
-            XPath.helper.get_day_button_xpath(3),
+            XPath.weekday_button(3),
             "/html/body/div/div[6]/div/div[3]/div[3]/div/p",
         )
 
@@ -75,26 +73,16 @@ class TestBookingHelper(unittest.TestCase):
 
     def test_get_day_button(self):
         self.assertEqual(
-            get_day_button("Monday", XPath.helper),
+            XPath.weekday_button("Monday"),
             "/html/body/div/div[6]/div/div[3]/div[2]/div/p",
         )
         self.assertEqual(
-            get_day_button("Sunday", XPath.helper),
+            XPath.weekday_button("Sunday"),
             "/html/body/div/div[6]/div/div[3]/div[8]/div/p",
         )
         self.assertEqual(
-            get_day_button("NonexistentDay", XPath.helper),
+            XPath.weekday_button("NonexistentDay"),
             "/html/body/div/div[6]/div/div[3]/div[0]/div/p",
-        )
-
-    def test_get_booking_slot(self):
-        self.assertEqual(
-            get_booking_slot(1, True, XPath.helper),
-            "/html/body/div/div[6]/div/div[1]/div/div[1]/div[3]/button",
-        )
-        self.assertEqual(
-            get_booking_slot(1, False, XPath.helper),
-            "/html/body/div/div[6]/div/div[1]/div/div[2]/div[3]/button",
         )
 
     def test_stop_booking_process(self):

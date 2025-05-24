@@ -35,8 +35,8 @@ class XPath:
     """Helper class with static methods for XPath generation."""
 
     @staticmethod
-    def booking_head() -> str:
-        return XPathEnum.BOOKING_HEAD.value
+    def booking_section_head() -> str:
+        return XPathEnum.BOOKING_SECTION.value
 
     # Username XPaths
     @staticmethod
@@ -70,9 +70,19 @@ class XPath:
         return XPathEnum.SWITCH_WEEK_BUTTON.value
 
     @staticmethod
-    def get_day_button_xpath(day_index: int) -> str:
-        return XPathEnum.GET_DAY_BUTTON.value.format(day_index=day_index)
-        # f"{XPathEnum.BOOKING_HEAD.value}[3]/div[{day_index}]/div/p"
+    def weekday_button(day_to_book: int) -> str:
+        day_indices = {
+            "Monday": 2,
+            "Tuesday": 3,
+            "Wednesday": 4,
+            "Thursday": 5,
+            "Friday": 6,
+            "Saturday": 7,
+            "Sunday": 8,
+        }
+        return XPathEnum.GET_DAY_BUTTON.value.format(
+            day_index=day_indices.get(day_to_book, 0)
+        )
 
     @staticmethod
     def booking_slot_action(slot: int) -> str:
