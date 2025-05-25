@@ -3,8 +3,7 @@ from collections import defaultdict
 from datetime import datetime
 
 # from selenium.common.exceptions import NoSuchElementException
-import time
-from .alert_error_handler import AlertErrorHandler
+from .utils.alerts import AlertErrorHandler
 from .utils.logging import CustomLogger, LogHandler
 from .notifications.mailing import MailHandler  # Assuming MailHandler is in this module
 from .utils.selenium_manager import SeleniumManager
@@ -42,20 +41,16 @@ class Booker:
 
     def __init__(
         self,
-        chromedriver: str,
         base_url: str,
         days_before_bookable: int,
         execution_booking_time: str,
+        chromedriver: str = None,  # defaults to None, will use the default chromedriver path: "/usr/local/bin/chromedriver"
         env: str = "prd",
     ):
         self.selenium_manager = SeleniumManager(chromedriver, env)
         self.base_url = base_url
         self.days_before_bookable = days_before_bookable
         self.execution_booking_time = execution_booking_time
-        self.warning_prompt_helper = AlertErrorHandler(
-            driver=self.selenium_manager.get_driver(),
-            selenium_manager=self.selenium_manager,
-        )
         self.loggingHandler = LogHandler(log_level=logging.INFO)
         self.mail_handler = None
         self.class_dict = None
@@ -97,29 +92,35 @@ class Booker:
         except Exception as e:
             logging.error(f"! Error during username entry: {e}")
 
-        try:
-            alert_div = self.selenium_manager.wait_for_element(
-                xpath=XPath.login_error_window(), timeout=10
-            )
+        stop_booking = AlertErrorHandler.login_error_is_present(
+            selenium_manager=self.selenium_manager
+        )
 
-            if alert_div is not None:
-                logging.error("Login alert found")
-                alert_text = alert_div.text
-            else:
-                logging.info("No login alert found")
-                alert_text = ""
+        # try:
+        #     alert_div = self.selenium_manager.wait_for_element(
+        #         xpath=XPath.login_error_window(), timeout=10
+        #     )
 
-            if alert_text and any(
-                keyword.lower() in alert_text.lower()
-                for keyword in ["credentials", "Fehler"]
-            ):
-                logging.error(f"Incorrect credentials: {alert_text}")
-                return stop_booking_process()
-        except Exception as e:
-            logging.error(f"! Error during login attempt: {e}")
+        #     if alert_div is not None:
+        #         logging.error("Login alert found")
+        #         alert_text = alert_div.text
+        #     else:
+        #         logging.info("No login alert found")
+        #         alert_text = ""
 
-        logging.success("Login successful")
-        return not stop_booking_process
+        #     if alert_text and any(
+        #         keyword.lower() in alert_text.lower()
+        #         for keyword in ["credentials", "Fehler"]
+        #     ):
+        #         logging.error(f"Incorrect credentials: {alert_text}")
+        #         return stop_booking_process()
+        # except Exception as e:
+        #     logging.error(f"! Error during login attempt: {e}")
+        if stop_booking:
+            return stop_booking_process()
+        else:
+            logging.success("Login successful")
+            return not stop_booking_process
 
     def switch_day(self) -> (str, str):
         """Switch to the desired day for booking slots."""
@@ -274,25 +275,17 @@ class Booker:
                 logging.info(f"Took {(end_time - start_time).total_seconds()}s")
                 break
 
-        alert_obj = self.warning_prompt_helper.alert_is_present()
-        if alert_obj:
-            evaluate_result = self.warning_prompt_helper.evaluate_alert(
-                alert_obj, prioritize_waiting_list
-            )
-            if evaluate_result is False:
-                pass
+        stop_booking = AlertErrorHandler.check_booking_alert(
+            selenium_manager=self.selenium_manager, waiting_list=prioritize_waiting_list
+        )
 
-            return evaluate_result
-
-        error_text = self.warning_prompt_helper.error_is_present()
-        if error_text:
-            # TODO: Remove sleep
-            time.sleep(3)
-            return self.warning_prompt_helper.evaluate_error(error_text)
-
-        logging.success("Class booked")
-        self.booking_successful = True
-        return stop_booking_process
+        if stop_booking:
+            logging.error("Booking process stopped due to an error.")
+            return stop_booking_process()
+        else:
+            logging.success("Class booked")
+            self.booking_successful = True
+            return stop_booking_process
 
     def send_result(
         self,

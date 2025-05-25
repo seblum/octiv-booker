@@ -61,6 +61,10 @@ def get_day(days_before_bookable: int) -> tuple[date, int]:
     return future_date, diff_week
 
 
+def text_contains_list_keywords(text: str, keywords: list) -> bool:
+    return any(keyword.lower() in text.lower() for keyword in keywords)
+
+
 # def get_booking_slot(booking_slot: int, book_action: bool) -> str:
 #     """Sets the XPath of the booking slot button to be clicked and whether
 #     the slot (class) shall be booked or cancelled.

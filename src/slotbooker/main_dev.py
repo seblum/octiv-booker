@@ -2,10 +2,6 @@ import os
 import yaml
 from .slotbooker import Booker
 
-# Load config yaml
-config_path = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
-config = yaml.safe_load(open(config_path))
-
 classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
 classes = yaml.safe_load(open(classes_path))
 
@@ -18,9 +14,8 @@ def main():
     execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
 
     booker = Booker(
-        chromedriver=config.get("chromedriver"),
         days_before_bookable=days_before_bookable,
-        base_url=config.get("base_url"),
+        base_url="https://app.octivfitness.com/login",
         execution_booking_time=execution_booking_time,
         env="dev",
     )
