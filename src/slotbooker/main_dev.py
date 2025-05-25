@@ -10,13 +10,9 @@ def main():
     # get env variables
     user = os.environ.get("OCTIV_USERNAME")
     password = os.environ.get("OCTIV_PASSWORD")
-    days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
-    execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
 
     booker = Booker(
-        days_before_bookable=days_before_bookable,
         base_url="https://app.octivfitness.com/login",
-        execution_booking_time=execution_booking_time,
         env="dev",
     )
 
@@ -29,13 +25,13 @@ def main():
     )
 
     # Configure mailing settings && send mail
-    booker.send_result(
-        sender=os.getenv("EMAIL_SENDER"),
-        password=os.getenv("EMAIL_PASSWORD"),
-        receiver=os.getenv("EMAIL_RECEIVER"),
-        format="html",
-        attach_logfile=True,
-    )
+    # booker.send_result(
+    #     sender=os.getenv("EMAIL_SENDER"),
+    #     password=os.getenv("EMAIL_PASSWORD"),
+    #     receiver=os.getenv("EMAIL_RECEIVER"),
+    #     format="html",
+    #     attach_logfile=True,
+    # )
 
     # booker.close()
 

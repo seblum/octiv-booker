@@ -9,6 +9,7 @@ from .notifications.mailing import MailHandler  # Assuming MailHandler is in thi
 from .utils.selenium_manager import SeleniumManager
 from .utils.helpers import stop_booking_process, get_day
 from slotbooker.utils.xpaths import XPath
+import os
 
 # Set up custom logger
 logging.setLoggerClass(CustomLogger)
@@ -22,8 +23,6 @@ class Booker:
     Attributes:
         driver (object): The Selenium WebDriver instance.
         base_url (str): The base URL of the booking website.
-        days_before_bookable (int): Number of days before a class becomes bookable.
-        execution_booking_time (str): Time the booking is executed.
         class_dict (dict): Dictionary containing class booking information for a specific day.
         booking_action (bool): Indicates whether to perform booking actions (True) or not (False).
         day (str): The selected day for booking.
@@ -42,15 +41,12 @@ class Booker:
     def __init__(
         self,
         base_url: str,
-        days_before_bookable: int,
-        execution_booking_time: str,
         chromedriver: str = None,  # defaults to None, will use the default chromedriver path: "/usr/local/bin/chromedriver"
         env: str = "prd",
     ):
-        self.selenium_manager = SeleniumManager(chromedriver, env)
         self.base_url = base_url
-        self.days_before_bookable = days_before_bookable
-        self.execution_booking_time = execution_booking_time
+        self.selenium_manager = SeleniumManager(chromedriver, env)
+
         self.loggingHandler = LogHandler(log_level=logging.INFO)
         self.mail_handler = None
         self.class_dict = None
@@ -92,39 +88,25 @@ class Booker:
         except Exception as e:
             logging.error(f"! Error during username entry: {e}")
 
-        stop_booking = AlertErrorHandler.login_error_is_present(
+        stop_booking = AlertErrorHandler.check_login_alert(
             selenium_manager=self.selenium_manager
         )
 
-        # try:
-        #     alert_div = self.selenium_manager.wait_for_element(
-        #         xpath=XPath.login_error_window(), timeout=10
-        #     )
-
-        #     if alert_div is not None:
-        #         logging.error("Login alert found")
-        #         alert_text = alert_div.text
-        #     else:
-        #         logging.info("No login alert found")
-        #         alert_text = ""
-
-        #     if alert_text and any(
-        #         keyword.lower() in alert_text.lower()
-        #         for keyword in ["credentials", "Fehler"]
-        #     ):
-        #         logging.error(f"Incorrect credentials: {alert_text}")
-        #         return stop_booking_process()
-        # except Exception as e:
-        #     logging.error(f"! Error during login attempt: {e}")
         if stop_booking:
             return stop_booking_process()
         else:
             logging.success("Login successful")
             return not stop_booking_process
 
-    def switch_day(self) -> (str, str):
+    def switch_day(self, days_before_bookable: str = None) -> (str, str):
         """Switch to the desired day for booking slots."""
-        future_date, diff_week = get_day(self.days_before_bookable)
+        if days_before_bookable is None:
+            days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
+            logging.info(
+                f"Switching to day {days_before_bookable} days before bookable date"
+            )
+
+        future_date, diff_week = get_day(days_before_bookable)
         self.day = future_date.strftime("%A")
 
         try:
@@ -260,11 +242,19 @@ class Booker:
         """Book a specific class slot."""
         logging.info(f"> Booking {self.booking_class_slot} at {self.booking_time_slot}")
 
+        execution_booking_time = os.environ.get(
+            "EXECUTION_BOOKING_TIME", "00:00:00.000000"
+        )
+        logging.info(
+            f"Execution booking time set to {execution_booking_time} (HH:MM:SS.mmmmmm)"
+        )
+
         # self._click_book_button(button_xpath)
         element = self.selenium_manager.find_element(xpath=button_xpath)
         while True:
             current_time = datetime.now().time().strftime("%H:%M:%S.%f")
-            if current_time >= self.execution_booking_time:
+
+            if current_time >= execution_booking_time:
                 start_time = datetime.now()
                 logging.info(f"Start execution at {current_time}")
                 self.selenium_manager.execute_script(

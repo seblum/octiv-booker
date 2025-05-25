@@ -10,16 +10,21 @@ from slotbooker.utils.selenium_manager import SeleniumManager
 class AlertTypes(Enum):
     """Enumeration of possible alert types that can be encountered."""
 
-    ClassFull = "Class is fully booked"
+    ClassFull = "Class is fully booked."
     ClassFullGerman = "Die Stunde ist voll. Möchtest du auf die Warteliste kommen? Du wirst automatisch gebucht, wenn ein Platz frei wird."
     CancelBooking = "Möchtest du deine Buchung wirklich stornieren?"
-    CannotBookInAdvance = "You cannot book this far in advance"
-    MaxBookings = "You have reached your maximum bookings per day limit"
     NotIdentifyAlert = "Could not identify Alert"
-    NotIdentifyError = "Could not identify Error"
     NotAlert = "No Alert"
-    NotError = "No Error"
     LoginCredentials = "The user credentials were incorrect."
+
+
+class ErrorTypes(Enum):
+    """Enumeration of possible error types that can be encountered."""
+
+    NotIdentifyError = "Could not identify Error"
+    NotError = "No Error"
+    CannotBookInAdvance = "You cannot book this far in advance."
+    MaxBookings = "You have reached your maximum bookings per day limit."
 
 
 class AlertErrorHandler:
@@ -63,22 +68,7 @@ class AlertErrorHandler:
             return not stop_booking_process
 
     @staticmethod
-    def evaluate_error(error_text: str) -> bool:
-        """Evaluates the error text and determines if it matches certain conditions."""
-        error_map = {
-            AlertTypes.MaxBookings.value: True,
-            AlertTypes.CannotBookInAdvance.value: True,
-            AlertTypes.ClassFull.value: False,
-        }
-        result = error_map.get(error_text, False)
-        if result is False:
-            logging.error(f"{AlertTypes.NotIdentifyError.value}: {error_text}")
-        else:
-            logging.error(f"Another Error occured: {error_text}")
-        return result
-
-    @staticmethod
-    def login_error_is_present(selenium_manager):
+    def check_login_alert(selenium_manager):
         try:
             alert_div = selenium_manager.wait_for_element(
                 xpath=XPath.login_error_window(), timeout=3
@@ -122,4 +112,10 @@ class AlertErrorHandler:
             if error_text:
                 # TODO: Remove sleep
                 time.sleep(3)
-                return AlertErrorHandler.evaluate_error(error_text)
+
+                for error in ErrorTypes:
+                    if error.value == error_text:
+                        logging.error(f"identified: {error.value}")
+                        return error
+                logging.error(f"{ErrorTypes.NotIdentifyError.value}: {error_text}")
+                return ErrorTypes.NotIdentifyError
