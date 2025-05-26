@@ -5,7 +5,7 @@ from selenium.common.exceptions import SessionNotCreatedException, NoSuchDriverE
 from .slotbooker import Booker
 
 # Define file paths for configuration and classes
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
+# CONFIG_PATH = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
 CLASSES_PATH = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
 
 
@@ -16,7 +16,7 @@ def load_yaml(file_path):
         return yaml.safe_load(file)
 
 
-config = load_yaml(CONFIG_PATH)
+# config = load_yaml(CONFIG_PATH)
 classes = load_yaml(CLASSES_PATH)
 
 
@@ -27,10 +27,10 @@ def main(retry: int = 3):
     if os.environ.get("IS_TEST"):
         logging.info("Testing Docker Container")
         booker = Booker(
-            chromedriver=config.get("chromedriver"),
-            days_before_bookable=0,
-            base_url=config.get("base_url"),
-            execution_booking_time="00:00:00.00",
+            # chromedriver=config.get("chromedriver"),
+            # days_before_bookable=0,
+            base_url="https://app.octivfitness.com/login",
+            # execution_booking_time="00:00:00.00",
         )
         user = os.environ.get("OCTIV_USERNAME")
         test_password = "if-this-would-be-the-password"
@@ -45,17 +45,17 @@ def main(retry: int = 3):
     # Retrieve environment variables
     user = os.environ.get("OCTIV_USERNAME")
     password = os.environ.get("OCTIV_PASSWORD")
-    days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
-    execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
+    # days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
+    # execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
 
     for attempt in range(1, retry + 1):
         try:
             # Initialize the Booker instance
             booker = Booker(
-                chromedriver=config.get("chromedriver"),
-                days_before_bookable=days_before_bookable,
-                base_url=config.get("base_url"),
-                execution_booking_time=execution_booking_time,
+                # chromedriver=config.get("chromedriver"),
+                # days_before_bookable=days_before_bookable,
+                base_url="https://app.octivfitness.com/login",
+                # execution_booking_time=execution_booking_time,
             )
 
             # Login and book the class
