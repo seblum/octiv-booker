@@ -50,7 +50,6 @@ class Booker:
         self.loggingHandler = LogHandler(log_level=logging.INFO)
         self.mail_handler = None
         self.class_dict = None
-        self.booking_action = None
         self.day = None
         self.booking_class_slot = None
         self.booking_time_slot = None
@@ -127,15 +126,11 @@ class Booker:
         return self.day, future_date.strftime("%d/%m/%Y")
 
     def book_class(
-        self, class_dict: dict, booking_action: bool = True
+        self, class_dict: dict, enter_class: bool = True
     ) -> (bool, str, str):
         """Book classes based on provided booking information."""
-        if booking_action:
-            logging.info("Booking classes...")
-        else:
-            logging.info("Cancelling classes...")
+        logging.info(f"{'Booking' if enter_class else 'Cancelling'} classes...")
 
-        self.booking_action = booking_action
         self.class_dict = class_dict.get(self.day)
 
         # Load and transform the input class_dict into a list of unique class entries.
@@ -148,7 +143,7 @@ class Booker:
         )
 
         all_possible_booking_slots_dict = self._generate_bounding_box_class_dict(
-            class_entry_list, all_slots_bounding_boxes
+            class_entry_list, all_slots_bounding_boxes, enter_class=enter_class
         )
 
         for entry in self.class_dict:
@@ -194,13 +189,14 @@ class Booker:
         return self.booking_successful, self.booking_class_slot, self.booking_time_slot
 
     def _generate_bounding_box_class_dict(
-        self, class_entry_list: list, all_slots_bounding_boxes: list
+        self,
+        class_entry_list: list,
+        all_slots_bounding_boxes: list,
+        enter_class: bool = True,
     ) -> dict:
         """Get all possible booking slots for specified class entries and bounding boxes."""
         logging.info(f"? Possible classes: {class_entry_list}")
 
-        # book class = 1, cancel class = 2
-        class_action = 1 if self.booking_action else 2
         all_possible_booking_slots_dict = defaultdict(dict)
 
         for slot_index, box in enumerate(all_slots_bounding_boxes, start=1):
@@ -208,21 +204,21 @@ class Booker:
                 class_name = self.selenium_manager.get_element_text(
                     xpath=XPath.bounding_box_label(
                         slot_index=slot_index,
-                        bounding_box_number=class_action,
+                        enter_class=enter_class,
                     )
                 )
                 if class_name in class_entry_list:
                     time_slot = self.selenium_manager.get_element_text(
                         xpath=XPath.bounding_box_time(
                             slot_index=slot_index,
-                            bounding_box_number=class_action,
+                            enter_class=enter_class,
                         )
                     )
                     logging.info(f"- Time: {time_slot} - Class: {class_name}")
 
                     button_book = (
                         XPath.enter_slot(slot=slot_index)
-                        if self.booking_action
+                        if enter_class
                         else XPath.cancel_slot(slot=slot_index)
                     )
 

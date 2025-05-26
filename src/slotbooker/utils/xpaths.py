@@ -88,13 +88,17 @@ class XPath:
         )
 
     @staticmethod
-    def bounding_box_label(slot_index: int, bounding_box_number: int) -> str:
+    def bounding_box_label(slot_index: int, enter_class: bool = True) -> str:
+        # book class = 1, cancel class = 2
+        bounding_box_number = 1 if enter_class else 2
         return XPathEnum.BOUNDING_BOX_LABEL.value.format(
             slot_index=slot_index, bounding_box_number=bounding_box_number
         )
 
     @staticmethod
-    def bounding_box_time(slot_index: int, bounding_box_number: int) -> str:
+    def bounding_box_time(slot_index: int, enter_class: bool = True) -> str:
+        # book class = 1, cancel class = 2
+        bounding_box_number = 1 if enter_class else 2
         return XPathEnum.BOUNDING_BOX_TIME.value.format(
             slot_index=slot_index, bounding_box_number=bounding_box_number
         )
