@@ -34,6 +34,7 @@ class WebDriverManager:
         options.add_experimental_option("detach", True)
         if self.env != "dev":
             options.add_argument("--headless")  # needs to be set to run in docker image
+
         try:
             self.driver = webdriver.Chrome(service=service, options=options)
         except (SessionNotCreatedException, NoSuchDriverException) as e:

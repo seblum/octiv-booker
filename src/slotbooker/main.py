@@ -52,12 +52,14 @@ def development(ci_run=False):
     user = os.environ.get("OCTIV_USERNAME")
     if ci_run:
         password = "if-this-would-be-the-password"
+        env = "prd"
     else:
         password = os.environ.get("OCTIV_PASSWORD")
+        env = "dev"
 
     booker = Booker(
         base_url="https://app.octivfitness.com/login",
-        env="dev",
+        env=env,
     )
 
     login_failed = booker.login(username=user, password=password)
