@@ -84,8 +84,13 @@ class Booker:
             )
             self.selenium_manager.click_button(XPath.login_password_check())
             self.selenium_manager.click_button(XPath.login_password_button())
+        except ValueError as e:
+            logging.warning("! ValueError during login entry")
+            logging.error(e, exc_info=True)
+            exit(1)
         except Exception as e:
-            logging.error(f"! Error during username entry: {e}")
+            logging.error(f"! Unexpected Error during Login: {e}")
+            exit(1)
 
         stop_booking = AlertErrorHandler.check_login_alert(
             selenium_manager=self.selenium_manager

@@ -1,27 +1,33 @@
 import os
 import yaml
 from .slotbooker import Booker
+import logging
 
 classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
 classes = yaml.safe_load(open(classes_path))
 
 
-def main():
+def main_dev(ci_run=False):
     # get env variables
     user = os.environ.get("OCTIV_USERNAME")
-    password = os.environ.get("OCTIV_PASSWORD")
+    if ci_run:
+        password = "if-this-would-be-the-password"
+    else:
+        password = os.environ.get("OCTIV_PASSWORD")
 
     booker = Booker(
         base_url="https://app.octivfitness.com/login",
         env="dev",
     )
 
-    booker.login(username=user, password=password)
+    login_failed = booker.login(username=user, password=password)
+    if login_failed:
+        logging.info("TEST OK | Login failed as expected")
     booker.switch_day()
 
     success, _, _ = booker.book_class(
         class_dict=classes.get("class_dict"),
-        booking_action=classes.get("book_class"),
+        # booking_action=classes.get("book_class"),
     )
 
     # Configure mailing settings && send mail
@@ -37,4 +43,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main_dev()

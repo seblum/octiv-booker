@@ -1,5 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.common.exceptions import (
+    SessionNotCreatedException,
+    NoSuchDriverException,
+)
+import logging
 
 
 class WebDriverManager:
@@ -28,8 +33,16 @@ class WebDriverManager:
         options.add_experimental_option("detach", True)
         if self.env != "dev":
             options.add_argument("--headless")  # needs to be set to run in docker image
-
-        self.driver = webdriver.Chrome(service=service, options=options)
+        try:
+            self.driver = webdriver.Chrome(service=service, options=options)
+        except (SessionNotCreatedException, NoSuchDriverException) as e:
+            logging.warning(
+                "Failed to create a WebDriver session. Please check the ChromeDriver path and ensure it is compatible with your Chrome version."
+            )
+            logging.error(e, exc_info=True)
+            raise ValueError(
+                "Failed to create a WebDriver session. Please check the ChromeDriver path and ensure it is compatible with your Chrome version."
+            )
         return self.driver
 
     def close_driver(self) -> None:
