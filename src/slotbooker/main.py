@@ -57,6 +57,7 @@ def development(ci_run=False):
 
     booker = Booker(
         base_url="https://app.octivfitness.com/login",
+        chromedriver="chromedriver",
         env="dev",
     )
 
