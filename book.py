@@ -4,8 +4,8 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, NamedTuple
 from dataclasses import dataclass
-from .utils.xpaths import XPath
-from .utils.alerts import AlertErrorHandler
+from .src.slotbooker.utils.xpaths import XPath
+from .src.slotbooker.utils.alerts import AlertErrorHandler
 
 
 @dataclass
@@ -297,11 +297,11 @@ class ClassBooker:
             logging.error(f"Error handling booking response: {str(e)}")
             return True  # Stop on error
 
-
-# Helper function to maintain compatibility with existing code
-def stop_booking_process() -> bool:
-    """Helper function for stopping booking process."""
-    return True
+    # Helper function to maintain compatibility with existing code
+    def stop_booking_process(self) -> bool:
+        """Helper function for stopping booking process."""
+        self.selenium_manager.close_driver()
+        return True
 
 
 # Example usage and integration

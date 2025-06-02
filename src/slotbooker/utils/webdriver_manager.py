@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.common.exceptions import (
     SessionNotCreatedException,
     NoSuchDriverException,
@@ -53,3 +54,13 @@ class WebDriverManager:
 
     def get_driver(self):
         return self.driver
+
+    def driver_is_initialialized(self) -> bool:
+        """Checks if the WebDriver is initialized and returns True if it is, otherwise False."""
+        if not isinstance(self.driver, WebDriver):
+            raise RuntimeError(
+                "WebDriver failed to initialize is not of type WebDriver"
+            )
+        elif not self.driver:
+            raise RuntimeError("WebDriver failed to initialize and is None")
+        return True

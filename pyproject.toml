@@ -28,7 +28,7 @@ coverage = "^7.5.3"
 
 [tool.poetry.scripts]
 slotBooker = "slotbooker.main:main"
-slotBookerDev = "slotbooker.main_dev:main_dev"
+slotBookerDev = "slotbooker.main:development"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

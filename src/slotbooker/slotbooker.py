@@ -7,7 +7,7 @@ from .utils.alerts import AlertErrorHandler
 from .utils.logging import CustomLogger, LogHandler
 from .notifications.mailing import MailHandler  # Assuming MailHandler is in this module
 from .utils.selenium_manager import SeleniumManager
-from .utils.helpers import stop_booking_process, get_day
+from .utils.helpers import get_day
 from slotbooker.utils.xpaths import XPath
 import os
 
@@ -65,6 +65,8 @@ class Booker:
         )
 
     def login(self, username: str, password: str) -> bool:
+        self.selenium_manager.driver_is_initialialized()
+
         """Login to the booking website using the provided credentials."""
         try:
             logging.info(f"Log in as: {username}")
@@ -97,12 +99,14 @@ class Booker:
         )
 
         if stop_booking:
-            return stop_booking_process()
+            return self.__stop_booking_process()
         else:
             logging.success("Login successful")
-            return not stop_booking_process
+            return not self.__stop_booking_process
 
     def switch_day(self, days_before_bookable: str = None) -> (str, str):
+        self.selenium_manager.driver_is_initialialized()
+
         """Switch to the desired day for booking slots."""
         days_before_bookable = os.environ.get("DAYS_BEFORE_BOOKABLE", 0)
         days_before_bookable = (
@@ -138,6 +142,9 @@ class Booker:
         self, class_dict: dict, enter_class: bool = True
     ) -> (bool, str, str):
         """Book classes based on provided booking information."""
+
+        self.selenium_manager.driver_is_initialialized()
+
         logging.info(f"{'Booking' if enter_class else 'Cancelling'} classes...")
 
         self.class_dict = class_dict.get(self.day)
@@ -276,11 +283,11 @@ class Booker:
 
         if stop_booking:
             logging.error("Booking process stopped due to an error.")
-            return stop_booking_process()
+            return self.__stop_booking_process()
         else:
             logging.success("Class booked")
             self.booking_successful = True
-            return stop_booking_process
+            return self.__stop_booking_process
 
     def send_result(
         self,
@@ -329,5 +336,10 @@ class Booker:
 
     def close(self):
         """Closes the WebDriver."""
+        self.selenium_manager.driver_is_initialialized()
         self.selenium_manager.close_driver()
         logging.info("WebDriver closed")
+
+    def __stop_booking_process(self) -> bool:
+        self.close()
+        return True
