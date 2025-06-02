@@ -4,8 +4,8 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, NamedTuple
 from dataclasses import dataclass
-from .src.slotbooker.utils.xpaths import XPath
-from .src.slotbooker.utils.alerts import AlertErrorHandler
+from .utils.xpaths import XPath
+from .utils.alerts import AlertErrorHandler
 
 
 @dataclass

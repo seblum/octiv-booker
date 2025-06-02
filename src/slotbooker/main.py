@@ -63,23 +63,24 @@ def development(ci_run=False):
     login_failed = booker.login(username=user, password=password)
     if login_failed:
         logging.info("TEST OK | Login failed as expected")
-    booker.switch_day()
+    else:
+        booker.switch_day()
 
-    success, _, _ = booker.book_class(
-        class_dict=classes.get("class_dict"),
-        # booking_action=classes.get("book_class"),
-    )
+        success, _, _ = booker.book_class(
+            class_dict=classes.get("class_dict"),
+            # booking_action=classes.get("book_class"),
+        )
 
-    # Configure mailing settings && send mail
-    # booker.send_result(
-    #     sender=os.getenv("EMAIL_SENDER"),
-    #     password=os.getenv("EMAIL_PASSWORD"),
-    #     receiver=os.getenv("EMAIL_RECEIVER"),
-    #     format="html",
-    #     attach_logfile=True,
-    # )
+        # Configure mailing settings && send mail
+        # booker.send_result(
+        #     sender=os.getenv("EMAIL_SENDER"),
+        #     password=os.getenv("EMAIL_PASSWORD"),
+        #     receiver=os.getenv("EMAIL_RECEIVER"),
+        #     format="html",
+        #     attach_logfile=True,
+        # )
 
-    # booker.close()
+        # booker.close()
 
 
 def main():
