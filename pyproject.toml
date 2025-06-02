@@ -21,16 +21,14 @@ poetry-plugin-dotenv = "^2.1.6"
 coverage = "^7.5.3"
 retrying = "^1.3.4"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
 ruff = "^0.7.1"
+coverage = "^7.5.3"
 
 [tool.poetry.scripts]
 slotBooker = "slotbooker.main:main"
 slotBookerDev = "slotbooker.main_dev:main_dev"
-
-[tool.poetry.group.dev.dependencies]
-coverage = "^7.5.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -104,8 +104,12 @@ class Booker:
 
     def switch_day(self, days_before_bookable: str = None) -> (str, str):
         """Switch to the desired day for booking slots."""
+        days_before_bookable = os.environ.get("DAYS_BEFORE_BOOKABLE", 0)
+        days_before_bookable = (
+            int(days_before_bookable) if days_before_bookable.strip() else 0
+        )
+
         if days_before_bookable is None:
-            days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
             logging.info(
                 f"Switching to day {days_before_bookable} days before bookable date"
             )
