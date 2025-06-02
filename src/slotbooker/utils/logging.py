@@ -7,7 +7,7 @@ from typing import Dict, List
 
 # Constants for logging configuration
 LOG_DIR = "logs"
-LOG_FILE_TEMPLATE = "log_{timestamp}.log"
+LOG_FILE_TEMPLATE = "log_{timestamp}.txt"
 
 LOG_LEVELS: Dict[str, str] = {
     "INFO": "info",
@@ -78,7 +78,7 @@ class LogHandler:
             lines = file.readlines()
 
         html_content = self._generate_html_content(lines)
-        html_file_path = self.log_file_path.replace(".log", ".html")
+        html_file_path = self.log_file_path.replace(".txt", ".html")
 
         with open(html_file_path, "w") as file:
             file.write(html_content)
