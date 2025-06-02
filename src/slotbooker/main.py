@@ -10,8 +10,15 @@ classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
 classes = yaml.safe_load(open(classes_path))
 
 
-@retry(stop_max_attempt_number=3)
 def main():
+    if os.environ.get("IS_TEST"):
+        main_dev(ci_run=True)
+    else:
+        main_prod()
+
+
+@retry(stop_max_attempt_number=3)
+def main_prod():
     """Slotbooker Main Function."""
 
     # Retrieve environment variables
@@ -46,10 +53,3 @@ def main():
     logging.info(
         "Slotbooker completed successfully."
     )  # TODO: correct logging output if fails
-
-
-if __name__ == "__main__":
-    if os.environ.get("IS_TEST"):
-        main_dev(ci_run=True)
-    else:
-        main()

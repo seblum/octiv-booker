@@ -40,7 +40,3 @@ def main_dev(ci_run=False):
     # )
 
     # booker.close()
-
-
-if __name__ == "__main__":
-    main_dev()
