@@ -1,6 +1,5 @@
 import unittest
 from datetime import date, timedelta
-from slotbooker.utils.helpers import XPathHelper
 from slotbooker.utils.helpers import (
     stop_booking_process,
     get_day,
@@ -12,16 +11,16 @@ class TestXPathHelper(unittest.TestCase):
     def test_xpath_booking_head(self):
         self.assertEqual(XPath.booking_section_head(), "/html/body/div/div[6]/div/div")
 
-    def test_xpath_login_username_head(self):
+    def test_xpath_login_username_input(self):
         self.assertEqual(
-            XPath.login_username_head(),
-            "/html/body/div/div[3]/div/div/div/div/div/div/form",
+            XPath.login_username_input(),
+            "/html/body/div/div[3]/div/div/div/div/div/div/form/div[1]/input",
         )
 
-    def test_xpath_login_password_head(self):
+    def test_xpath_login_password_input(self):
         self.assertEqual(
-            XPath.login_password_head(),
-            "/html/body/div[1]/div[3]/div/div/div/div/div/div/form",
+            XPath.login_password_input(),
+            "/html/body/div/div[3]/div/div/div/div/div/div/form/div[2]/input",
         )
 
     def test_xpath_login_error_window(self):
@@ -33,16 +32,16 @@ class TestXPathHelper(unittest.TestCase):
     def test_get_day_button_xpath(self):
         self.assertEqual(
             XPath.weekday_button(3),
-            "/html/body/div/div[6]/div/div[3]/div[3]/div/p",
+            "/html/body/div/div[6]/div/div[3]/div[0]/div/p",
         )
 
-    def test_xpath_booking_slot(self):
+    def test_xpath_enter_slot(self):
         self.assertEqual(
-            XPath.booking_slot(1, True),
+            XPath.enter_slot(1),
             "/html/body/div/div[6]/div/div[1]/div/div[1]/div[3]/button",
         )
         self.assertEqual(
-            XPath.booking_slot(1, False),
+            XPath.cancel_slot(1),
             "/html/body/div/div[6]/div/div[1]/div/div[2]/div[3]/button",
         )
 
@@ -60,9 +59,6 @@ class TestXPathHelper(unittest.TestCase):
 
 
 class TestBookingHelper(unittest.TestCase):
-    def setUp(self):
-        XPath.helper = XPathHelper()
-
     def test_get_day(self):
         today = date.today()
         future_date, diff_week = get_day(5)
