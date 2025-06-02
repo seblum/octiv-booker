@@ -6,62 +6,25 @@ from retrying import retry
 from .main_dev import main_dev
 
 # Define file paths for configuration and classes
-# CONFIG_PATH = os.path.join(os.path.dirname(__file__), "utils/config.yaml")
-CLASSES_PATH = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
-
-
-# Load configuration files
-def load_yaml(file_path):
-    """Load YAML configuration from a file."""
-    with open(file_path, "r") as file:
-        return yaml.safe_load(file)
-
-
-# config = load_yaml(CONFIG_PATH)
-classes = load_yaml(CLASSES_PATH)
+classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
+classes = yaml.safe_load(open(classes_path))
 
 
 @retry(stop_max_attempt_number=3)
-def main(ci_run=False):
+def main():
     """Slotbooker Main Function."""
-
-    # Check if testing environment is set
-    if ci_run:
-        main_dev(ci_run=True)
-        # logging.info("Testing Docker Container")
-        # booker = Booker(
-        #     # chromedriver=config.get("chromedriver"),
-        #     # days_before_bookable=0,
-        #     base_url="https://app.octivfitness.com/login",
-        #     # execution_booking_time="00:00:00.00",
-        # )
-        # user = os.environ.get("OCTIV_USERNAME")
-        # test_password = "if-this-would-be-the-password"
-
-        # login_failed = booker.login(username=user, password=test_password)
-        # if login_failed:
-        #     logging.info("TEST OK | Login failed as expected")
-
-        # booker.close()
-        # exit()
 
     # Retrieve environment variables
     user = os.environ.get("OCTIV_USERNAME")
     password = os.environ.get("OCTIV_PASSWORD")
-    # days_before_bookable = int(os.environ.get("DAYS_BEFORE_BOOKABLE", 0))
-    # execution_booking_time = os.environ.get("EXECUTION_BOOKING_TIME")
 
     # Initialize the Booker instance
     booker = Booker(
-        # chromedriver="chromedriver",
-        # days_before_bookable=days_before_bookable,
         base_url="https://app.octivfitness.com/login",
-        # execution_booking_time=execution_booking_time,
     )
 
     # Login and book the class
-    if booker.login(username=user, password=password):
-        raise ValueError("Login failed")
+    booker.login(username=user, password=password)
 
     booker.switch_day()
     booker.book_class(
@@ -80,8 +43,13 @@ def main(ci_run=False):
 
     # Close the Booker instance
     booker.close()
-    logging.info("Attempt: OctivBooker succeeded")
+    logging.info(
+        "Slotbooker completed successfully."
+    )  # TODO: correct logging output if fails
 
 
 if __name__ == "__main__":
-    main(ci_run=os.environ.get("IS_TEST"))
+    if os.environ.get("IS_TEST"):
+        main_dev(ci_run=True)
+    else:
+        main()
