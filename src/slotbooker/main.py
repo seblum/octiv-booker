@@ -38,6 +38,7 @@ def production():
         receiver=os.getenv("EMAIL_RECEIVER"),
         format="html",
         attach_logfile=True,
+        send_mail=["on_failure", "on_neutral"],  # Set to False for testing
     )
 
     # Close the Booker instance
@@ -74,13 +75,14 @@ def development(ci_run=False):
         )
 
         # Configure mailing settings && send mail
-        # booker.send_result(
-        #     sender=os.getenv("EMAIL_SENDER"),
-        #     password=os.getenv("EMAIL_PASSWORD"),
-        #     receiver=os.getenv("EMAIL_RECEIVER"),
-        #     format="html",
-        #     attach_logfile=True,
-        # )
+        booker.send_result(
+            sender=os.getenv("EMAIL_SENDER"),
+            password=os.getenv("EMAIL_PASSWORD"),
+            receiver=os.getenv("EMAIL_RECEIVER"),
+            format="html",
+            attach_logfile=True,
+            send_mail=["on_failure", "on_neutral"],  # Set to False for testing
+        )
 
         # booker.close()
 
