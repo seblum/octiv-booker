@@ -296,6 +296,7 @@ class Booker:
         receiver: str,
         format: str = "plain",
         attach_logfile=False,
+        send_mail: list = ["on_success", "on_failure", "on_neutral"],
     ) -> None:
         """
         Configure email settings for sending notifications.
@@ -317,18 +318,22 @@ class Booker:
         if attach_logfile:
             attachment_path = self.loggingHandler.get_log_file_path()
 
-        if self.booking_successful:
+        if self.booking_successful and "on_success" in send_mail:
             self.mail_handler.send_successful_booking_email(
                 booking_information=self.booking_information,
                 attachment_path=attachment_path,
             )
             logging.success(f"Booked successfully {self.booking_class_slot}")
-        elif self.booking_successful is False and self.booking_class_slot is None:
+        elif (
+            self.booking_successful is False
+            and self.booking_class_slot is None
+            and "on_neutral" in send_mail
+        ):
             self.mail_handler.send_no_classes_email(
                 booking_date=self.booking_information["current_date"],
                 attachment_path=attachment_path,
             )
-        else:
+        elif "on_failure" in send_mail:
             self.mail_handler.send_unsuccessful_booking_email(
                 booking_information=self.booking_information,
                 attachment_path=attachment_path,
