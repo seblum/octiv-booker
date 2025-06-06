@@ -8,7 +8,7 @@ on:
 
 jobs:
   call-octivbooker:
-    uses: seblum/octivbooker/.github/workflows/callable.yaml@ghactions-setup
+    uses: seblum/octiv-booker/.github/workflows/callable.yaml@ghactions-setup
     secrets:
       OCTIV_USERNAME: ${{ secrets.OCTIV_USERNAME }}
       OCTIV_PASSWORD: ${{ secrets.OCTIV_PASSWORD }}
