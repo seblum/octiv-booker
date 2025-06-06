@@ -1,0 +1,20 @@
+name: Run OctivBookerBot on 1730 schedule
+
+on:
+    schedule:
+        - cron: "25 17 * * *" # “At 17:25 UTC every day.”
+    workflow_dispatch:
+    push:
+
+jobs:
+  call-octivbooker:
+    uses: seblum/octivbooker/.github/workflows/callable.yaml@refactor/ghactions-setup
+    secrets:
+      OCTIV_USERNAME: ${{ secrets.OCTIV_USERNAME }}
+      OCTIV_PASSWORD: ${{ secrets.OCTIV_PASSWORD }}
+      EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+      EMAIL_RECEIVER_NAME: ${{ secrets.EMAIL_RECEIVER_NAME }}
+    with:
+      schedule_label: "1730-schedule"
