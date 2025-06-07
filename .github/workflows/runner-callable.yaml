@@ -62,13 +62,6 @@ jobs:
       - name: 🐳 Set up Docker
         uses: docker/setup-buildx-action@v2
 
-      - 
-        name: Run update script
-        run: python scripts/update_runner_docker_version.py "v${{ env.TAG_VERSION }}"
-      - 
-        name: Verify Update
-        run: cat .github/workflows/runner-*.yml
-
       - name: 🏃 Run OctivBooker Docker Container
         run: |
           docker run --rm \
@@ -80,5 +73,5 @@ jobs:
           -e EMAIL_RECEIVER="${{ secrets.EMAIL_RECEIVER }}" \
           -e EMAIL_RECEIVER_NAME="${{ secrets.EMAIL_RECEIVER_NAME }}" \
           -e DAYS_BEFORE_BOOKABLE="${{ vars.DAYS_BEFORE_BOOKABLE }}" \
-          -e EXECUTION_BOOKING_TIME="${{ var.EXECUTION_BOOKING_TIME }}" \
+          -e EXECUTION_BOOKING_TIME="${{ vars.EXECUTION_BOOKING_TIME }}" \
           seblum/${{ inputs.docker_image }}

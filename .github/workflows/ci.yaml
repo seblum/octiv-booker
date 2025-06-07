@@ -24,16 +24,23 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      
+      
+      - 
+        name: Run update script
+        run: python scripts/update_runner_docker_version.py "v${{ env.TAG_VERSION }}"
+      - 
+        name: Verify Update
+        run: cat .github/workflows/runner-*.yml
+
+
+      
       - 
         name: 📘 Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           poetry install
-      # - 
-      #   name: ⚙️ Install dependencies
-      #   run: |
-      #     poetry install
       - 
         name: 💄 Run linting with ruff
         run: |
