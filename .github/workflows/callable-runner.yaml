@@ -42,7 +42,7 @@ jobs:
       - name: 🔎 List environment subdirectories
         id: get_envdirs
         run: |
-          ENV_SUBDIRS=$(find src/slotbooker/data/${{ inputs.time }} -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
+          ENV_SUBDIRS=$(find src/data/${{ inputs.time }} -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
           ENV_SUBDIR_LIST=$(echo "$ENV_SUBDIRS" | jq -R -s -c 'split("\n")[:-1]')
           echo "environment_dir_list=$ENV_SUBDIR_LIST" >> $GITHUB_OUTPUT
           echo $ENV_SUBDIR_LIST
