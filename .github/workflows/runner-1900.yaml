@@ -1,4 +1,4 @@
-name: 🤖 Octiv BookerBot — Auto-run @ 1900
+name: 🤖 BookerBot — Auto-run @1900
 
 on:
   schedule:
