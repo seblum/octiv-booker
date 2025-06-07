@@ -2,7 +2,8 @@ import os
 import logging
 import yaml
 from .slotbooker import Booker
-from retrying import retry
+from tenacity import retry, stop_after_attempt
+
 
 # Define file paths for configuration and classes
 parent_dir = os.path.dirname(os.path.dirname(__file__))
@@ -11,7 +12,11 @@ print(classes_path)
 classes = yaml.safe_load(open(classes_path))
 
 
-@retry(stop_max_attempt_number=3)
+@retry(
+    stop=stop_after_attempt(3),
+    before=lambda retry_state: print(f"Attempt #{retry_state.attempt_number}"),
+    reraise=False,  # Do not raise RetryError
+)
 def production():
     """Slotbooker Main Function."""
 
@@ -28,11 +33,14 @@ def production():
     booker.login(username=user, password=password)
 
     booker.switch_day()
-    booker.book_class(
+    result = booker.book_class(
         class_dict=classes.get("class_dict"),
         enter_class=True,
     )
-
+    if not result:
+        raise ValueError(
+            f"Booking failed for class: {classes.get('class_dict').get('name')}"
+        )
     # Send results via email
     booker.send_result(
         sender=os.getenv("EMAIL_SENDER"),
@@ -42,12 +50,7 @@ def production():
         attach_logfile=True,
         send_mail=["on_failure", "on_neutral"],  # Set to False for testing
     )
-
-    # Close the Booker instance
-    booker.close()
-    logging.info(
-        "Slotbooker completed successfully."
-    )  # TODO: correct logging output if fails
+    # TODO: make mailhander static
 
 
 def development(ci_run=False):
@@ -65,14 +68,14 @@ def development(ci_run=False):
         env=env,
     )
 
-    login_failed = booker.login(username=user, password=password)
-    if login_failed:
+    login_successfull = booker.login(username=user, password=password)
+    if not login_successfull:
         logging.info("TEST OK | Login failed as expected")
         print("TEST OK | Login failed as expected")
     else:
         booker.switch_day()
 
-        success, _, _ = booker.book_class(
+        booker.book_class(
             class_dict=classes.get("class_dict"),
             # booking_action=classes.get("book_class"),
         )

@@ -20,8 +20,10 @@ LOG_LEVELS: Dict[str, str] = {
 
 
 class LogHandler:
-    def __init__(self, log_level=logging.INFO) -> None:
-        self.timestamp: str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    def __init__(self, log_level=logging.INFO, logfile_name: str = None) -> None:
+        self.timestamp: str = logfile_name or datetime.now().strftime(
+            "%Y-%m-%d_%H-%M-%S"
+        )
         self.log_dir = LOG_DIR
         self.log_file_path: str = self._setup_log_dir()
         self.orig_stdout = sys.stdout
