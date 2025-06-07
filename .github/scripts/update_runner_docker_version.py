@@ -28,7 +28,7 @@ def update_docker_image_version(version: str, workflows_dir=".github/workflows")
         return
 
     docker_image_pattern = re.compile(
-        r'^(\s*DOCKER_IMAGE:\s*)(["\'])octivbooker:[^"\']*(["\'])',
+        r'^(\s*docker_image:\s*)(["\'])octivbooker:[^"\']*(["\'])',
         re.MULTILINE,
     )
 
@@ -47,11 +47,11 @@ def update_docker_image_version(version: str, workflows_dir=".github/workflows")
         new_content, count = docker_image_pattern.subn(replacer, content)
 
         if count == 0:
-            print(f"Warning: No DOCKER_IMAGE line found in {filepath}")
+            print(f"Warning: No docker_image line found in {filepath}")
         else:
             with open(filepath, "w", encoding="utf-8") as f:
                 f.write(new_content)
-            print(f"Updated DOCKER_IMAGE to octivbooker:v{version} in {filepath}")
+            print(f"Updated docker_image to octivbooker:v{version} in {filepath}")
 
 
 if __name__ == "__main__":
