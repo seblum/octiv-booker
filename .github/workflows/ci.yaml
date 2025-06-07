@@ -28,7 +28,7 @@ jobs:
       
       - 
         name: Run update script
-        run: python scripts/update_runner_docker_version.py "v${{ env.TAG_VERSION }}"
+        run: python .github/scripts/update_runner_docker_version.py "v${{ env.TAG_VERSION }}"
       - 
         name: Verify Update
         run: cat .github/workflows/runner-*.yml
