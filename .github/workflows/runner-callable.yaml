@@ -1,4 +1,4 @@
-name: Run OctivBookerBot Callable
+name: 🐳🏃 Run OctivBookerBot
 
 on:
   workflow_call:
@@ -11,6 +11,9 @@ on:
         required: false
         type: string
         default: "00:00"
+      docker_image:
+        required: false
+        type: string
     secrets:
       OCTIV_USERNAME:
         required: true
@@ -24,9 +27,6 @@ on:
         required: true
       EMAIL_RECEIVER_NAME:
         required: true
-
-env:
-  DOCKER_IMAGE: "octivbooker:v2.6.3"
 
 jobs:
   prepare:
@@ -72,4 +72,4 @@ jobs:
           -e EMAIL_RECEIVER_NAME="${{ secrets.EMAIL_RECEIVER_NAME }}" \
           -e DAYS_BEFORE_BOOKABLE="${{ inputs.days_before_bookable }}" \
           -e EXECUTION_BOOKING_TIME="${{ inputs.execution_booking_time }}" \
-          seblum/${{ env.DOCKER_IMAGE }}
+          seblum/${{ inputs.docker_image }}

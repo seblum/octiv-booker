@@ -19,3 +19,4 @@ jobs:
     with:
       days_before_bookable: ${{ VARS.DAYS_BEFORE_BOOKABLE }}
       execution_booking_time: ${{ VARS.EXECUTION_BOOKING_TIME }}
+      docker_image: octivbooker:v2.6.3
