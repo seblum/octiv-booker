@@ -1,8 +1,8 @@
 from pathlib import Path
 from datetime import datetime, timedelta
 
-TEMPLATE_PATH = Path("./hooks/runner-template.yaml")
-TIME_FOLDER = Path("src/slotbooker/data/")
+TEMPLATE_PATH = Path(".github/hooks/runner-template.yaml")
+TIME_FOLDER = Path("src/data/")
 WORKFLOW_DIR = Path(".github/workflows")
 
 

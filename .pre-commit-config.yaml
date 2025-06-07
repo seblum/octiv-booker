@@ -17,13 +17,13 @@ repos:
         pass_filenames: false
       - id: update-chromedriver-version
         name: Update ChromeDriver Version
-        entry: python hooks/update-chromedriver.py
+        entry: python .github/hooks/update-chromedriver.py
         language: system
         pass_filenames: false
         args:
           - poetry.Dockerfile
       - id: runner-generator
         name: Runner Generator
-        entry: python hooks/runner-generator.py
+        entry: python .github/hooks/runner-generator.py
         language: system
         types: [file]

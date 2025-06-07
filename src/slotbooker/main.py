@@ -5,7 +5,9 @@ from .slotbooker import Booker
 from retrying import retry
 
 # Define file paths for configuration and classes
-classes_path = os.path.join(os.path.dirname(__file__), "data/classes.yaml")
+parent_dir = os.path.dirname(os.path.dirname(__file__))
+classes_path = os.path.join(parent_dir, "data/classes.yaml")
+print(classes_path)
 classes = yaml.safe_load(open(classes_path))
 
 
