@@ -1,4 +1,4 @@
-name: 🤖 Octiv BookerBot — Auto-run @ {time}
+name: 🤖 BookerBot — Auto-run @{time}
 
 on:
   schedule:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   call-octivbooker:
-    uses: seblum/octiv-booker/.github/workflows/runner-callable.yaml@ghactions-setup
+    uses: seblum/octiv-booker/.github/workflows/runner-callable.yaml@master
     secrets:
       OCTIV_USERNAME: ${{{{ secrets.OCTIV_USERNAME }}}}
       OCTIV_PASSWORD: ${{{{ secrets.OCTIV_PASSWORD }}}}

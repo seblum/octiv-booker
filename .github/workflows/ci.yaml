@@ -1,4 +1,4 @@
-name: Deployment CI
+name: 🧹🧪🏗️ CI Workflow
 
 env:
   TEST_TAG: octivbooker:test
