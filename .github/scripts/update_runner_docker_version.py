@@ -4,8 +4,7 @@ import os
 
 def update_docker_image_version(version: str, workflows_dir=".github/workflows"):
     """
-    Update DOCKER_IMAGE version string in all YAML workflow files
-    that start with 'runner-' in the workflows directory.
+    Update docker_image version in all workflow files starting with 'runner-'.
 
     Args:
         version: The version string to update to (e.g. "2.6.3").
@@ -20,15 +19,15 @@ def update_docker_image_version(version: str, workflows_dir=".github/workflows")
         print(f"Directory {workflows_dir} not found!")
         return
 
-    # Filter files starting with 'runner-'
     runner_files = [f for f in files_in_dir if f.startswith("runner-")]
 
     if not runner_files:
         print(f"No files starting with 'runner-' found in {workflows_dir}")
         return
 
+    # Regex to find docker_image: octivbooker:v<version>
     docker_image_pattern = re.compile(
-        r'^(\s*docker_image:\s*)(["\'])octivbooker:[^"\']*(["\'])',
+        r"^(\s*docker_image:\s*octivbooker:)v[\d\.]+",
         re.MULTILINE,
     )
 
@@ -38,13 +37,10 @@ def update_docker_image_version(version: str, workflows_dir=".github/workflows")
         with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
 
-        def replacer(match):
-            prefix = match.group(1)
-            quote_start = match.group(2)
-            quote_end = match.group(3)
-            return f"{prefix}{quote_start}octivbooker:v{version}{quote_end}"
-
-        new_content, count = docker_image_pattern.subn(replacer, content)
+        new_content, count = docker_image_pattern.subn(
+            rf"\1v{version}",
+            content,
+        )
 
         if count == 0:
             print(f"Warning: No docker_image line found in {filepath}")

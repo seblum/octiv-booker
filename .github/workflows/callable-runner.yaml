@@ -56,13 +56,14 @@ jobs:
         environment: ${{ fromJson(needs.prepare.outputs.environment_dir_list) }}
     environment: ${{ matrix.environment }}
     steps:
-      - name: 📥 Checkout code
+      - 
+        name: 📥 Checkout code
         uses: actions/checkout@v4
-
-      - name: 🐳 Set up Docker
+      - 
+        name: 🐳 Set up Docker
         uses: docker/setup-buildx-action@v2
-
-      - name: 🏃 Run OctivBooker Docker Container
+      - 
+        name: 🏃 Run OctivBooker Docker Container
         run: |
           docker run --rm \
           --volume $(pwd)/src/slotbooker/data/${{ inputs.time }}/${{ matrix.environment }}:/app/src/slotbooker/data/ \

@@ -24,17 +24,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
-      
-      - 
-        name: Run update script
-        run: python .github/scripts/update_runner_docker_version.py "v${{ env.TAG_VERSION }}"
-      - 
-        name: Verify Update
-        run: cat .github/workflows/runner-*.yml
-
-
-      
       - 
         name: 📘 Install Poetry
         run: |
