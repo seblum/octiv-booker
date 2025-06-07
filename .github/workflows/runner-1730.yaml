@@ -4,7 +4,6 @@ on:
   schedule:
     - cron: "25 17 * * *" # “At 17:25 UTC every day.”
   workflow_dispatch:
-  push:
 
 jobs:
   call-octivbooker:
