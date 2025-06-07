@@ -21,8 +21,10 @@ def update_docker_image_version(
         print(f"No files found matching {file_pattern}")
         return
 
+    # Match any amount of whitespace before key, support single or double quotes for value
     docker_image_pattern = re.compile(
-        r'^( *)DOCKER_IMAGE: "octivbooker:.*"$', re.MULTILINE
+        r'^(\s*DOCKER_IMAGE:\s*)(["\'])octivbooker:[^"\']*(["\'])',
+        re.MULTILINE,
     )
 
     for filepath in files:
@@ -30,11 +32,14 @@ def update_docker_image_version(
         with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # Replace the line that starts with DOCKER_IMAGE: "octivbooker:..."
-        new_content, count = docker_image_pattern.subn(
-            rf'\1DOCKER_IMAGE: "octivbooker:v{version}"',
-            content,
-        )
+        # Replace the DOCKER_IMAGE value but keep original quoting style and spacing
+        def replacer(match):
+            prefix = match.group(1)
+            quote_start = match.group(2)
+            quote_end = match.group(3)
+            return f"{prefix}{quote_start}octivbooker:v{version}{quote_end}"
+
+        new_content, count = docker_image_pattern.subn(replacer, content)
 
         if count == 0:
             print(f"Warning: No DOCKER_IMAGE line found in {filepath}")

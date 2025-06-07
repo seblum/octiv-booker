@@ -94,13 +94,13 @@ jobs:
       TAG_VERSION: ${{ needs.get-tag.outputs.PACKAGE_VERSION }}  
     steps:
       - 
-        name: Checkout code with full history
+        name: 📥 Checkout code with full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.WORKFLOW_TOKEN }}
       - 
-        name: Create new Branch
+        name: 🏗️ Create new Branch
         run: |
           git fetch origin
           git checkout -b update-runner-dockerversion-${{ env.TAG_VERSION }} origin/master
@@ -109,13 +109,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - 
-        name: Run update script
+        name: 🔄 Run update script
         run: python scripts/update_runner_docker_version.py "v${{ env.TAG_VERSION }}"
       - 
-        name: Verify Update
+        name: 🔍 Verify Update
         run: cat .github/workflows/runner-*.yml
       - 
-        name: Commit changes
+        name: ⚙️ Commit changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -123,11 +123,11 @@ jobs:
           git commit -m "Update DOCKER_IMAGE: to ${{ env.TAG_VERSION }}"
           git push origin update-runner-dockerversion-${{ env.TAG_VERSION }}
       - 
-        name: Install GitHub CLI
+        name: ⚙️ Install GitHub CLI
         run: |
           sudo apt-get install gh
       - 
-        name: Create Pull Request
+        name: 🏗️ Create Pull Request
         run: |
           PR_EXISTS=$(gh pr list --head update-runner-dockerversion-${{ env.TAG_VERSION }} --json number --jq '.[0].number' || echo "")
           if [ -z "$PR_EXISTS" ]; then
