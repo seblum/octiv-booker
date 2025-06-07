@@ -1,4 +1,4 @@
-name: Deployment CD
+name: 📦 Build & 🐳 Deploy
 
 env:
   DOCKERREPO: seblum/octivbooker
@@ -20,22 +20,22 @@ jobs:
       versions_changed: ${{ steps.compare_versions.outputs.versions_changed }}
     steps:
       - 
-        name: Checkout code
+        name: 📥 Checkout code
         uses: actions/checkout@v4
       -  
-        name: Extract version from pyproject.toml
+        name: 🔍 Extract version from pyproject.toml
         id: extract_version
         run: |
           VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' ./pyproject.toml)
           echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_OUTPUT
       - 
-        name: Get previous version
+        name: 🔍 Get previous version
         id: get_previous_version
         run: |
           PREVIOUS_VERSION=$(git show HEAD~1:pyproject.toml | sed -n 's/^version = "\(.*\)"/\1/p')
           echo "PREVIOUS_VERSION=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
       - 
-        name: Compare versions
+        name: 🔄 Compare versions
         id: compare_versions
         run: |
           if [ "${{ steps.extract_version.outputs.PACKAGE_VERSION }}" = "${{ steps.get_previous_version.outputs.PREVIOUS_VERSION }}" ]; then
@@ -48,7 +48,7 @@ jobs:
           fi
 
   deploy:
-    name: "📦 Build & Push : ${{ matrix.tags }}"
+    name: "📦 Build & 🐳 Push : ${{ matrix.tags }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -57,22 +57,22 @@ jobs:
     if: ${{ needs.get-tag.outputs.versions_changed }}
     steps:
       - 
-        name: Checkout code
+        name: 📥 Checkout code
         uses: actions/checkout@v4
       -
-        name: Set up QEMU
+        name: ⚙️ Set up QEMU
         uses: docker/setup-qemu-action@v3
       -
-        name: Set up Docker Buildx
+        name: 🏗️ Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       -
-        name: Login to DockerHub
+        name: 🔑 Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push
+        name: 🐳 Build and push
         uses: docker/build-push-action@v6
         with:
           file: ./poetry.Dockerfile
@@ -94,48 +94,44 @@ jobs:
       TAG_VERSION: ${{ needs.get-tag.outputs.PACKAGE_VERSION }}  
     steps:
       - 
-        name: Checkout code with full history
+        name: 📥 Checkout code with full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.WORKFLOW_TOKEN }}
       - 
-        name: Create new Branch
+        name: 🏗️ Create new Branch
         run: |
           git fetch origin
-          git checkout -b update-run-on-schedule-version-${{ env.TAG_VERSION }} origin/master
+          git checkout -b update-runner-dockerversion-${{ env.TAG_VERSION }} origin/master
           git pull --rebase
-          git push origin update-run-on-schedule-version-${{ env.TAG_VERSION }} --force
+          git push origin update-runner-dockerversion-${{ env.TAG_VERSION }} --force
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - 
-        name: Update Version in pyproject.toml
-        run: |
-          sed -i "s/^    DOCKER_IMAGE: \"octivbooker:.*\"/    DOCKER_IMAGE: \"octivbooker:v${{ env.TAG_VERSION }}\"/" .github/workflows/run-on-schedule-*.yml
+        name: 🔄 Run update script
+        run: python .github/scripts/update_runner_docker_version.py "v${{ env.TAG_VERSION }}"
       - 
-        name: Verify Update
-        run: cat .github/workflows/run-on-schedule-*.yml
-      - 
-        name: Commit changes
+        name: ⚙️ Commit changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .github/workflows/run-on-schedule-*.yml
+          git add .github/workflows/runner-*.yml
           git commit -m "Update DOCKER_IMAGE: to ${{ env.TAG_VERSION }}"
-          git push origin update-run-on-schedule-version-${{ env.TAG_VERSION }}
+          git push origin update-runner-dockerversion-${{ env.TAG_VERSION }}
       - 
-        name: Install GitHub CLI
+        name: ⚙️ Install GitHub CLI
         run: |
           sudo apt-get install gh
       - 
-        name: Create Pull Request
+        name: 🏗️ Create Pull Request
         run: |
-          PR_EXISTS=$(gh pr list --head update-run-on-schedule-version-${{ env.TAG_VERSION }} --json number --jq '.[0].number' || echo "")
+          PR_EXISTS=$(gh pr list --head update-runner-dockerversion-${{ env.TAG_VERSION }} --json number --jq '.[0].number' || echo "")
           if [ -z "$PR_EXISTS" ]; then
-            gh pr create --title "Bump run-on-schedule.yml version to ${{ env.TAG_VERSION }}" \
-                          --body "This PR updates the version in run-on-schedule.yml to ${{ env.TAG_VERSION }}." \
+            gh pr create --title "Bump runner-time.yml version to ${{ env.TAG_VERSION }}" \
+                          --body "This PR updates the version in runner-time.yml to ${{ env.TAG_VERSION }}." \
                           --base master \
-                          --head update-run-on-schedule-version-${{ env.TAG_VERSION }}
+                          --head update-runner-dockerversion-${{ env.TAG_VERSION }}
           else
             echo "PR already exists."
           fi

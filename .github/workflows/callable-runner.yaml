@@ -1,0 +1,78 @@
+name: 🐳🏃 Run OctivBookerBot
+
+on:
+  workflow_call:
+    inputs:
+      days_before_bookable:
+        required: false
+        type: string
+      execution_booking_time:
+        required: false
+        type: string
+      docker_image:
+        required: false
+        type: string
+      time:
+        required: false
+        type: string
+    secrets:
+      OCTIV_USERNAME:
+        required: true
+      OCTIV_PASSWORD:
+        required: true
+      EMAIL_SENDER:
+        required: true
+      EMAIL_PASSWORD:
+        required: true
+      EMAIL_RECEIVER:
+        required: true
+      EMAIL_RECEIVER_NAME:
+        required: true
+
+jobs:
+  prepare:
+    name: "🔍 Prepare Environment for ${{ inputs.time }}"
+    runs-on: ubuntu-latest
+    outputs:
+      environment_dir_list: ${{ steps.get_envdirs.outputs.environment_dir_list }}
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔎 List environment subdirectories
+        id: get_envdirs
+        run: |
+          ENV_SUBDIRS=$(find src/slotbooker/data/${{ inputs.time }} -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
+          ENV_SUBDIR_LIST=$(echo "$ENV_SUBDIRS" | jq -R -s -c 'split("\n")[:-1]')
+          echo "environment_dir_list=$ENV_SUBDIR_LIST" >> $GITHUB_OUTPUT
+          echo $ENV_SUBDIR_LIST
+
+  run-octivbooker:
+    name: "🏋️‍♂️ Run Booker ${{ matrix.environment }}"
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: ${{ fromJson(needs.prepare.outputs.environment_dir_list) }}
+    environment: ${{ matrix.environment }}
+    steps:
+      - 
+        name: 📥 Checkout code
+        uses: actions/checkout@v4
+      - 
+        name: 🐳 Set up Docker
+        uses: docker/setup-buildx-action@v2
+      - 
+        name: 🏃 Run OctivBooker Docker Container
+        run: |
+          docker run --rm \
+          --volume $(pwd)/src/data/${{ inputs.time }}/${{ matrix.environment }}:/app/src/data/ \
+          -e OCTIV_USERNAME="${{ secrets.OCTIV_USERNAME }}" \
+          -e OCTIV_PASSWORD="${{ secrets.OCTIV_PASSWORD }}" \
+          -e EMAIL_SENDER="${{ secrets.EMAIL_SENDER }}" \
+          -e EMAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
+          -e EMAIL_RECEIVER="${{ secrets.EMAIL_RECEIVER }}" \
+          -e EMAIL_RECEIVER_NAME="${{ secrets.EMAIL_RECEIVER_NAME }}" \
+          -e DAYS_BEFORE_BOOKABLE="${{ vars.DAYS_BEFORE_BOOKABLE }}" \
+          -e EXECUTION_BOOKING_TIME="${{ vars.EXECUTION_BOOKING_TIME }}" \
+          seblum/${{ inputs.docker_image }}

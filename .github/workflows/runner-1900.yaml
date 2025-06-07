@@ -1,0 +1,20 @@
+name: 🤖 Octiv BookerBot — Auto-run @ 1900
+
+on:
+  schedule:
+    - cron: "55 18 * * *" # “At 18:55 UTC every day.”
+  workflow_dispatch:
+
+jobs:
+  call-octivbooker:
+    uses: seblum/octiv-booker/.github/workflows/runner-callable.yaml@ghactions-setup
+    secrets:
+      OCTIV_USERNAME: ${{ secrets.OCTIV_USERNAME }}
+      OCTIV_PASSWORD: ${{ secrets.OCTIV_PASSWORD }}
+      EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+      EMAIL_RECEIVER_NAME: ${{ secrets.EMAIL_RECEIVER_NAME }}
+    with:
+      docker_image: octivbooker:v2.6.3
+      time: "1900"

@@ -104,13 +104,15 @@ class Booker:
             logging.success("Login successful")
             return not self.__stop_booking_process
 
-    def switch_day(self, days_before_bookable: str = None) -> (str, str):
+    def switch_day(self) -> (str, str):
         self.selenium_manager.driver_is_initialialized()
 
         """Switch to the desired day for booking slots."""
-        days_before_bookable = os.environ.get("DAYS_BEFORE_BOOKABLE", 0)
+        days_before_bookable = os.environ.get("DAYS_BEFORE_BOOKABLE", None)
         days_before_bookable = (
-            int(days_before_bookable) if days_before_bookable.strip() else 0
+            int(days_before_bookable)
+            if days_before_bookable and days_before_bookable.strip()
+            else 0
         )
 
         if days_before_bookable is None:
