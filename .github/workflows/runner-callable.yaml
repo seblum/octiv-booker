@@ -3,9 +3,14 @@ name: Run OctivBookerBot Callable
 on:
   workflow_call:
     inputs:
-      schedule_label:
+      days_before_bookable:
         required: false
         type: string
+        default: "7"
+      execution_booking_time:
+        required: false
+        type: string
+        default: "00:00"
     secrets:
       OCTIV_USERNAME:
         required: true
@@ -29,10 +34,10 @@ jobs:
     outputs:
       environment_dir_list: ${{ steps.get_envdirs.outputs.environment_dir_list }}
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: List environment subdirectories
+      - name: 🔎 List environment subdirectories
         id: get_envdirs
         run: |
           ENV_SUBDIRS=$(find src/slotbooker/data/prod/1900 -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
@@ -49,13 +54,13 @@ jobs:
         environment: ${{ fromJson(needs.prepare.outputs.environment_dir_list) }}
     environment: ${{ matrix.environment }}
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker
+      - name: 🐳 Set up Docker
         uses: docker/setup-buildx-action@v2
 
-      - name: Run OctivBooker Docker Container
+      - name: 🏃 Run OctivBooker Docker Container
         run: |
           docker run --rm \
           --volume $(pwd)/src/slotbooker/data/prod/1900/${{ matrix.environment }}:/app/src/slotbooker/data/ \
@@ -65,6 +70,6 @@ jobs:
           -e EMAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
           -e EMAIL_RECEIVER="${{ secrets.EMAIL_RECEIVER }}" \
           -e EMAIL_RECEIVER_NAME="${{ secrets.EMAIL_RECEIVER_NAME }}" \
-          -e DAYS_BEFORE_BOOKABLE="${{ vars.DAYS_BEFORE_BOOKABLE }}" \
-          -e EXECUTION_BOOKING_TIME="${{ vars.EXECUTION_BOOKING_TIME }}" \
+          -e DAYS_BEFORE_BOOKABLE="${{ inputs.days_before_bookable }}" \
+          -e EXECUTION_BOOKING_TIME="${{ inputs.execution_booking_time }}" \
           seblum/${{ env.DOCKER_IMAGE }}

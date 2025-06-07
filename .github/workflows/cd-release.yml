@@ -1,4 +1,4 @@
-name: Release CD
+name: 🚀 Release CD
 
 env:
   DOCKERREPO: seblum/octivbooker
@@ -21,10 +21,10 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
     steps:
       - 
-        name: Checkout code
+        name: 📥 Checkout code
         uses: actions/checkout@v4
       - 
-        name: Release
+        name: 🚀 Release
         uses: googleapis/release-please-action@v4
         id: release
         with:

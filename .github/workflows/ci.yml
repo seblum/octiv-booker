@@ -11,49 +11,50 @@ on:
 
 jobs:
   test-and-lint:
-    name: "🧰 Test & Lint"
+    name: "🧰🏗️ Test & Lint"
     runs-on: ubuntu-latest
     outputs:
       PACKAGE_VERSION: ${{ steps.extract_version.outputs.PACKAGE_VERSION }}
     steps:
       - 
-        name: Checkout code
+        name: 📥 Checkout code
         uses: actions/checkout@v4
       - 
-        name: Set up Python
+        name: 🐍 Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - 
-        name: Install Poetry
+        name: 📘 Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - 
-        name: Install dependencies
-        run: |
           poetry install
+      # - 
+      #   name: ⚙️ Install dependencies
+      #   run: |
+      #     poetry install
       - 
-        name: Run linting with ruff
+        name: 💄 Run linting with ruff
         run: |
           poetry run ruff check . --fix
       - 
-        name: Run tests
+        name: 👩‍🔬 Run tests
         run: |
           poetry run coverage run -m pytest
           poetry run coverage report -m
       - 
-        name: Export coverage HTML
+        name: ✔️ Export coverage HTML
         run: |
           poetry run coverage html -d coverage_html
       - 
-        name: Upload coverage HTML artifact
+        name: 📊 Upload coverage HTML artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage_html
       -  
-        name: Extract version from pyproject.toml
+        name: 🔎 Extract version from pyproject.toml
         id: extract_version
         run: |
           VERSION=$(grep -Po '(?<=^version = ")[^"]*' ./pyproject.toml)

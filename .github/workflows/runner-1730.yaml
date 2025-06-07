@@ -8,7 +8,7 @@ on:
 
 jobs:
   call-octivbooker:
-    uses: seblum/octiv-booker/.github/workflows/callable.yaml@ghactions-setup
+    uses: seblum/octiv-booker/.github/workflows/runner-callable.yaml@ghactions-setup
     secrets:
       OCTIV_USERNAME: ${{ secrets.OCTIV_USERNAME }}
       OCTIV_PASSWORD: ${{ secrets.OCTIV_PASSWORD }}
@@ -17,4 +17,5 @@ jobs:
       EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
       EMAIL_RECEIVER_NAME: ${{ secrets.EMAIL_RECEIVER_NAME }}
     with:
-      schedule_label: "1730-schedule"
+      days_before_bookable: ${{ VARS.DAYS_BEFORE_BOOKABLE }}
+      execution_booking_time: ${{ VARS.EXECUTION_BOOKING_TIME }}
