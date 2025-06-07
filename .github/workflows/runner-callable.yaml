@@ -6,11 +6,9 @@ on:
       days_before_bookable:
         required: false
         type: string
-        default: "7"
       execution_booking_time:
         required: false
         type: string
-        default: "00:00"
       docker_image:
         required: false
         type: string
@@ -74,6 +72,6 @@ jobs:
           -e EMAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
           -e EMAIL_RECEIVER="${{ secrets.EMAIL_RECEIVER }}" \
           -e EMAIL_RECEIVER_NAME="${{ secrets.EMAIL_RECEIVER_NAME }}" \
-          -e DAYS_BEFORE_BOOKABLE="${{ inputs.days_before_bookable }}" \
-          -e EXECUTION_BOOKING_TIME="${{ inputs.execution_booking_time }}" \
+          -e DAYS_BEFORE_BOOKABLE="${{ vars.DAYS_BEFORE_BOOKABLE }}" \
+          -e EXECUTION_BOOKING_TIME="${{ var.EXECUTION_BOOKING_TIME }}" \
           seblum/${{ inputs.docker_image }}
