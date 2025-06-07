@@ -1,8 +1,8 @@
-name: 🤖 Octiv BookerBot — Auto-run @ 1730
+name: 🤖 Octiv BookerBot — Auto-run @ 1900
 
 on:
   schedule:
-    - cron: "25 17 * * *" # “At 17:25 UTC every day.”
+    - cron: "55 18 * * *" # “At 18:55 UTC every day.”
   workflow_dispatch:
   push:
 
@@ -20,4 +20,4 @@ jobs:
       days_before_bookable: ${{ VARS.DAYS_BEFORE_BOOKABLE }}
       execution_booking_time: ${{ VARS.EXECUTION_BOOKING_TIME }}
       docker_image: octivbooker:v2.6.3
-      time: "1730"
+      time: "1900"

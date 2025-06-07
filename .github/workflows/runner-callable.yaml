@@ -14,6 +14,9 @@ on:
       docker_image:
         required: false
         type: string
+      time:
+        required: false
+        type: string
     secrets:
       OCTIV_USERNAME:
         required: true
@@ -30,6 +33,7 @@ on:
 
 jobs:
   prepare:
+    name: "🔍 Prepare Environment for ${{ inputs.time }}"
     runs-on: ubuntu-latest
     outputs:
       environment_dir_list: ${{ steps.get_envdirs.outputs.environment_dir_list }}
@@ -40,7 +44,7 @@ jobs:
       - name: 🔎 List environment subdirectories
         id: get_envdirs
         run: |
-          ENV_SUBDIRS=$(find src/slotbooker/data/prod/1900 -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
+          ENV_SUBDIRS=$(find src/slotbooker/data/${{ inputs.time }} -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
           ENV_SUBDIR_LIST=$(echo "$ENV_SUBDIRS" | jq -R -s -c 'split("\n")[:-1]')
           echo "environment_dir_list=$ENV_SUBDIR_LIST" >> $GITHUB_OUTPUT
           echo $ENV_SUBDIR_LIST
@@ -63,7 +67,7 @@ jobs:
       - name: 🏃 Run OctivBooker Docker Container
         run: |
           docker run --rm \
-          --volume $(pwd)/src/slotbooker/data/prod/1900/${{ matrix.environment }}:/app/src/slotbooker/data/ \
+          --volume $(pwd)/src/slotbooker/data/${{ inputs.time }}/${{ matrix.environment }}:/app/src/slotbooker/data/ \
           -e OCTIV_USERNAME="${{ secrets.OCTIV_USERNAME }}" \
           -e OCTIV_PASSWORD="${{ secrets.OCTIV_PASSWORD }}" \
           -e EMAIL_SENDER="${{ secrets.EMAIL_SENDER }}" \
