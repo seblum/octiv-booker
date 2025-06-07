@@ -14,7 +14,18 @@ def update_docker_image_version(
         workflows_dir: Directory containing the workflow YAML files.
         pattern: Filename pattern to match workflow files.
     """
+    print(f"Listing files in {workflows_dir}:")
+    try:
+        files_in_dir = os.listdir(workflows_dir)
+        for f in files_in_dir:
+            print(f" - {f}")
+    except FileNotFoundError:
+        print(f"Directory {workflows_dir} not found!")
+        return
+
     file_pattern = os.path.join(workflows_dir, pattern)
+    print(f"Using glob pattern: {file_pattern}")
+
     files = glob.glob(file_pattern)
 
     if not files:
@@ -28,7 +39,7 @@ def update_docker_image_version(
     )
 
     for filepath in files:
-        print(f"Updating file: {filepath}")
+        print(f"\nUpdating file: {filepath}")
         with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
 
