@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.1](https://github.com/seblum/octiv-booker/compare/v2.7.0...v2.7.1) (2025-06-07)
+
+
+### Bug Fixes
+
+* commit changes pipeline ([#87](https://github.com/seblum/octiv-booker/issues/87)) ([d48e6e0](https://github.com/seblum/octiv-booker/commit/d48e6e0d0bc2f340632ede35dd99508b75af55c7))
+
 ## [2.7.0](https://github.com/seblum/octiv-booker/compare/v2.6.3...v2.7.0) (2025-06-07)
 
 
