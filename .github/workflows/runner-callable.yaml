@@ -50,7 +50,7 @@ jobs:
           echo $ENV_SUBDIR_LIST
 
   run-octivbooker:
-    name: "🏋️‍♂️ Run OctivBooker ${{ matrix.environment }}"
+    name: "🏋️‍♂️ Run Booker ${{ matrix.environment }}"
     needs: prepare
     runs-on: ubuntu-latest
     strategy:
