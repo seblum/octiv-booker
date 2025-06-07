@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.7.0](https://github.com/seblum/octiv-booker/compare/v2.6.3...v2.7.0) (2025-06-07)
+
+
+### Features
+
+* add mail sending flag ([#84](https://github.com/seblum/octiv-booker/issues/84)) ([7378f78](https://github.com/seblum/octiv-booker/commit/7378f78983a69f83bdf28335396597491ce48f43))
+* refactor & simplify helper functions ([#79](https://github.com/seblum/octiv-booker/issues/79)) ([e10046c](https://github.com/seblum/octiv-booker/commit/e10046c849cfaa038a15b505fc38267dc8a4180a))
+* rework ghactions setup ([#86](https://github.com/seblum/octiv-booker/issues/86)) ([8ea755f](https://github.com/seblum/octiv-booker/commit/8ea755f751fff51f9061c677e578ab05b0cd9e45))
+
 ## [2.6.3](https://github.com/seblum/octiv-booker/compare/v2.6.2...v2.6.3) (2025-05-24)
 
 
