@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.7.2](https://github.com/seblum/octiv-booker/compare/v2.7.1...v2.7.2) (2025-06-07)
+
+
+### Bug Fixes
+
+* callable-runner.yaml ([#93](https://github.com/seblum/octiv-booker/issues/93)) ([d2ab43c](https://github.com/seblum/octiv-booker/commit/d2ab43cc7aee119b3973f58bbbf2957f401ad5ed))
+* list data dirs ([#95](https://github.com/seblum/octiv-booker/issues/95)) ([49e2d38](https://github.com/seblum/octiv-booker/commit/49e2d38c4ee07e8eec937ab034fd52d5ee8f6f15))
+* versioning in runner ([#96](https://github.com/seblum/octiv-booker/issues/96)) ([34f344f](https://github.com/seblum/octiv-booker/commit/34f344f54cf99f1fc47cee428bbd71e2bc992656))
+
 ## [2.7.1](https://github.com/seblum/octiv-booker/compare/v2.7.0...v2.7.1) (2025-06-07)
 
 
