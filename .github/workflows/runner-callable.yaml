@@ -62,6 +62,13 @@ jobs:
       - name: 🐳 Set up Docker
         uses: docker/setup-buildx-action@v2
 
+      - 
+        name: Run update script
+        run: python scripts/update_runner_docker_version.py "v${{ env.TAG_VERSION }}"
+      - 
+        name: Verify Update
+        run: cat .github/workflows/runner-*.yml
+
       - name: 🏃 Run OctivBooker Docker Container
         run: |
           docker run --rm \

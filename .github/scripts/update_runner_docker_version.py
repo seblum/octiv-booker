@@ -1,0 +1,55 @@
+import re
+import glob
+import os
+
+
+def update_docker_image_version(
+    version: str, workflows_dir=".github/workflows", pattern="runner-*.yml"
+):
+    """
+    Update DOCKER_IMAGE version string in matching YAML workflow files.
+
+    Args:
+        version: The version string to update to (e.g. "2.6.3").
+        workflows_dir: Directory containing the workflow YAML files.
+        pattern: Filename pattern to match workflow files.
+    """
+    file_pattern = os.path.join(workflows_dir, pattern)
+    files = glob.glob(file_pattern)
+
+    if not files:
+        print(f"No files found matching {file_pattern}")
+        return
+
+    docker_image_pattern = re.compile(
+        r'^( *)DOCKER_IMAGE: "octivbooker:.*"$', re.MULTILINE
+    )
+
+    for filepath in files:
+        print(f"Updating file: {filepath}")
+        with open(filepath, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Replace the line that starts with DOCKER_IMAGE: "octivbooker:..."
+        new_content, count = docker_image_pattern.subn(
+            rf'\1DOCKER_IMAGE: "octivbooker:v{version}"',
+            content,
+        )
+
+        if count == 0:
+            print(f"Warning: No DOCKER_IMAGE line found in {filepath}")
+        else:
+            with open(filepath, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            print(f"Updated DOCKER_IMAGE to octivbooker:v{version} in {filepath}")
+
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) != 2:
+        print(f"Usage: {sys.argv[0]} <TAG_VERSION>")
+        sys.exit(1)
+
+    tag_version = sys.argv[1]
+    update_docker_image_version(tag_version)
