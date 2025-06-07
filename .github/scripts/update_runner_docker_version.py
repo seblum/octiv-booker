@@ -1,18 +1,15 @@
 import re
-import glob
 import os
 
 
-def update_docker_image_version(
-    version: str, workflows_dir=".github/workflows", pattern="runner-*.yml"
-):
+def update_docker_image_version(version: str, workflows_dir=".github/workflows"):
     """
-    Update DOCKER_IMAGE version string in matching YAML workflow files.
+    Update DOCKER_IMAGE version string in all YAML workflow files
+    that start with 'runner-' in the workflows directory.
 
     Args:
         version: The version string to update to (e.g. "2.6.3").
         workflows_dir: Directory containing the workflow YAML files.
-        pattern: Filename pattern to match workflow files.
     """
     print(f"Listing files in {workflows_dir}:")
     try:
@@ -23,27 +20,24 @@ def update_docker_image_version(
         print(f"Directory {workflows_dir} not found!")
         return
 
-    file_pattern = os.path.join(workflows_dir, pattern)
-    print(f"Using glob pattern: {file_pattern}")
+    # Filter files starting with 'runner-'
+    runner_files = [f for f in files_in_dir if f.startswith("runner-")]
 
-    files = glob.glob(file_pattern)
-
-    if not files:
-        print(f"No files found matching {file_pattern}")
+    if not runner_files:
+        print(f"No files starting with 'runner-' found in {workflows_dir}")
         return
 
-    # Match any amount of whitespace before key, support single or double quotes for value
     docker_image_pattern = re.compile(
         r'^(\s*DOCKER_IMAGE:\s*)(["\'])octivbooker:[^"\']*(["\'])',
         re.MULTILINE,
     )
 
-    for filepath in files:
+    for filename in runner_files:
+        filepath = os.path.join(workflows_dir, filename)
         print(f"\nUpdating file: {filepath}")
         with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # Replace the DOCKER_IMAGE value but keep original quoting style and spacing
         def replacer(match):
             prefix = match.group(1)
             quote_start = match.group(2)
