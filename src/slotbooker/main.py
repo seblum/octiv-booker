@@ -2,16 +2,15 @@ import os
 import logging
 import yaml
 from .slotbooker import Booker
-from retrying import retry
+
 
 # Define file paths for configuration and classes
 parent_dir = os.path.dirname(os.path.dirname(__file__))
 classes_path = os.path.join(parent_dir, "data/classes.yaml")
-print(classes_path)
+
 classes = yaml.safe_load(open(classes_path))
 
 
-@retry(stop_max_attempt_number=3)
 def production():
     """Slotbooker Main Function."""
 
@@ -32,7 +31,6 @@ def production():
         class_dict=classes.get("class_dict"),
         enter_class=True,
     )
-
     # Send results via email
     booker.send_result(
         sender=os.getenv("EMAIL_SENDER"),
@@ -42,12 +40,6 @@ def production():
         attach_logfile=True,
         send_mail=["on_failure", "on_neutral"],  # Set to False for testing
     )
-
-    # Close the Booker instance
-    booker.close()
-    logging.info(
-        "Slotbooker completed successfully."
-    )  # TODO: correct logging output if fails
 
 
 def development(ci_run=False):
@@ -65,16 +57,15 @@ def development(ci_run=False):
         env=env,
     )
 
-    login_failed = booker.login(username=user, password=password)
-    if login_failed:
+    login_successfull = booker.login(username=user, password=password)
+    if not login_successfull:
         logging.info("TEST OK | Login failed as expected")
         print("TEST OK | Login failed as expected")
     else:
         booker.switch_day()
 
-        success, _, _ = booker.book_class(
+        booker.book_class(
             class_dict=classes.get("class_dict"),
-            # booking_action=classes.get("book_class"),
         )
 
         # Configure mailing settings && send mail
@@ -86,8 +77,6 @@ def development(ci_run=False):
         #     attach_logfile=True,
         #     send_mail=["on_failure", "on_neutral"],  # Set to False for testing
         # )
-
-        # booker.close()
 
 
 def main():
