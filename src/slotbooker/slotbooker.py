@@ -137,7 +137,8 @@ class Booker:
             logging.info(f"Booking on {self.day}, {future_date}")
         except Exception as e:
             logging.error(f"! Error during day switch: {e}")
-            # TODO: make script fail if day switch fails
+            self.__stop_booking()
+            raise e
 
         self.booking_information.update(
             {"current_date": f"{self.day}, {future_date.strftime('%d/%m/%Y')}"}
