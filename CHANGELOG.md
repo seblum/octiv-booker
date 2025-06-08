@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.8.1](https://github.com/seblum/octiv-booker/compare/v2.8.0...v2.8.1) (2025-06-08)
+
+
+### Bug Fixes
+
+* update version update cd ([#101](https://github.com/seblum/octiv-booker/issues/101)) ([edbbeab](https://github.com/seblum/octiv-booker/commit/edbbeab123d406023fc921afbbf7afe0c5baa452))
+
 ## [2.8.0](https://github.com/seblum/octiv-booker/compare/v2.7.1...v2.8.0) (2025-06-08)
 
 
