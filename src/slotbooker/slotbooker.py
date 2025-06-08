@@ -43,14 +43,11 @@ class Booker:
         base_url: str,
         chromedriver: str = None,  # defaults to None, will use the default chromedriver path: "/usr/local/bin/chromedriver"
         env: str = "prd",
-        logfile_name: str = "booker.txt",
     ):
         self.base_url = base_url
         self.selenium_manager = SeleniumManager(chromedriver, env)
 
-        self.loggingHandler = LogHandler(
-            log_level=logging.INFO, logfile_name=logfile_name
-        )
+        self.loggingHandler = LogHandler(log_level=logging.INFO)
         self.mail_handler = None
         self.class_dict = None
         self.day = None

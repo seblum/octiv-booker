@@ -2,21 +2,15 @@ import os
 import logging
 import yaml
 from .slotbooker import Booker
-from tenacity import retry, stop_after_attempt
 
 
 # Define file paths for configuration and classes
 parent_dir = os.path.dirname(os.path.dirname(__file__))
 classes_path = os.path.join(parent_dir, "data/classes.yaml")
-print(classes_path)
+
 classes = yaml.safe_load(open(classes_path))
 
 
-@retry(
-    stop=stop_after_attempt(3),
-    before=lambda retry_state: print(f"Attempt #{retry_state.attempt_number}"),
-    reraise=False,  # Do not raise RetryError
-)
 def production():
     """Slotbooker Main Function."""
 
@@ -33,14 +27,10 @@ def production():
     booker.login(username=user, password=password)
 
     booker.switch_day()
-    result = booker.book_class(
+    booker.book_class(
         class_dict=classes.get("class_dict"),
         enter_class=True,
     )
-    if not result:
-        raise ValueError(
-            f"Booking failed for class: {classes.get('class_dict').get('name')}"
-        )
     # Send results via email
     booker.send_result(
         sender=os.getenv("EMAIL_SENDER"),
@@ -50,7 +40,6 @@ def production():
         attach_logfile=True,
         send_mail=["on_failure", "on_neutral"],  # Set to False for testing
     )
-    # TODO: make mailhander static
 
 
 def development(ci_run=False):
@@ -77,7 +66,6 @@ def development(ci_run=False):
 
         booker.book_class(
             class_dict=classes.get("class_dict"),
-            # booking_action=classes.get("book_class"),
         )
 
         # Configure mailing settings && send mail
@@ -89,8 +77,6 @@ def development(ci_run=False):
         #     attach_logfile=True,
         #     send_mail=["on_failure", "on_neutral"],  # Set to False for testing
         # )
-
-        # booker.close()
 
 
 def main():
