@@ -33,7 +33,7 @@ def update_docker_image_version(version: str, workflow_dirs=None):
 
         # Regex to find docker_image: octivbooker:v<version>
         docker_image_pattern = re.compile(
-            r"^(\s*docker_image:\s*octivbooker:)v[\d\.]+",
+            r"^(\s*docker_image:\s*octivbooker:)(v?)[\d\.]+",
             re.MULTILINE,
         )
 
@@ -44,7 +44,7 @@ def update_docker_image_version(version: str, workflow_dirs=None):
                 content = f.read()
 
             new_content, count = docker_image_pattern.subn(
-                rf"\1v{version}",
+                rf"\1{version}",
                 content,
             )
 
@@ -53,7 +53,7 @@ def update_docker_image_version(version: str, workflow_dirs=None):
             else:
                 with open(filepath, "w", encoding="utf-8") as f:
                     f.write(new_content)
-                print(f"Updated docker_image to octivbooker:v{version} in {filepath}")
+                print(f"Updated docker_image to octivbooker:{version} in {filepath}")
 
 
 if __name__ == "__main__":

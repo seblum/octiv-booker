@@ -1,4 +1,4 @@
-name: 📦 Build & 🐳 Deploy
+name: 📦🐳 Build & Deploy
 
 env:
   DOCKERREPO: seblum/octivbooker
@@ -103,9 +103,9 @@ jobs:
         name: 🏗️ Create new Branch
         run: |
           git fetch origin
-          git checkout -b update-runner-dockerversion-${{ env.TAG_VERSION }} origin/master
+          git checkout -b update-runner-dockerversion-v${{ env.TAG_VERSION }} origin/master
           git pull --rebase
-          git push origin update-runner-dockerversion-${{ env.TAG_VERSION }} --force
+          git push origin update-runner-dockerversion-v${{ env.TAG_VERSION }} --force
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - 
@@ -117,8 +117,8 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add .github/
-          git commit -m "Update DOCKER_IMAGE: to ${{ env.TAG_VERSION }}"
-          git push origin update-runner-dockerversion-${{ env.TAG_VERSION }}
+          git commit -m "Update DOCKER_IMAGE: to v${{ env.TAG_VERSION }}"
+          git push origin update-runner-dockerversion-v${{ env.TAG_VERSION }}
       - 
         name: ⚙️ Install GitHub CLI
         run: |
@@ -126,12 +126,12 @@ jobs:
       - 
         name: 🏗️ Create Pull Request
         run: |
-          PR_EXISTS=$(gh pr list --head update-runner-dockerversion-${{ env.TAG_VERSION }} --json number --jq '.[0].number' || echo "")
+          PR_EXISTS=$(gh pr list --head update-runner-dockerversion-v${{ env.TAG_VERSION }} --json number --jq '.[0].number' || echo "")
           if [ -z "$PR_EXISTS" ]; then
-            gh pr create --title "Bump runner-time.yml version to ${{ env.TAG_VERSION }}" \
-                          --body "This PR updates the version in runner-time.yml to ${{ env.TAG_VERSION }}." \
+            gh pr create --title "Bump runner-time.yml version to v${{ env.TAG_VERSION }}" \
+                          --body "This PR updates the version in runner-time.yml to v${{ env.TAG_VERSION }}." \
                           --base master \
-                          --head update-runner-dockerversion-${{ env.TAG_VERSION }}
+                          --head update-runner-dockerversion-v${{ env.TAG_VERSION }}
           else
             echo "PR already exists."
           fi
