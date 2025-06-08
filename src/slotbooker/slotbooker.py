@@ -56,13 +56,17 @@ class Booker:
         self.booking_successful = False
         self.booking_information = {"bookings": []}
 
-    def __return_bookings(self) -> (str, str, str):
-        """Return the booking information."""
-        return (
-            self.booking_successful,
-            self.booking_class_slot,
-            self.booking_time_slot,
-        )
+    def __continue_booking(self) -> bool:
+        """Continues the booking process."""
+        return True
+
+    def __stop_booking(self) -> bool:
+        """Stops the booking process."""
+        logging.info("! Stopping booking process")
+        self.selenium_manager.driver_is_initialialized()
+        self.selenium_manager.close_driver()
+        logging.info("WebDriver closed")
+        return False
 
     def login(self, username: str, password: str) -> bool:
         self.selenium_manager.driver_is_initialialized()
@@ -99,10 +103,10 @@ class Booker:
         )
 
         if stop_booking:
-            return self.__stop_booking_process()
+            return self.__stop_booking()
         else:
             logging.success("Login successful")
-            return not self.__stop_booking_process
+            return self.__continue_booking()
 
     def switch_day(self) -> (str, str):
         self.selenium_manager.driver_is_initialialized()
@@ -133,7 +137,8 @@ class Booker:
             logging.info(f"Booking on {self.day}, {future_date}")
         except Exception as e:
             logging.error(f"! Error during day switch: {e}")
-            # TODO: make script fail if day switch fails
+            self.__stop_booking()
+            raise e
 
         self.booking_information.update(
             {"current_date": f"{self.day}, {future_date.strftime('%d/%m/%Y')}"}
@@ -167,7 +172,8 @@ class Booker:
         for entry in self.class_dict:
             if entry.get("class") == "None":
                 logging.info("! No class set for this day.")
-                return self.__return_bookings()
+                self.booking_successful = False
+                return self.__stop_booking()
 
             self.booking_time_slot, self.booking_class_slot, prioritize_waiting_list = (
                 entry.get("time"),
@@ -180,7 +186,8 @@ class Booker:
 
             if not all_possible_booking_slots_dict:
                 logging.info("! No classes found overall for this day.")
-                return self.__return_bookings()
+                self.booking_successful = False
+                return self.__stop_booking()
 
             try:
                 button_xpath = all_possible_booking_slots_dict[self.booking_class_slot][
@@ -190,21 +197,17 @@ class Booker:
                     f"? Checking {self.booking_class_slot} at {self.booking_time_slot}..."
                 )
             except KeyError:
-                button_xpath = None
                 logging.info(
                     f"! No class of type {self.booking_class_slot} is present on {self.day} at {self.booking_time_slot}"
                 )
-
-            if not button_xpath:
-                logging.info(
-                    f"! No class {self.booking_class_slot} found for this day."
-                )
-                return self.__return_bookings()
+                self.booking_successful = False
+                return self.__stop_booking()
 
             if self._book_class_slot(button_xpath, prioritize_waiting_list):
-                return self.__return_bookings()
+                self.booking_successful = True
+                return self.__stop_booking()
 
-        return self.booking_successful, self.booking_class_slot, self.booking_time_slot
+        return self.__continue_booking()
 
     def _generate_bounding_box_class_dict(
         self,
@@ -285,11 +288,10 @@ class Booker:
 
         if stop_booking:
             logging.error("Booking process stopped due to an error.")
-            return self.__stop_booking_process()
+            return self.__continue_booking()
         else:
             logging.success("Class booked")
-            self.booking_successful = True
-            return self.__stop_booking_process
+            return self.__continue_booking()
 
     def send_result(
         self,
@@ -332,7 +334,9 @@ class Booker:
             and "on_neutral" in send_mail
         ):
             self.mail_handler.send_no_classes_email(
-                booking_date=self.booking_information["current_date"],
+                booking_date=self.booking_information[
+                    "current_date"
+                ],  # TODO: gotten from switch_day()
                 attachment_path=attachment_path,
             )
         elif "on_failure" in send_mail:
@@ -340,13 +344,3 @@ class Booker:
                 booking_information=self.booking_information,
                 attachment_path=attachment_path,
             )
-
-    def close(self):
-        """Closes the WebDriver."""
-        self.selenium_manager.driver_is_initialialized()
-        self.selenium_manager.close_driver()
-        logging.info("WebDriver closed")
-
-    def __stop_booking_process(self) -> bool:
-        self.close()
-        return True

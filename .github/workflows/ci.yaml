@@ -37,7 +37,7 @@ jobs:
       - 
         name: 👩‍🔬 Run tests
         run: |
-          poetry run coverage run -m pytest
+          poetry run coverage run -m pytest -v
           poetry run coverage report -m
       - 
         name: ✔️ Export coverage HTML
