@@ -56,6 +56,18 @@ class Booker:
         self.booking_successful = False
         self.booking_information = {"bookings": []}
 
+    def __continue_booking(self) -> bool:
+        """Continues the booking process."""
+        return True
+
+    def __stop_booking(self) -> bool:
+        """Stops the booking process."""
+        logging.info("! Stopping booking process")
+        self.selenium_manager.driver_is_initialialized()
+        self.selenium_manager.close_driver()
+        logging.info("WebDriver closed")
+        return False
+
     def login(self, username: str, password: str) -> bool:
         self.selenium_manager.driver_is_initialialized()
 
@@ -331,18 +343,3 @@ class Booker:
                 booking_information=self.booking_information,
                 attachment_path=attachment_path,
             )
-
-    def close(self):
-        """Closes the WebDriver."""
-        self.selenium_manager.driver_is_initialialized()
-        self.selenium_manager.close_driver()
-        logging.info("WebDriver closed")
-
-    def __continue_booking(self) -> bool:
-        return True
-
-    def __stop_booking(self) -> bool:
-        """Stops the booking process."""
-        logging.info("! Stopping booking process")
-        self.close()
-        return False
