@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.8.0](https://github.com/seblum/octiv-booker/compare/v2.7.1...v2.8.0) (2025-06-08)
+
+
+### Features
+
+* remove retry && add login tests ([#98](https://github.com/seblum/octiv-booker/issues/98)) ([7a81f20](https://github.com/seblum/octiv-booker/commit/7a81f201fe0149e8b73c1c84132442c40a23c599))
+
+
+### Bug Fixes
+
+* callable-runner.yaml ([#93](https://github.com/seblum/octiv-booker/issues/93)) ([d2ab43c](https://github.com/seblum/octiv-booker/commit/d2ab43cc7aee119b3973f58bbbf2957f401ad5ed))
+* list data dirs ([#95](https://github.com/seblum/octiv-booker/issues/95)) ([49e2d38](https://github.com/seblum/octiv-booker/commit/49e2d38c4ee07e8eec937ab034fd52d5ee8f6f15))
+* versioning in runner ([#96](https://github.com/seblum/octiv-booker/issues/96)) ([34f344f](https://github.com/seblum/octiv-booker/commit/34f344f54cf99f1fc47cee428bbd71e2bc992656))
+
 ## [2.7.1](https://github.com/seblum/octiv-booker/compare/v2.7.0...v2.7.1) (2025-06-07)
 
 
