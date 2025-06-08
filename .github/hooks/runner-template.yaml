@@ -16,5 +16,5 @@ jobs:
       EMAIL_RECEIVER: ${{{{ secrets.EMAIL_RECEIVER }}}}
       EMAIL_RECEIVER_NAME: ${{{{ secrets.EMAIL_RECEIVER_NAME }}}}
     with:
-      docker_image: octivbooker:v2.7.1
+      docker_image: octivbooker:v2.8.1
       time: "{time}"
