@@ -178,3 +178,4 @@ registry.terraform.io
 .DS_Store
 
 **/commands.md
+.vscode/*
