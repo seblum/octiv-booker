@@ -1,42 +1,7 @@
 from unittest.mock import patch, MagicMock
 from datetime import datetime
 from slotbooker.slotbooker import Booker  # Update import as per your actual structure
-
-
-@patch("slotbooker.slotbooker.get_day")
-@patch("slotbooker.slotbooker.XPath")
-@patch("slotbooker.slotbooker.SeleniumManager")
-def test_switch_day(mock_selenium_manager, mock_xpath, mock_get_day, monkeypatch):
-    # Setup mock environment
-    monkeypatch.setenv("DAYS_BEFORE_BOOKABLE", "3")
-
-    mock_selenium = MagicMock()
-    mock_selenium.driver_is_initialialized.return_value = True
-    mock_selenium.click_button.return_value = None
-    mock_selenium_manager.return_value = mock_selenium
-
-    # Setup get_day to return a known day
-    test_date = datetime(2025, 6, 10)  # Let's say it's a Tuesday
-    mock_get_day.return_value = (test_date, 2)
-
-    # Mock XPath methods
-    mock_xpath.switch_week_button.return_value = "xpath_to_week_button"
-    mock_xpath.weekday_button.return_value = "xpath_to_tuesday_button"
-
-    # Instantiate Booker and run switch_day
-    booker = Booker(base_url="http://example.com")
-    day, date_str = booker.switch_day()
-
-    # Assertions
-    assert day == "Tuesday"
-    assert date_str == "10/06/2025"
-    assert booker.day == "Tuesday"
-    assert booker.booking_information["current_date"] == "Tuesday, 10/06/2025"
-
-    # Check that switching weeks happened
-    assert mock_selenium.click_button.call_count == 3  # 2 for week switch, 1 for day
-    mock_selenium.click_button.assert_any_call("xpath_to_week_button")
-    mock_selenium.click_button.assert_any_call("xpath_to_tuesday_button")
+import pytest
 
 
 @patch("slotbooker.slotbooker.XPath")
@@ -98,3 +63,62 @@ def test_login_triggers_stop_booking(
         result = booker.login("testuser", "testpass")
         assert result is False
         mock_stop.assert_called_once()
+
+
+@patch("slotbooker.slotbooker.get_day")
+@patch("slotbooker.slotbooker.XPath")
+@patch("slotbooker.slotbooker.os.environ", {"DAYS_BEFORE_BOOKABLE": "3"})
+def test_switch_day_success(mock_xpath, mock_get_day):
+    # Arrange mocks
+    mock_xpath.switch_week_button.return_value = "xpath_switch_week"
+    mock_xpath.weekday_button.return_value = "xpath_day_button"
+    mock_get_day.return_value = (datetime(2025, 6, 10), 2)  # Tuesday, 2 weeks diff
+
+    booker = Booker(base_url="http://example.com")
+    booker.selenium_manager = MagicMock()
+    booker.selenium_manager.driver_is_initialialized.return_value = True
+    booker.selenium_manager.click_button.return_value = None
+
+    # Act
+    day, date_str = booker.switch_day()
+
+    # Assert
+    assert day == "Tuesday"
+    assert date_str == "10/06/2025"
+    assert booker.day == "Tuesday"
+    assert booker.booking_information["current_date"] == "Tuesday, 10/06/2025"
+
+    # Should call click_button 2 times for weeks and once for the day
+    assert booker.selenium_manager.click_button.call_count == 3
+    booker.selenium_manager.click_button.assert_any_call("xpath_switch_week")
+    booker.selenium_manager.click_button.assert_any_call("xpath_day_button")
+
+
+@patch("slotbooker.slotbooker.get_day")
+@patch("slotbooker.slotbooker.XPath")
+def test_switch_day_raises_exception_and_calls_stop_booking(mock_xpath, mock_get_day):
+    mock_get_day.return_value = (datetime(2025, 6, 10), 1)
+    mock_xpath.switch_week_button.return_value = "xpath_switch_week"
+    mock_xpath.weekday_button.return_value = "xpath_day_button"
+
+    booker = Booker(base_url="http://example.com")
+    booker.selenium_manager = MagicMock()
+    booker.selenium_manager.driver_is_initialialized.return_value = True
+
+    # Simulate exception on click_button when clicking the weekday button
+    def click_button_side_effect(arg):
+        if arg == "xpath_day_button":
+            raise Exception("Click failed")
+        return None
+
+    booker.selenium_manager.click_button.side_effect = click_button_side_effect
+
+    # Patch __stop_booking method to spy on it
+    with patch.object(
+        booker, "_Booker__stop_booking", wraps=booker._Booker__stop_booking
+    ) as mock_stop_booking:
+        with pytest.raises(Exception) as excinfo:
+            booker.switch_day()
+
+        assert "Click failed" in str(excinfo.value)
+        mock_stop_booking.assert_called_once()
