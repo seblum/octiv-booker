@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.8.2](https://github.com/seblum/octiv-booker/compare/v2.8.1...v2.8.2) (2025-06-09)
+
+
+### Bug Fixes
+
+* send mail on neutral ([#104](https://github.com/seblum/octiv-booker/issues/104)) ([c105f0b](https://github.com/seblum/octiv-booker/commit/c105f0bc5272dbe3a761fbb863adb7da3d3177e9))
+
 ## [2.8.1](https://github.com/seblum/octiv-booker/compare/v2.8.0...v2.8.1) (2025-06-08)
 
 
