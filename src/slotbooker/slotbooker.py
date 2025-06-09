@@ -10,10 +10,17 @@ from .utils.selenium_manager import SeleniumManager
 from .utils.helpers import get_day
 from slotbooker.utils.xpaths import XPath
 import os
+from enum import Enum, auto
 
 # Set up custom logger
 logging.setLoggerClass(CustomLogger)
 logger = logging.getLogger(__name__)
+
+
+class BookingState(Enum):
+    SUCCESS = auto()
+    FAIL = auto()
+    NEUTRAL = auto()
 
 
 class Booker:
@@ -53,7 +60,7 @@ class Booker:
         self.day = None
         self.booking_class_slot = None
         self.booking_time_slot = None
-        self.booking_successful = False
+        self.booking_successful = BookingState.FAIL
         self.booking_information = {"bookings": []}
 
     def __continue_booking(self) -> bool:
@@ -63,10 +70,12 @@ class Booker:
     def __stop_booking(self) -> bool:
         """Stops the booking process."""
         logging.info("! Stopping booking process")
+        return False
+
+    def close_driver(self) -> None:
         self.selenium_manager.driver_is_initialialized()
         self.selenium_manager.close_driver()
         logging.info("WebDriver closed")
-        return False
 
     def login(self, username: str, password: str) -> bool:
         self.selenium_manager.driver_is_initialialized()
@@ -153,6 +162,12 @@ class Booker:
         self.selenium_manager.driver_is_initialialized()
 
         logging.info(f"{'Booking' if enter_class else 'Cancelling'} classes...")
+        execution_booking_time = os.environ.get(
+            "EXECUTION_BOOKING_TIME", "00:00:00.000000"
+        )
+        logging.info(
+            f"Execution booking time set to {execution_booking_time} (HH:MM:SS.mmmmmm)"
+        )
 
         self.class_dict = class_dict.get(self.day)
 
@@ -172,7 +187,7 @@ class Booker:
         for entry in self.class_dict:
             if entry.get("class") == "None":
                 logging.info("! No class set for this day.")
-                self.booking_successful = False
+                self.booking_successful = BookingState.NEUTRAL
                 return self.__stop_booking()
 
             self.booking_time_slot, self.booking_class_slot, prioritize_waiting_list = (
@@ -186,7 +201,7 @@ class Booker:
 
             if not all_possible_booking_slots_dict:
                 logging.info("! No classes found overall for this day.")
-                self.booking_successful = False
+                self.booking_successful = BookingState.FAIL
                 return self.__stop_booking()
 
             try:
@@ -200,11 +215,13 @@ class Booker:
                 logging.info(
                     f"! No class of type {self.booking_class_slot} is present on {self.day} at {self.booking_time_slot}"
                 )
-                self.booking_successful = False
+                self.booking_successful = BookingState.FAIL
                 return self.__stop_booking()
 
-            if self._book_class_slot(button_xpath, prioritize_waiting_list):
-                self.booking_successful = True
+            if self._book_class_slot(
+                button_xpath, prioritize_waiting_list, execution_booking_time
+            ):
+                self.booking_successful = BookingState.SUCCESS
                 return self.__stop_booking()
 
         return self.__continue_booking()
@@ -255,16 +272,10 @@ class Booker:
         self,
         button_xpath: str,
         prioritize_waiting_list: bool,
+        execution_booking_time: str = "00:00:00.000000",
     ) -> bool:
         """Book a specific class slot."""
         logging.info(f"> Booking {self.booking_class_slot} at {self.booking_time_slot}")
-
-        execution_booking_time = os.environ.get(
-            "EXECUTION_BOOKING_TIME", "00:00:00.000000"
-        )
-        logging.info(
-            f"Execution booking time set to {execution_booking_time} (HH:MM:SS.mmmmmm)"
-        )
 
         # self._click_book_button(button_xpath)
         element = self.selenium_manager.find_element(xpath=button_xpath)
@@ -288,7 +299,7 @@ class Booker:
 
         if stop_booking:
             logging.error("Booking process stopped due to an error.")
-            return self.__continue_booking()
+            return self.__stop_booking()
         else:
             logging.success("Class booked")
             return self.__continue_booking()
@@ -299,18 +310,23 @@ class Booker:
         password: str,
         receiver: str,
         format: str = "plain",
-        attach_logfile=False,
-        send_mail: list = ["on_success", "on_failure", "on_neutral"],
+        attach_logfile: bool = False,
+        send_mail: list[str] = None,
     ) -> None:
         """
-        Configure email settings for sending notifications.
+        Configure and send booking result notification via email.
 
         Args:
-            sender (str): The email address of the sender.
-            password (str): The password of the sender's email account.
-            receiver (str): The email address of the receiver.
-            format (str): The format of the email body ("plain" or "html").
+            sender (str): Sender's email address.
+            password (str): Sender's email password.
+            receiver (str): Receiver's email address.
+            format (str): Email format, "plain" or "html".
+            attach_logfile (bool): Whether to attach a log file.
+            send_mail (list): Which types of emails to send ("on_success", "on_failure", "on_neutral").
         """
+        if send_mail is None:
+            send_mail = ["on_success", "on_failure", "on_neutral"]
+
         self.mail_handler = MailHandler(
             email_sender=sender,
             email_password=password,
@@ -318,29 +334,50 @@ class Booker:
             format=format,
         )
 
-        attachment_path = None
-        if attach_logfile:
-            attachment_path = self.loggingHandler.get_log_file_path()
+        attachment_path = (
+            self.loggingHandler.get_log_file_path() if attach_logfile else None
+        )
 
-        if self.booking_successful and "on_success" in send_mail:
+        def handle_success():
             self.mail_handler.send_successful_booking_email(
                 booking_information=self.booking_information,
                 attachment_path=attachment_path,
             )
             logging.success(f"Booked successfully {self.booking_class_slot}")
-        elif (
-            self.booking_successful is False
-            and self.booking_class_slot is None
-            and "on_neutral" in send_mail
-        ):
+
+        def handle_neutral():
             self.mail_handler.send_no_classes_email(
-                booking_date=self.booking_information[
-                    "current_date"
-                ],  # TODO: gotten from switch_day()
+                booking_date=self.booking_information["current_date"],
                 attachment_path=attachment_path,
             )
-        elif "on_failure" in send_mail:
+
+        def handle_failure():
             self.mail_handler.send_unsuccessful_booking_email(
                 booking_information=self.booking_information,
                 attachment_path=attachment_path,
             )
+
+        handlers = [
+            (
+                self.booking_successful == BookingState.SUCCESS
+                and "on_success" in send_mail,
+                handle_success,
+            ),
+            (
+                self.booking_successful == BookingState.NEUTRAL
+                and "on_neutral" in send_mail,
+                handle_neutral,
+            ),
+            (
+                self.booking_successful == BookingState.FAIL
+                and "on_failure" in send_mail,
+                handle_failure,
+            ),
+        ]
+
+        self.close_driver()
+        # Dispatch table with conditions in priority order
+        for condition, handler in handlers:
+            if condition:
+                handler()
+                break

@@ -68,7 +68,7 @@ def development(ci_run=False):
             class_dict=classes.get("class_dict"),
         )
 
-        # Configure mailing settings && send mail
+        # # Configure mailing settings && send mail
         # booker.send_result(
         #     sender=os.getenv("EMAIL_SENDER"),
         #     password=os.getenv("EMAIL_PASSWORD"),
