@@ -108,21 +108,32 @@ jobs:
           git push origin update-runner-dockerversion-v${{ env.TAG_VERSION }} --force
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
       - 
         name: 🔄 Run update script
         run: python .github/scripts/update_runner_docker_version.py "v${{ env.TAG_VERSION }}"
+        shell: bash
       - 
         name: ⚙️ Commit changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
           git add .github/
-          git commit -m "Update DOCKER_IMAGE: to v${{ env.TAG_VERSION }}"
-          git push origin update-runner-dockerversion-v${{ env.TAG_VERSION }}
+
+          # Only commit if there are changes
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update DOCKER_IMAGE: to v${{ env.TAG_VERSION }}"
+            git push origin update-runner-dockerversion-v${{ env.TAG_VERSION }}
+          fi
+        shell: bash
       - 
         name: ⚙️ Install GitHub CLI
         run: |
           sudo apt-get install gh
+        shell: bash
       - 
         name: 🏗️ Create Pull Request
         run: |
@@ -137,4 +148,5 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
         
