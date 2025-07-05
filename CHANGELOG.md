@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.8.3](https://github.com/seblum/octiv-booker/compare/v2.8.2...v2.8.3) (2025-07-05)
+
+
+### Bug Fixes
+
+* only send on failure ([#110](https://github.com/seblum/octiv-booker/issues/110)) ([91b986e](https://github.com/seblum/octiv-booker/commit/91b986e4a9d12f21c665fd7f05428255106f9f44))
+
 ## [2.8.2](https://github.com/seblum/octiv-booker/compare/v2.8.1...v2.8.2) (2025-06-09)
 
 
