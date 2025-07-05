@@ -38,7 +38,7 @@ def production():
         receiver=os.getenv("EMAIL_RECEIVER"),
         format="html",
         attach_logfile=True,
-        send_mail=["on_failure", "on_neutral"],  # Set to False for testing
+        send_mail=["on_failure"],  # Set to False for testing
     )
 
 
